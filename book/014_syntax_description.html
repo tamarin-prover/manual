@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamarin Prover Manual</title>
+    <link rel="stylesheet" type="text/css" href="book.css">
+    <script src="book.js"></script>
+    <link rel="stylesheet" href="styles/github.css">
+<!--    <script src="highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+-->
+    </head>
+<body class="tamarindoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+  <div id="nav">
+    <button id="toggle-nav">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    </button>
+  </div>
+  <div id='toc' class='mobile-hidden'>
+  <ul class='chapter'>
+<!-- <li><a href='000_prelims.html'                    ><b>0. </b>Preliminaries</a></li> -->
+<li><a href='001_introduction.html'               ><b>1. </b> Introduction</a></li>
+<li><a href='002_installation.html'               ><b>2. </b> Installation</a></li>
+<li><a href='003_example.html'                    ><b>3. </b> First Example</a></li>
+<li><a href='004_cryptographic-messages.html'     ><b>4. </b> Cryptographic Messages</a></li>
+<li><a href='005_protocol-specification.html'     ><b>5. </b> Protocol Specification</a></li>
+<li><a href='006_property-specification.html'     ><b>6. </b> Property Specification</a></li>
+<li><a href='007_precomputation.html'             ><b>7. </b> Precomputation</a></li>
+<li><a href='008_modeling-issues.html'            ><b>8. </b> Modeling Issues</a></li>
+<li><a href='009_advanced-features.html'          ><b>9. </b> Advanced Features</a></li>
+<li><a href='010_case-studies.html'               ><b>10.</b> Case Studies</a></li>
+<li><a href='011_toolchains.html'                 ><b>11.</b> Toolchains</a></li>
+<li><a href='012_limitations.html'                ><b>12.</b> Limitations</a></li>
+<li><a href='013_contact-and-further-reading.html'><b>13.</b> Contact Information and Further Reading</a></li>
+<li><a href='014_syntax_description.html'         ><b>14.</b> Syntax Description</a></li>
+  </ul>
+  </div>
+  <div id='page-wrapper'>
+    <div id='page'>
+<p class="halfbreak">
+</p>
+<h1 id="syntax-description"><a href="#syntax-description">Syntax Description</a></h1>
+<p>Here, we explain the formal syntax of the security protocol theory format that is processed by Tamarin.</p>
+<p>Comments are C-style:</p>
+<pre><code>/* for a multi-line comment */
+// for a line-comment</code></pre>
+<p>All security protocol theory are named and delimited by 'begin' and 'end'. We explain the non-terminals of the body in the following paragraphs.</p>
+<pre><code>security_protocol_theory := &#39;theory&#39; ident &#39;begin&#39; body &#39;end&#39;
+body := (signature_spec | rule | axiom | lemma | formal_comment)+</code></pre>
+<p>Here, we use the term signature more liberally to denote both the defined function symbols and the equalities describing their interaction. Note that our parser is stateful and remembers what functions have been defined. It will only parse function applications of defined functions.</p>
+<pre><code>signature_spec := functions | equations | built_in
+functions      := &#39;functions&#39; &#39;:&#39; (ident &#39;/&#39; arity) list
+equations      := &#39;equations&#39; &#39;:&#39; (term &#39;=&#39; term) list
+arity          := digit+</code></pre>
+<p>Note that the equations must be subterm-convergent. Tamarin provides built-in sets of function definitions and subterm convergent equations. They are expanded upon parsing and you can therefore inspect them by pretty printing the file using 'tamarin-prover your_file.spthy'. The built-in 'diffie-hellman' is special. It refers to the equations given in Section <a href="004_cryptographic-messages.html#equational-theories">Cryptographic Messages</a>. You need to enable it to parse terms containing exponentiations, e.g., g ^ x.</p>
+<pre><code>built_in       := &#39;builtins&#39; &#39;:&#39; built_ins list
+built_ins      := &#39;diffie-hellman&#39;
+                | &#39;hashing&#39; | &#39;symmetric-encryption&#39;
+                | &#39;asymmetric-encryption&#39; | &#39;signing&#39;</code></pre>
+<p>Multiset rewriting rules are specified as follows. The protocol corresponding to a security protocol theory is the set of all multiset rewriting rules specified in the body of the theory.</p>
+<pre><code>rule := &#39;rule&#39; ident &#39;:&#39;
+        [let_block]
+        &#39;[&#39; facts &#39;]&#39; ( &#39;--&gt;&#39; | &#39;--[&#39; facts &#39;]-&gt;&#39;) &#39;[&#39; facts &#39;]&#39;
+
+let_block := &#39;let&#39; (ident &#39;=&#39; term)+ &#39;in&#39;</code></pre>
+<p>The let-block allows more succinct specifications. The equations are applied in a bottom-up fashion. For example,</p>
+<pre><code>let x = y
+    y = &lt;z,x&gt;
+in [] --&gt; [ A(y)]    is desugared to    [] --&gt; [ A(&lt;z,y&gt;) ]</code></pre>
+<p>This becomes a lot less confusing if you keep the set of variables on the left-hand side separate from the free variables on the right-hand side.</p>
+<p>Axioms specify restrictions on the set of traces considered, i.e., they filter the set of traces of a protocol. The formula of an axiom is available as an assumption in the proofs of <em>all</em> security properties specified in this security protocol theory.</p>
+<pre><code>axiom := &#39;axiom&#39; ident &#39;:&#39; &#39;&quot;&#39; formula &#39;&quot;&#39;</code></pre>
+<p>In observational equivalence mode, axioms can be associated to one side.</p>
+<pre><code>axiom := &#39;axiom&#39; ident [axiom_attrs] &#39;:&#39; &#39;&quot;&#39; formula &#39;&quot;&#39;
+axiom_attrs      := &#39;[&#39; (&#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
+<p>Lemmas specify security properties. By default, the given formula is interpreted as a property that must hold for all traces of the protocol of the security protocol theory. You can change this using the 'exists-trace' trace quantifier.</p>
+<pre><code>lemma := &#39;lemma&#39; ident [lemma_attrs] &#39;:&#39;
+         [trace_quantifier]
+         &#39;&quot;&#39; formula &#39;&quot;&#39;
+         proof
+lemma_attrs      := &#39;[&#39; (&#39;typing&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
+                         &#39;hide_lemma=&#39; ident) &#39;]&#39;
+trace_quantifier := &#39;all-traces&#39; | &#39;exists-trace&#39;
+proof            := ... a proof as output by the Tamarin prover ..</code></pre>
+<p>In observational equivalence mode, lemmas can be associated to one side.</p>
+<pre><code>lemma_attrs      := &#39;[&#39; (&#39;typing&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
+                         &#39;hide_lemma=&#39; ident | &#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
+<p>Formal comments are used to make the input more readable. In contrast to /<em>...</em>/ and //... comments, formal comments are stored and output again when pretty-printing a security protocol theory.</p>
+<pre><code>formal_comment := ident &#39;{*&#39; ident* &#39;*}&#39;</code></pre>
+<p>For the syntax of terms, you best look at our examples. A common pitfall is to use an undefined function symbol. This results in an error message pointing to a position slightly before the actual use of the function due to some ambiguity in the grammar.</p>
+<p>We provide special syntax for tuples, multiplications, exponentiation, nullary and binary function symbols. An n-ary tuple <t1,...,tn> is parsed as n-ary, right-associative application of pairing. Multiplication and exponentiation are parsed left-associatively. For a binary operator 'enc' you can write 'enc{m}k' or 'enc(m,k)'. For nullary function symbols, there is no need to write 'nullary()'. Note that the number of arguments of an n-ary function application must agree with the arity given in the function definition.</p>
+<pre><code>tupleterm := multterm list
+multterm  := expterm (&#39;*&#39; expterm)*
+expterm   := term    (&#39;^&#39; term   )*
+term      := &#39;&lt;&#39; tupleterm &#39;&gt;&#39;     // n-ary right-associative pairing
+           | &#39;(&#39; multterm &#39;)&#39;      // a nested term
+           | nullary_fun
+           | binary_app
+           | nary_app
+           | literal
+
+nullary_fun := &lt;all-nullary-functions-defined-up-to-here&gt;
+binary_app  := binary_fun &#39;{&#39; tupleterm &#39;}&#39; term
+binary_fun  := &lt;all-binary-functions-defined-up-to-here&gt;
+nary_app    := nary_fun &#39;(&#39; multterm* &#39;)&#39;
+
+literal := &quot;&#39;&quot;  ident &quot;&#39;&quot;      // a fixed, public name
+         | &#39;$&#39;  ident          // a variable of sort &#39;pub&#39;
+         | &quot;~&#39;&quot; ident &quot;&#39;&quot;      // a fixed, fresh name
+         | &quot;~&quot;  ident          // a variable of sort &#39;fresh&#39;
+         | &quot;#&quot;  ident          // a variable of sort &#39;temp&#39;
+         | ident               // a variable of sort &#39;msg&#39;</code></pre>
+<p>Facts do not have to be defined up-front. This will probably change once we implement user-defined sorts. Facts prefixed with '!' are persistent facts. All other facts are linear. There are six reserved fact symbols: In, Out, KU, KD, and K. KU and KD facts are used for construction and deconstruction rules. KU-facts also log the messages deduced by construction rules. Note that KU-facts have arity 2. Their first argument is used to track the exponentiation tags. See the 'loops/Crypto_API_Simple.spthy' example for more information.</p>
+<pre><code>facts := fact list
+fact := [&#39;!&#39;] ident &#39;(&#39; multterm list &#39;)&#39;</code></pre>
+<p>Formulas are trace formulas as described previously. Note that we are a bit more liberal with respect to guardedness. We accept a conjunction of atoms as guards.</p>
+<pre><code>formula   := atom | &#39;(&#39; iff &#39;)&#39; | ( &#39;All&#39; | &#39;Ex&#39; ) ident+ &#39;.&#39; iff
+iff       := imp &#39;&lt;=&gt;&#39; imp
+imp       := disjuncts &#39;==&gt;&#39; disjuncts
+disjuncts := conjuncts (&#39;|&#39; disjuncts)+  // left-associative
+conjuncts := negation  (&#39;|&#39; conjuncts)+  // left-associative
+negation  := &#39;not&#39; formula
+
+atom := tvar &#39;&lt;&#39; tvar              // ordering of temporal variables
+      | &#39;#&#39; ident &#39;=&#39; &#39;#&#39; ident    // equality between temporal variables
+      | multterm  &#39;=&#39; multterm     // equality between terms
+      | fact &#39;@&#39; tvar              // action
+      | &#39;T&#39;                        // true
+      | &#39;F&#39;                        // false
+      | &#39;(&#39; formula &#39;)&#39;            // nested formula
+
+// Where unambiguous the &#39;#&#39; sort prefix can be dropped.
+tvar := [&#39;#&#39;] ident</code></pre>
+<p>Identifiers always start with a character. Moreover, they must not be one of the reserved keywords 'let', 'in', or 'rule'.</p>
+<pre><code>ident := alpha (alpha | digit)*</code></pre>
+<div class="references">
+
+</div>
+    </div>
+  </div>
+</body>
+</html>

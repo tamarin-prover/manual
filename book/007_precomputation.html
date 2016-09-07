@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamarin Prover Manual</title>
+    <link rel="stylesheet" type="text/css" href="book.css">
+    <script src="book.js"></script>
+    <link rel="stylesheet" href="styles/github.css">
+<!--    <script src="highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+-->
+    </head>
+<body class="tamarindoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+  <div id="nav">
+    <button id="toggle-nav">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    </button>
+  </div>
+  <div id='toc' class='mobile-hidden'>
+  <ul class='chapter'>
+<!-- <li><a href='000_prelims.html'                    ><b>0. </b>Preliminaries</a></li> -->
+<li><a href='001_introduction.html'               ><b>1. </b> Introduction</a></li>
+<li><a href='002_installation.html'               ><b>2. </b> Installation</a></li>
+<li><a href='003_example.html'                    ><b>3. </b> First Example</a></li>
+<li><a href='004_cryptographic-messages.html'     ><b>4. </b> Cryptographic Messages</a></li>
+<li><a href='005_protocol-specification.html'     ><b>5. </b> Protocol Specification</a></li>
+<li><a href='006_property-specification.html'     ><b>6. </b> Property Specification</a></li>
+<li><a href='007_precomputation.html'             ><b>7. </b> Precomputation</a></li>
+<li><a href='008_modeling-issues.html'            ><b>8. </b> Modeling Issues</a></li>
+<li><a href='009_advanced-features.html'          ><b>9. </b> Advanced Features</a></li>
+<li><a href='010_case-studies.html'               ><b>10.</b> Case Studies</a></li>
+<li><a href='011_toolchains.html'                 ><b>11.</b> Toolchains</a></li>
+<li><a href='012_limitations.html'                ><b>12.</b> Limitations</a></li>
+<li><a href='013_contact-and-further-reading.html'><b>13.</b> Contact Information and Further Reading</a></li>
+<li><a href='014_syntax_description.html'         ><b>14.</b> Syntax Description</a></li>
+  </ul>
+  </div>
+  <div id='page-wrapper'>
+    <div id='page'>
+<p class="halfbreak">
+</p>
+<h1 id="sec:precomputation"><a href="#sec:precomputation">Precomputation</a></h1>
+<p>In this section, we will explain some of the aspects of the precomputation performed by Tamarin. This is relevant for users that model complex protocols since they may at some point run into so-called <a href="#sec:openchains">open chains</a>, which can be problematic for verification.</p>
+<p>To illustrate the concepts, consider the example of the Needham-Schroeder-Lowe Public Key Protocol, given here in Alice&amp;Bob notation:</p>
+<pre class="tamarin"><code>  protocol NSLPK3 {
+    1. I -&gt; R: {&#39;1&#39;,ni,I}pk(R)
+    2. I &lt;- R: {&#39;2&#39;,ni,nr,R}pk(I)
+    3. I -&gt; R: {&#39;3&#39;,nr}pk(R)
+
+  }</code></pre>
+<p>It is specified in Tamarin by the following rules:</p>
+<pre class="tamarin"><code>rule Register_pk:
+  [ Fr(~ltkA) ]
+  --&gt;
+  [ !Ltk($A, ~ltkA), !Pk($A, pk(~ltkA)), Out(pk(~ltkA)) ]
+
+rule Reveal_ltk:
+  [ !Ltk(A, ltkA) ] --[ RevLtk(A)    ]-&gt; [ Out(ltkA) ]
+
+rule I_1:
+  let m1 = aenc{&#39;1&#39;, ~ni, $I}pkR
+  in
+    [ Fr(~ni), !Pk($R, pkR) ]
+  --[ OUT_I_1(m1)]-&gt;
+    [ Out( m1 ), St_I_1($I, $R, ~ni)]
+
+rule R_1:
+  let m1 = aenc{&#39;1&#39;, ni, I}pk(ltkR)
+      m2 = aenc{&#39;2&#39;, ni, ~nr, $R}pkI
+  in
+    [ !Ltk($R, ltkR), In( m1 ), !Pk(I, pkI), Fr(~nr)]
+  --[ IN_R_1_ni( ni, m1 ), OUT_R_1( m2 ), Running(I, $R, &lt;&#39;init&#39;,ni,~nr&gt;)]-&gt;
+    [ Out( m2 ), St_R_1($R, I, ni, ~nr) ]
+
+rule I_2:
+  let m2 = aenc{&#39;2&#39;, ni, nr, R}pk(ltkI)
+      m3 = aenc{&#39;3&#39;, nr}pkR
+  in
+    [ St_I_1(I, R, ni), !Ltk(I, ltkI), In( m2 ), !Pk(R, pkR) ]
+  --[ IN_I_2_nr( nr, m2), Commit(I, R, &lt;&#39;init&#39;,ni,nr&gt;), Running(R, I, &lt;&#39;resp&#39;,ni,nr&gt;) ]-&gt;
+    [ Out( m3 ), Secret(I,R,nr), Secret(I,R,ni) ]
+
+rule R_2:
+    [ St_R_1(R, I, ni, nr), !Ltk(R, ltkR), In( aenc{&#39;3&#39;, nr}pk(ltkR) ) ]
+  --[ Commit(R, I, &lt;&#39;resp&#39;,ni,nr&gt;)]-&gt;
+    [ Secret(R,I,nr), Secret(R,I,ni)    ]
+
+rule Secrecy_claim:
+  [ Secret(A, B, m) ] --[ Secret(A, B, m) ]-&gt; []
+
+</code></pre>
+<p>We now want to prove the following lemma:</p>
+<pre class="tamarin"><code>
+lemma nonce_secrecy:
+  &quot; /* It cannot be that */
+    not(
+        Ex A B s #i.
+          /* somebody claims to have setup a shared secret, */
+          Secret(A, B, s) @ i
+          /* but the adversary knows it */
+        &amp; (Ex #j. K(s) @ j)
+          /* without having performed a long-term key reveal. */
+        &amp; not (Ex #r. RevLtk(A) @ r)
+        &amp; not (Ex #r. RevLtk(B) @ r)
+       )&quot;
+</code></pre>
+<p>This proof attempt will not terminate due to there being <code>12 chains left</code> when looking at this example in the GUI as described in detail below.</p>
+<h2 id="sec:openchains"><a href="#sec:openchains">Open Chains</a></h2>
+<p>In the precomputation phase, Tamarin goes through all rules and inspects their premises. For each of these facts, Tamarin will precompute a set of possible <em>sources</em>. Each such source is called a <em>chain</em> and represents combinations of rules from which the fact could be obtained. For each fact, this leads to a set of possible sources and we refer to these sets as the <em>case distinctions</em>.</p>
+<!--**FIX: above notions are confusing: chain versus sources versus case distinctions.**-->
+
+<p>However, for some rules Tamarin cannot resolve where a fact must have come from. We call such a chain an <em>open chain</em>, and we will explain them in more detail below.</p>
+<p>The existence of open chains complicates automated proof generation and often (but not always) means that no proof will be found automatically. For this reason, it is useful for users to be able to find open chains and examine if it is possible to remove them.</p>
+<p>In the interactive mode you can find open chains as follows. On the top left, under &quot;Untyped case distinction&quot;, one can find the chains that were precomputed by Tamarin.</p>
+<p><img src="../images/FindOpenChains1.png" title="Untyped case distinctions" alt="Tamarin GUI" />{ width=50% }<br /> The unsolved chains can be identified by the light green arrows as in the following example:</p>
+<p><img src="../images/FindOpenChains2.png" title="Open chain visible" alt="Open chain visible in green" />{ width=100% }<br /> The green arrow indicates that Tamarin cannot exclude the possibility that the adversary can derive any fresh term <code>~t.1</code> with this rule <code>I_2</code>. As we are using an untyped protocol model, the tool cannot determine that <code>nr.7</code> should be a fresh nonce, but that it could be any message. For this reason Tamarin concludes that it can derive any message with this rule.</p>
+<!--**FIX Cas: In the above, we mention untyped protocol model. Did we explain
+this?**-->
+
+<h3 id="why-open-chains-complicate-proofs"><a href="#why-open-chains-complicate-proofs">Why open chains complicate proofs</a></h3>
+<p>To get a better understanding of the problem, consider what happens if we try to prove the lemma <code>nonce_secrecy</code>. If we manually always choose the first case for the proof, we can see that Tamarin derives the secret key to decrypt the output of rule <code>I_2</code> by repeatedly using this rule <code>I_2</code>. More specifically, in <code>a)</code> the output of rule <code>I_2</code> is decrypted by the adversary. To get the relevant key for this, in part <code>b)</code> again the output from rule <code>I_2</code> is decrypted by the adversary. This is done with a key coming from part <code>c)</code> where the same will happen repeatedly.</p>
+<p><img src="../images/FindOpenChains3_RepetitionHilighted.jpg" title="`I_2` repeatedly" alt="Secret derived by using I_2" />{ width=90% }<br /> As Tamarin is unable to conclude that the secret key could not have come from the rule <code>I_2</code>, the algorithm derives the secret key that is needed. The proof uses the same strategy recursively but will not terminate.</p>
+<h2 id="using-typing-lemmas-to-mitigate-open-chains"><a href="#using-typing-lemmas-to-mitigate-open-chains">Using Typing Lemmas to Mitigate Open Chains</a></h2>
+<p>Once we identified the rules and cases in which open chains occur, we can try to avoid them. A good mechanism to get rid of open chains is the use of so-called <em>typing lemmas</em>.</p>
+<p>Typing lemmas are a special case of lemmas, and are applied during Tamarin's pre-computation. Roughly, verification in Tamarin involves the following steps:</p>
+<ol style="list-style-type: decimal">
+<li><p>Tamarin first determines the possible sources of all premises. We call these the untyped case distinctions.</p></li>
+<li><p>Next, automatic proof mode is used to discharge any typing lemmas using induction.</p></li>
+<li><p>The typing lemmas are applied to the untyped case distinctions, yielding a new set of sources, which we call the typed case distinctions.</p></li>
+<li><p>Depending on the mode, the other (non-typing) lemmas are now considered manually or automatically using the typed case distinctions.</p></li>
+</ol>
+<p>For full technical details, we refer the reader to <span class="citation">(Meier 2012)</span>.</p>
+<p>In our example, we can add the following lemma:</p>
+<pre class="tamarin"><code>lemma types [typing]:
+  &quot; (All ni m1 #i.
+       IN_R_1_ni( ni, m1) @ i
+       ==&gt;
+       ( (Ex #j. KU(ni) @ j &amp; j &lt; i)
+       | (Ex #j. OUT_I_1( m1 ) @ j)
+       )
+    )
+  &amp; (All nr m2 #i.
+       IN_I_2_nr( nr, m2) @ i
+       ==&gt;
+       ( (Ex #j. KU(nr) @ j &amp; j &lt; i)
+       | (Ex #j. OUT_R_1( m2 ) @ j)
+       )
+    )
+  &quot;
+</code></pre>
+<p>This typing lemma is applied to the untyped case distinctions to compute the typed case distinctions. All non-typing lemmas are proven with the resulting typed case distinctions, while typing lemmas must be proved with the untyped case distinctions.</p>
+<p>This lemma relates the point of instantiation to the point of sending by either the adversary or the communicating partner. In other words, it says that whenever the responder receives the first nonce, either the nonce was known to the adversary or the initiator sent the first message prior to that moment. Similarly, the second part states that whenever the initiator receives the second message, either the adversary knew the corresponding nonce or the responder has sent the second message before. Generally, in a protocol with open chains it is advisable to try if the problem can be solved by a typing lemma that considers where a term could be coming from. As in the above example, one idea to do so is by stating that a used term must either have occured in one of a list of rules before, or it must have come from the adversary.</p>
+<p>The above typing lemma can be automatically proven by Tamarin. With the typing lemma, Tamarin can then automatically prove the lemma <code>nonce_secrecy</code>.</p>
+<p>Another possibility is that the open chains only occur in an undesired application of a rule that we do not wish to consider in our model. In such a case, we can explicitly exclude this application of the rule with an axiom. But, we should ensure that the resulting model is the one we want; so use this with care.</p>
+<div class="references">
+<p>Meier, Simon. 2012. “Advancing Automated Security Protocol Verification.” PhD thesis, ETH Zurich. <a href="http://dx.doi.org/10.3929/ethz-a-009790675">http://dx.doi.org/10.3929/ethz-a-009790675</a>.</p>
+</div>
+    </div>
+  </div>
+</body>
+</html>

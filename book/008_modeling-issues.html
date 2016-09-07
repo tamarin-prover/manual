@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamarin Prover Manual</title>
+    <link rel="stylesheet" type="text/css" href="book.css">
+    <script src="book.js"></script>
+    <link rel="stylesheet" href="styles/github.css">
+<!--    <script src="highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+-->
+    </head>
+<body class="tamarindoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+  <div id="nav">
+    <button id="toggle-nav">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    </button>
+  </div>
+  <div id='toc' class='mobile-hidden'>
+  <ul class='chapter'>
+<!-- <li><a href='000_prelims.html'                    ><b>0. </b>Preliminaries</a></li> -->
+<li><a href='001_introduction.html'               ><b>1. </b> Introduction</a></li>
+<li><a href='002_installation.html'               ><b>2. </b> Installation</a></li>
+<li><a href='003_example.html'                    ><b>3. </b> First Example</a></li>
+<li><a href='004_cryptographic-messages.html'     ><b>4. </b> Cryptographic Messages</a></li>
+<li><a href='005_protocol-specification.html'     ><b>5. </b> Protocol Specification</a></li>
+<li><a href='006_property-specification.html'     ><b>6. </b> Property Specification</a></li>
+<li><a href='007_precomputation.html'             ><b>7. </b> Precomputation</a></li>
+<li><a href='008_modeling-issues.html'            ><b>8. </b> Modeling Issues</a></li>
+<li><a href='009_advanced-features.html'          ><b>9. </b> Advanced Features</a></li>
+<li><a href='010_case-studies.html'               ><b>10.</b> Case Studies</a></li>
+<li><a href='011_toolchains.html'                 ><b>11.</b> Toolchains</a></li>
+<li><a href='012_limitations.html'                ><b>12.</b> Limitations</a></li>
+<li><a href='013_contact-and-further-reading.html'><b>13.</b> Contact Information and Further Reading</a></li>
+<li><a href='014_syntax_description.html'         ><b>14.</b> Syntax Description</a></li>
+  </ul>
+  </div>
+  <div id='page-wrapper'>
+    <div id='page'>
+<p class="halfbreak">
+</p>
+<h1 id="sec:modeling-issues"><a href="#sec:modeling-issues">Modeling Issues</a></h1>
+<h2 id="first-time-users"><a href="#first-time-users">First-time users</a></h2>
+<p>In this section we discuss some problems that a first-time user might face. This includes error messages and how one might fix them. We also discuss how certain 'sanity' lemmas can be proven to provide some confidence in the protocol specification.</p>
+<p>To illustrate these concepts, consider the following protocol, where an initiator <code>$I</code> and a receiver <code>$R</code> share a symmetric key <code>~k</code>. <code>$I</code> then sends the message <code>~m</code>, encrypted with their shared key <code>~k</code> to <code>$R</code>.</p>
+<pre class="tamarin"><code>builtins: symmetric-encryption
+
+/* protocol */
+
+rule setup:
+    [ Fr(~k), Fr(~m) ]
+    --[]-&gt;
+    [ AgSt($I,&lt;~k,~m&gt;), AgSt($R,~k) ]
+
+rule I_1: 
+    [ AgSt($I,&lt;~k,~m&gt;) ]
+    --[ Send($I,~m) ]-&gt; 
+    [ Out(senc(~m,~k)) ]
+
+rule R_1:
+    [ AgSt($R,~k), In(senc(m,~k))  ]
+    --[ Receive($R,m), Secret(m) ]-&gt;
+    [ ]
+
+lemma nonce_secret: 
+    &quot;All m #i #j. Secret(m) @i &amp; K(m) @j ==&gt; F&quot;
+</code></pre>
+<p>With the lemma <code>nonce_secret</code>, we examine if the message is secret from the receiver's perspective.</p>
+<h3 id="exist-trace-lemmas"><a href="#exist-trace-lemmas">Exist-Trace Lemmas</a></h3>
+<p>Imagine that in the setup rule you forgot the agent state fact for the receiver <code>AgSt($R,~k)</code> as follows:</p>
+<pre class="tamarin"><code>// WARNING: this rule illustrates a non-functional protocol
+rule setup:
+    [ Fr(~k), Fr(~m) ]
+    --[]-&gt;
+    [ AgSt($I,&lt;~k,~m&gt;) ]</code></pre>
+<p>With this omission, Tamarin verifies the lemma <code>nonce_secret</code>. The lemma says that whenever the action <code>Secret(m)</code> is reached in a trace, then the adversary does not learn <code>m</code>. However, in the modified specification, the rule <code>R_1</code> will never be executed. Consequently there will never be an action <code>Secret(m)</code> in the trace. For this reason, the lemma is vacuously true and verifying the lemma does not mean that the intended protocol has this property. To avoid proving lemmas in such degenerate ways, we first prove <code>exist-trace</code> lemmas.</p>
+<p>With an exist-trace lemma, we prove, in essence, that our protocol can be executed. In the above example, the goal is that first an initiator sends a message and that then the receiver receives the same message. We express this as follows:</p>
+<pre class="tamarin"><code>lemma functional: exists-trace
+    &quot;Ex I R m #i #j.
+        Send(I,m) @i
+        &amp; Receive(R,m) @j &quot;
+</code></pre>
+<p>If we try to prove this with Tamarin in the model with the error, the lemma statement will be falsified. This indicates that there exists no trace where the initiator sends a message to the receiver. Such errors arise, for example, when we forget to add a fact that connects several rules and some rules can never be reached. Generally it is recommended first to prove an <code>exists-trace</code> lemma before other properties are examined.</p>
+<h3 id="error-messages"><a href="#error-messages">Error Messages</a></h3>
+<p>In this section, we review common error messages produced by Tamarin. To this end, we will intentionally add mistakes to the above protocol, presenting a modified rule and explaining the corresponding error message.</p>
+<h3 id="inconsistent-fact-usage"><a href="#inconsistent-fact-usage">Inconsistent Fact usage</a></h3>
+<p>First we change the setup rule as follows:</p>
+<pre class="tamarin"><code>// WARNING: this rule illustrates an error message
+rule setup:
+    [ Fr(~k), Fr(~m) ]
+    --[]-&gt;
+    [ AgSt($I,~k,~m), AgSt($R,~k) ]</code></pre>
+<p>Note that the the first <code>AgSt(...)</code> in the conclusion has arity three, with variables <code>$I,~k,~m</code>, rather than the original arity two, with variables <code>$I,&lt;~k,~m&gt;</code> where the second argument is paired.</p>
+<p>The following statement that some wellformedness check failed will appear at the very end of the text when loading this theory.</p>
+<pre><code>WARNING: 1 wellformedness check failed!
+         The analysis results might be wrong!</code></pre>
+<p>Such a wellformedness warning appears in many different error messages at the bottom and indicates that there might be a problem. However, to get further information, one must scroll up in the command line to look at the more detailed error messages.</p>
+<pre><code>/*
+WARNING: the following wellformedness checks failed!
+
+fact usage:
+1. rule `setup&#39;, fact &quot;agst&quot;: (&quot;AgSt&quot;,3,Linear)
+        AgSt( $I, ~k, ~m )
+
+2. rule `setup&#39;, fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)
+        AgSt( $R, ~k )
+
+3. rule `I_1&#39;, fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)
+        AgSt( $I, &lt;~k, ~m&gt; )
+
+4. rule `R_1&#39;, fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)
+        AgSt( $R, ~k )
+*/</code></pre>
+<p>The problem lists all the fact usages of fact <code>AgSt</code>. The statement <code>1. rule 'setup', fact &quot;agst&quot;:(&quot;AgSt&quot;,3,Linear)</code> means that in the rule <code>setup</code> the fact <code>AgSt</code> is used as a linear fact with 3 arguments. This is not consistent with its use in other rules. For example <code>2. rule 'setup', fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)</code> indicates that it is also used with 2 arguments in the <code>setup</code> rule. To solve this problem we must ensure that we only use the same fact with the same number of arguments.</p>
+<h3 id="unbound-variables"><a href="#unbound-variables">Unbound variables</a></h3>
+<p>If we change the rule <code>R_1</code> to</p>
+<pre class="tamarin"><code>// WARNING: this rule illustrates an error message      
+rule R_1:
+    [ AgSt($R,~k), In(senc(~m,~k))  ]
+    --[ Receive($R,$I,~m), Secret($R,~n) ]-&gt;
+    [ ]</code></pre>
+<p>we get the error message</p>
+<pre><code>/*
+WARNING: the following wellformedness checks failed!
+
+unbound:
+  rule `R_1&#39; has unbound variables: 
+    ~n
+*/</code></pre>
+<p>The warning <code>unbound variables</code> indicates that there is a term, here the fresh <code>~n</code>, in the action or conclusion that never appeared in the premise. Here this is the case because we mistyped <code>~n</code> instead of <code>~m</code>. Generally, when such a warning appears, you should check that all the fresh variables variables already occur in the premise. If it is a fresh variable that appears for the first time in this rule, a <code>Fr(~n)</code> fact should be added to the premise.</p>
+<h3 id="free-term-in-formula"><a href="#free-term-in-formula">Free Term in formula</a></h3>
+<p>Next, we change the functional lemma as follows</p>
+<pre class="tamarin"><code>// WARNING: this lemma illustrates an error message
+lemma functional: exists-trace
+    &quot;Ex I R #i #j.
+        Send(I,R,m) @i
+        &amp; Receive(R,I,m) @j &quot;</code></pre>
+<p>This causes the following warning:</p>
+<pre><code>/*
+WARNING: the following wellformedness checks failed!
+
+formula terms:
+  lemma `functional&#39; uses terms of the wrong form: `Free m&#39;, `Free m&#39;
+  
+  The only allowed terms are public names and bound node and message
+  variables. If you encounter free message variables, then you might
+  have forgotten a #-prefix. Sort prefixes can only be dropped where
+  this is unambiguous.
+*/</code></pre>
+<p>The warning indicates that in this lemma the term <code>m</code> is occurs free. This means that it is not bound to any quantifier. Often such an error occurs when one forgets to list all the variables that are used in the formula after the <code>Ex</code> or <code>All</code> quantifier. In our example, the problem occured because we deleted the <code>m</code> in <code>Ex I R m #i #j.</code></p>
+<h3 id="undefined-action-fact-in-lemma"><a href="#undefined-action-fact-in-lemma">Undefined Action Fact in Lemma</a></h3>
+<p>Next, we change the lemma <code>nonce_secret</code>.</p>
+<pre class="tamarin"><code>// WARNING: this lemma illustrates an error message
+lemma nonce_secret: 
+    &quot;All R m #i #j. Secr(R,m) @i &amp; K(m) @j ==&gt; F&quot;</code></pre>
+<p>We get the following warning:</p>
+<pre><code>/*
+WARNING: the following wellformedness checks failed!
+
+lemma actions:
+  lemma `nonce_secret&#39; references action 
+    (ProtoFact Linear &quot;Secr&quot; 2,2,Linear)
+  but no rule has such an action.
+*/</code></pre>
+<p>Such a warning always occurs when a lemma uses a fact that never appears as an action fact in any rule. The cause of this is either that the fact is spelled differently (here <code>Secr</code> instead of <code>Secret</code>) or that one forgot to add the action fact to the protocol rules. Generally, it is a good advice to double check that the facts that are used in the lemmas appear in the relevant protocol rules as actions.</p>
+<h3 id="undeclared-function-symbols"><a href="#undeclared-function-symbols">Undeclared function symbols</a></h3>
+<p>If we omit the line</p>
+<pre class="tamarin"><code>builtins: symmetric-encryption</code></pre>
+<p>the following warning will be output</p>
+<pre><code>unexpected &quot;(&quot;
+expecting letter or digit, &quot;.&quot;, &quot;,&quot; or &quot;)&quot;</code></pre>
+<p>The warning indicates that Tamarin did not expect opening brackets. This means that a function is used that Tamarin does not recognize. This can be the case if a function <code>f</code> is used that has not been declared with <code>functions: f/1</code>. Also, this warning occurs when a built-in function is used but not declared. In this example, the problem arises because we used the symmetric encryption <code>senc</code>, but omitted the line where we declare that we use this built-in function.</p>
+<h3 id="inconsistent-sorts"><a href="#inconsistent-sorts">Inconsistent sorts</a></h3>
+<p>If we change the <code>setup</code> rule to</p>
+<pre class="tamarin"><code>// WARNING: this rule illustrates an error message
+rule setup:
+    [ Fr(~k), Fr(~m) ]
+    --[]-&gt;
+    [ AgSt($I,&lt;~k,m&gt;), AgSt($R,~k) ]</code></pre>
+<p>we get the error message</p>
+<pre><code>/*
+WARNING: the following wellformedness checks failed!
+
+unbound:
+  rule `setup&#39; has unbound variables: 
+    m
+
+sorts:
+  rule `setup&#39; clashing sorts, casings, or multiplicities:
+    1. ~m, m
+*/</code></pre>
+<p>This indicates that the sorts of a message were inconsistently used. In the rule <code>setup</code>, this is the case because we used m once as a fresh value <code>~m</code> and another time without the <code>~</code>.</p>
+<h3 id="what-to-do-when-tamarin-does-not-terminate"><a href="#what-to-do-when-tamarin-does-not-terminate">What to do when Tamarin does not terminate</a></h3>
+<p>Tamarin may fail to terminate when it automatically constructs proofs. One reason for this is that there are open chains. For advice on how to find and remove open chains, see <a href="007_precomputation.html#sec:openchains">open chains</a>.</p>
+<!-- 
+### functions ###
+function-> where does it go? doesn have support:
+local to rule with "let"
+-->
+ 
+
+<!-- Using rewrite rules to 'share'
+  ------------------------------
+
+  TODO: Katriel?
+-->
+
+
+<div class="references">
+
+</div>
+    </div>
+  </div>
+</body>
+</html>

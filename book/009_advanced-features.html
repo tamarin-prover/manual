@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamarin Prover Manual</title>
+    <link rel="stylesheet" type="text/css" href="book.css">
+    <script src="book.js"></script>
+    <link rel="stylesheet" href="styles/github.css">
+<!--    <script src="highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+-->
+    </head>
+<body class="tamarindoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+  <div id="nav">
+    <button id="toggle-nav">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    </button>
+  </div>
+  <div id='toc' class='mobile-hidden'>
+  <ul class='chapter'>
+<!-- <li><a href='000_prelims.html'                    ><b>0. </b>Preliminaries</a></li> -->
+<li><a href='001_introduction.html'               ><b>1. </b> Introduction</a></li>
+<li><a href='002_installation.html'               ><b>2. </b> Installation</a></li>
+<li><a href='003_example.html'                    ><b>3. </b> First Example</a></li>
+<li><a href='004_cryptographic-messages.html'     ><b>4. </b> Cryptographic Messages</a></li>
+<li><a href='005_protocol-specification.html'     ><b>5. </b> Protocol Specification</a></li>
+<li><a href='006_property-specification.html'     ><b>6. </b> Property Specification</a></li>
+<li><a href='007_precomputation.html'             ><b>7. </b> Precomputation</a></li>
+<li><a href='008_modeling-issues.html'            ><b>8. </b> Modeling Issues</a></li>
+<li><a href='009_advanced-features.html'          ><b>9. </b> Advanced Features</a></li>
+<li><a href='010_case-studies.html'               ><b>10.</b> Case Studies</a></li>
+<li><a href='011_toolchains.html'                 ><b>11.</b> Toolchains</a></li>
+<li><a href='012_limitations.html'                ><b>12.</b> Limitations</a></li>
+<li><a href='013_contact-and-further-reading.html'><b>13.</b> Contact Information and Further Reading</a></li>
+<li><a href='014_syntax_description.html'         ><b>14.</b> Syntax Description</a></li>
+  </ul>
+  </div>
+  <div id='page-wrapper'>
+    <div id='page'>
+<p class="halfbreak">
+</p>
+<h1 id="sec:advanced-features"><a href="#sec:advanced-features">Advanced Features</a></h1>
+<p>We now turn to some of Tamarin's more advanced features. We cover custom heuristics, the GUI, channel models, induction, internal preprocessor, and how to measure the time needed for proofs. <!--manual proofs,encoding tricks,--></p>
+<h2 id="heuristics"><a href="#heuristics">Heuristics</a></h2>
+<p>The commandline option <code>--heuristic</code> can be used to select which heuristic for goal selection should be used by the automated proof methods. The argument of the <code>--heuristic</code> flag is a word built from the alphabet <code>{s,S,c,C,i}</code>. Each of these letters describes a different way to rank the open goals of a constraint system.</p>
+<p><code>s</code>: : the 'smart' ranking is the ranking described in the extended version of our CSF'12 paper. It is the default ranking and works very well in a wide range of situations. Roughly, this ranking prioritizes chain goals, disjunctions, facts, actions, and adversary knowledge of private and fresh terms in that order (e.g., every action will be solved before any knowledge goal). Goals marked 'Probably Constructable' and 'Currently Deducible' in the GUI are lower priority.</p>
+<p><code>S</code>: : is like the 'smart' ranking, but does not delay the solving of premises marked as loop-breakers. What premises are loop breakers is determined from the protocol using a simple under-approximation to the vertex feedback set of the conclusion-may-unify-to-premise graph. We require these loop-breakers for example to guarantee the termination of the case distinction precomputation. You can inspect which premises are marked as loop breakers in the 'Multiset rewriting rules' page in the GUI.</p>
+<p><code>c</code>: : is the 'consecutive' or 'conservative' ranking. It solves goals in the order they occur in the constraint system. This guarantees that no goal is delayed indefinitely, but often leads to large proofs because some of the early goals are not worth solving.</p>
+<p><code>C</code>: : is like 'c' but without delaying loop breakers.</p>
+<p><code>i</code>: : is a ranking developed to be well-suited to injective stateful protocols. The priority of goals is similar to the 'S' ranking, but instead of a strict priority hierarchy, the fact, action, and knowledge goals are considered equal priority and solved by their age. This is useful for stateful protocols with an unbounded number of runs, in which for example solving a fact goal may create a new fact goal for the previous protocol run. This ranking will prioritize existing fact, action, and knowledge goals before following up on the fact goal of that previous run. In contrast the 'S' ranking would prioritize this new fact goal ahead of any existing action or knowledge goal, although solving the new goal may create yet another earlier fact goal and so on, preventing termination.</p>
+<p>If several rankings are given for the heuristic flag, then they are employed in a round-robin fashion depending on the proof-depth. For example, a flag <code>--heuristic=ssC</code> always uses two times the smart ranking and then once the 'Consecutive' goal ranking. The idea is that you can mix goal rankings easily in this way.</p>
+<h3 id="marking-facts-to-be-solved-preferentially-or-delayed"><a href="#marking-facts-to-be-solved-preferentially-or-delayed">Marking facts to be solved preferentially or delayed</a></h3>
+<p>By starting a fact name with <code>F_</code> (for first) the tool will solve instances of that fact earlier than normal, while putting <code>L_</code> (for last) as the prefix will delay solving the fact. This can have a performance impact.</p>
+<!-- FIXME: Describe oracle script mechanism -->
+
+<!--Advanced Encoding
+----------------------------
+
+to encoding using alternative more efficient descriptions-->
+
+<h2 id="manual-exploration-using-gui"><a href="#manual-exploration-using-gui">Manual Exploration using GUI</a></h2>
+<p>See Section <a href="003_example.html#sec:gui">Example</a> for a short demonstration of the main features of the GUI.</p>
+<!-- downloading proofs, keyboard commands (a vs A vs b vs B) etc. -->
+
+<h2 id="sec:channel-models"><a href="#sec:channel-models">Different Channel Models</a></h2>
+<p>Tamarin's built-in adversary model is often referred to as the Dolev-Yao adversary. This models an active adversary that has complete control of the communication network. Hence this adversary can eavesdrop on, block, and modify messages sent over the network and can actively inject messages into the network. The injected messages though must be those that the adversary can construct from his knowledge, i.e., the messages he initially knew, the messages he has learned from observing network traffic, and the messages that he can construct from messages he knows.</p>
+<p>The adversary's control over the communication network is modeled with the following two built-in rules:</p>
+<ol style="list-style-type: decimal">
+<li><pre><code>rule irecv:
+   [ Out( x ) ] --&gt; [ !KD( x ) ]</code></pre></li>
+<li><pre><code>rule isend:
+   [ !KU( x ) ] --[ K( x ) ]-&gt; [ In( x ) ]</code></pre></li>
+</ol>
+<p>The <code>irecv</code> rule states that any message sent by an agent using the <code>Out</code> fact is learned by the adversary. Such messages are then analyzed with the adversary's message deduction rules, which depend on the specified equational theory.</p>
+<p>The <code>isend</code> rule states that any message received by an agent by means of the <code>In</code> fact has been constructed by the adversary.</p>
+<p>We can limit the adversary's control over the protocol agents' communication channels by specifying channel rules, which model channels with intrinsic security properties. In the following, we illustrate the modelling of confidential, authentic, and secure channels. Consider for this purpose the following protocol, where an initiator generates a fresh nonce and sends it to a receiver.</p>
+<pre class="tamarin"><code>    I:  fresh(n)
+    I -&gt; R: n </code></pre>
+<p>We can model this protocol as follows.</p>
+<pre class="tamarin"><code>/* Protocol */
+
+rule I_1: 
+    [ Fr(~n) ]
+    --[ Send($I,~n), Secret_I(~n) ]-&gt; 
+    [ Out(&lt;$I,$R,~n&gt;) ]
+        
+rule R_1:
+    [ In(&lt;$I,$R,~n&gt;)  ]
+    --[ Secret_R(~n), Authentic($I,~n) ]-&gt;
+    [ ]
+
+/* Security Properties */
+
+lemma nonce_secret_initiator: 
+    &quot;All n #i #j. Secret_I(n) @i &amp; K(n) @j ==&gt; F&quot;
+
+lemma nonce_secret_receiver: 
+    &quot;All n #i #j. Secret_R(n) @i &amp; K(n) @j ==&gt; F&quot;
+
+lemma message_authentication: 
+    &quot;All I n #j. Authentic(I,n) @j ==&gt; Ex #i. Send(I,n) @i &amp;i&lt;j&quot;</code></pre>
+<p>We state the nonce secrecy property for the initiator and responder with the <code>nonce_secret_initiator</code> and the <code>nonce_secret_receiver</code> lemma, respectively. The lemma <code>message_authentication</code> specifies a <a href="006_property-specification.html#sec:message-authentication">message authentication</a> property for the responder role.</p>
+<p>If we analyze the protocol with insecure channels, none of the properties hold because the adversary can learn the nonce sent by the initiator and send his own one to the receiver.</p>
+<h4 id="confidential-channel-rules"><a href="#confidential-channel-rules">Confidential Channel Rules</a></h4>
+<p>Let us now modify the protocol such that the same message is sent over a confidential channel. By confidential we mean that only the intended receiver can read the message but everyone, including the adversary, can send a message on this channel.</p>
+<pre class="tamarin"><code>/* Channel rules */
+
+rule ChanOut_C:
+        [ Out_C($A,$B,x) ]
+      --[ ChanOut_C($A,$B,x) ]-&gt;
+        [ !Conf($B,x) ]
+
+rule ChanIn_C:
+        [ !Conf($B,x), In($A) ]
+      --[ ChanIn_C($A,$B,x) ]-&gt;
+        [ In_C($A,$B,x) ]
+
+rule ChanIn_CAdv:
+    [ In(&lt;$A,$B,x&gt;) ]
+        --&gt;
+        [ In_C($A,$B,x) ]
+
+/* Protocol */
+
+rule I_1: 
+    [ Fr(~n) ]
+      --[ Send($I,~n), Secret_I(~n) ]-&gt; 
+    [ Out_C($I,$R,~n) ]
+        
+rule R_1:
+    [ In_C($I,$R,~n)  ]
+      --[ Secret_R(~n), Authentic($I,~n) ]-&gt;
+    [ ]</code></pre>
+<p>The first three rules denote the channel rules for a confidential channel. They specify that whenever a message <code>x</code> is sent on a confidential channel from <code>$A</code> to <code>$B</code>, a fact <code>!Conf($B,x)</code> can be derived. This fact binds the receiver <code>$B</code> to the message <code>x</code>, because only he will be able to read the message. The rule <code>ChanIn_C</code> models that at the incoming end of a confidential channel, there must be a <code>!Conf($B,x)</code> fact, but any apparent sender <code>$A</code> from the adversary knowledge can be added. This models that a confidential channel is not authentic, and anybody could have sent the message.</p>
+<p>Note that <code>!Conf($B,x)</code> is a persistent fact. With this, we model that a message that was sent confidentially to <code>$B</code> can be replayed by the adversary at a later point in time. The last rule, <code>ChanIn_CAdv</code>, denotes that the adversary can also directly send a message from his knowledge on a confidential channel.</p>
+<p>Finally, we need to give protocol rules specifying that the message <code>~n</code> is sent and received on a confidential channel. We do this by changing the <code>Out</code> and <code>In</code> facts to the <code>Out_C</code> and <code>In_C</code> facts, respectively.</p>
+<p>In this modified protocol, the lemma <code>nonce_secret_initiator</code> holds. As the initiator sends the nonce on a confidential channel, only the intended receiver can read the message, and the adversary cannot learn it.</p>
+<h4 id="authentic-channel-rules"><a href="#authentic-channel-rules">Authentic Channel Rules</a></h4>
+<p>Unlike a confidential channel, an adversary can read messages sent on an authentic channel. However, on an authentic channel, the adversary cannot modify the messages or their sender. We modify the protocol again to use an authentic channel for sending the message.</p>
+<pre class="tamarin"><code>/* Channel rules */
+
+rule ChanOut_A:
+    [ Out_A($A,$B,x) ]
+    --[ ChanOut_A($A,$B,x) ]-&gt;
+    [ !Auth($A,x), Out(&lt;$A,$B,x&gt;) ]
+
+rule ChanIn_A:
+    [ !Auth($A,x), In($B) ]
+    --[ ChanIn_A($A,$B,x) ]-&gt;
+    [ In_A($A,$B,x) ]
+
+/* Protocol */
+
+rule I_1: 
+    [ Fr(~n) ]
+    --[ Send($I,~n), Secret_I(~n) ]-&gt; 
+    [ Out_A($I,$R,~n) ]
+        
+rule R_1:
+    [ In_A($I,$R,~n)  ]
+    --[ Secret_R(~n), Authentic($I,~n) ]-&gt;
+    [ ]</code></pre>
+<p>The first channel rule binds a sender <code>$A</code> to a message <code>x</code> by the fact <code>!Auth($A,x)</code>. Additionally, the rule produces an <code>Out</code> fact that models that the adversary can learn everything sent on an authentic channel. The second rule says that whenever there is a fact <code>!Auth($A,x)</code>, the message can be sent to any receiver <code>$B</code>. This fact is again persistent, which means that the adversary can replay it multiple times, possibly to different receivers.</p>
+<p>Again, if we want the nonce in the protocol to be sent over the authentic channel, the corresponding <code>Out</code> and <code>In</code> facts in the protocol rules must be changed to <code>Out_A</code> and <code>In_A</code>, respectively. In the resulting protocol, the lemma <code>message_authentication</code> is proven by Tamarin. The adversary can neither change the sender of the message nor the message itself. For this reason, the receiver can be sure that the agent in the initiator role indeed sent it.</p>
+<h4 id="secure-channel-rules"><a href="#secure-channel-rules">Secure Channel Rules</a></h4>
+<p>The final kind of channel that we consider in detail are secure channels. Secure channels have the property of being both confidential and authentic. Hence an adversary can neither modify nor learn messages that are sent over a secure channel. However, an adversary can store a message sent over a secure channel for replay at a later point in time.</p>
+<p>The protocol to send the messages over a secure channel can be modeled as follows.</p>
+<pre class="tamarin"><code>/* Channel rules */
+
+rule ChanOut_S:
+        [ Out_S($A,$B,x) ]
+      --[ ChanOut_S($A,$B,x) ]-&gt;
+        [ !Sec($A,$B,x) ]
+
+rule ChanIn_S:
+        [ !Sec($A,$B,x) ]
+      --[ ChanIn_S($A,$B,x) ]-&gt;
+        [ In_S($A,$B,x) ]
+
+/* Protocol */
+
+rule I_1: 
+    [ Fr(~n) ]
+    --[ Send($I,~n), Secret_I(~n) ]-&gt; 
+    [ Out_S($I,$R,~n) ]
+        
+rule R_1:
+    [ In_S($I,$R,~n)  ]
+    --[ Secret_R(~n), Authentic($I,~n) ]-&gt;
+    [ ]</code></pre>
+<p>The channel rules bind both the sender <code>$A</code> and the receiver <code>$B</code> to the message <code>x</code> by the fact <code>!Sec($A,$B,x)</code>, which cannot be modified by the adversary. As <code>!Sec($A,$B,x)</code> is a persistent fact, it can be reused several times as the premise of the rule <code>ChanIn_S</code>. This models that an adversary can replay such a message block arbitrary many times.</p>
+<p>For the protocol sending the message over a secure channel, Tamarin proves all the considered lemmas. The nonce is secret from the perspective of both the initiator and the receiver because the adversary cannot read anything on a secure channel. Furthermore, as the adversary cannot send his own messages on the secure channel nor modify messages transmitted on the channel, the receiver can be sure that the nonce was sent by the agent who he believes to be in the initiator role.</p>
+<p>Similarly, one can define other channels with other properties. For example, we can model a secure channel with the additional property that it does not allow for replay. This could be done by changing the secure channel rules above by chaining <code>!Sec($A,$B,x)</code> to be a linear fact <code>Sec($A,$B,x)</code>. Consequently, this fact can only be consumed once and not be replayed by the adversary at a later point in time. In a similar manner, the other channel properties can be changed and additional properties can be imagined.</p>
+<h2 id="induction"><a href="#induction">Induction</a></h2>
+<p>Tamarin's constraint solving approach is similar to a backwards search, in the sense that it starts from later states and reasons backwards to derive information about possible earlier states. For some properties, it is more useful to reason forwards, by making assumptions about earlier states and deriving conclusions about later states. To support this, Tamarin offers a specialised inductive proof method.</p>
+<p>We start by motivating the need for an inductive proof method on a simple example with two rules and one lemma:</p>
+<pre class="tamarin"><code>theory InductionExample
+begin
+
+rule start:
+  [ Fr(x) ]
+--[ Start(x) ]-&gt;
+  [ A(x) ]
+
+rule repeat:
+  [ A(x) ]
+--[ Loop(x) ]-&gt;
+  [ A(x) ]
+
+lemma AlwaysStarts [use_induction]:
+  &quot;All x #i. Loop(x) @i ==&gt; Ex #j. Start(x) @j&quot;
+
+end</code></pre>
+<p>If we try to prove this with Tamarin without using induction (comment out the <code>[use_induction]</code> to try this) the tool will loop on the backwards search over the repeating <code>A(x)</code> fact. This fact can have two sources, either the <code>start</code> rule, which ends the search, or another instantiation of the <code>loop</code> rule, which continues.</p>
+<p>The induction method works by distinguishing the last timepoint <code>#i</code> in the trace, as <code>last(#i)</code>, from all other timepoints. It assumes the property holds for all other timepoints than this one. As these other time points must occur earlier, this can be understood as a form of <em>wellfounded induction</em>. The induction hypothesis then becomes an additional constraint during the constraint solving phase and thereby allows more properties to be proven.</p>
+<p>This is particularly useful when reasoning about action facts that must always be preceded in traces by some other action facts. For example, induction can help to prove that some later protocol step is always preceded by the initalisation step of the corresponding protocol role, with similar parameters.</p>
+<h2 id="sec:integrated-preprocessor"><a href="#sec:integrated-preprocessor">Integrated Preprocessor</a></h2>
+<p>Tamarin's integrated preprocessor can be used to include or exclude parts of your file. You can use this, for example, to restrict your focus to just some subset of lemmas. This is done by putting the relevant part of your file within an <code>#ifdef</code> block with a keyword <code>KEYWORD</code></p>
+<pre><code>#ifdef KEYWORD
+...
+#endif</code></pre>
+<p>and then running Tamarin with the option <code>-DKEYWORD</code> to have this part included.</p>
+<p>If you use this feature to exclude typing lemmas, your case distinctions will change, and you may no longer be able to construct some proofs automatically. Similarly, if you have <code>reuse</code> marked lemmas that are removed, then other following lemmas may no longer be provable.</p>
+<p>The following is an example of a lemma that will be included when <code>timethis</code> is given as parameter to <code>-D</code>:</p>
+<pre class="tamarin"><code>#ifdef timethis
+lemma tobemeasured:
+  exists-trace
+  &quot;Ex r #i. Action1(r)@i&quot;
+#endif</code></pre>
+<p>At the same time this would be excluded:</p>
+<pre class="tamarin"><code>#ifdef nottimed
+lemma otherlemma2:
+  exists-trace
+  &quot;Ex r #i. Action2(r)@i&quot;
+#endif</code></pre>
+<h2 id="how-to-time-proofs-in-tamarin"><a href="#how-to-time-proofs-in-tamarin">How to Time Proofs in Tamarin</a></h2>
+<p>If you want to measure the time taken to verify a particular lemma you can use the previously described preprocessor to mark each lemma, and only include the one you wish to time. This can be done, for example, by wrapping the relevant lemma within <code>#ifdef timethis</code>. Also make sure to include <code>reuse</code> and <code>typing</code> lemmas in this. All other lemmas should be covered under a different keyword; in the example here we use <code>nottimed</code>.</p>
+<p>By running</p>
+<pre><code>time tamarin-prover -Dtimethis TimingExample.spthy --prove</code></pre>
+<p>the timing are computed for just the lemmas of interest. Here is the complete input file, with an artificial protocol:</p>
+<pre class="tamarin"><code>/*
+This is an artificial protocol to show how to include/exclude parts of
+the file based on the built-in preprocessor, particularly for timing
+of lemmas.
+*/
+
+theory TimingExample
+begin
+
+rule artificial:
+    [ Fr(~f) ]
+  --[ Action1(~f) , Action2(~f) ]-&gt;
+    [ Out(~f) ]
+
+#ifdef nottimed
+lemma otherlemma1:
+  exists-trace
+  &quot;Ex r #i. Action1(r)@i &amp; Action2(r)@i&quot;
+#endif
+
+#ifdef timethis
+lemma tobemeasured:
+  exists-trace
+  &quot;Ex r #i. Action1(r)@i&quot;
+#endif
+
+#ifdef nottimed
+lemma otherlemma2:
+  exists-trace
+  &quot;Ex r #i. Action2(r)@i&quot;
+#endif
+
+end</code></pre>
+<!-- One could add information on injective instances and the equation
+store from the old "doc/MANUAL.md" in the Tamarin source code
+repository here.  -->
+
+
+
+<div class="references">
+
+</div>
+    </div>
+  </div>
+</body>
+</html>
