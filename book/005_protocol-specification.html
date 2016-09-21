@@ -109,7 +109,7 @@ rule MyRule2:
 <p>The facts mentioned above are called 'linear facts'. They are not only produced by rules, they also can be consumed by rules. Hence they might appear in one state but not in the next.</p>
 <p>In contrast, some facts in our models will never be removed from the state once they are introduced. Modeling this using linear facts would require that every rule that has such a fact in the left-hand-side, also has an exact copy of this fact in the right-hand side. While there is no fundamental problem with this modeling, it is inconvenient for the user and it also might lead Tamarin to explore rule instantiations that are irrelevant for tracing such facts.</p>
 <p>For the above two reasons, we introduce 'persistent facts', which are never removed from the state. We denote these facts by prefixing them with a bang (<code>!</code>).</p>
-<p>Facts always start with an upper-case letter and need not be declared explicitly. If their name is prefixed with an exclamation mark <code>!</code>, then they are persistent. Otherwise, they are linear. Note that every fact name must be used consistently; i.e., it must always be used with the same arity, case, persistence, and multiplicity. Otherwise, Tamarin complains that the theory is not wellformed.</p>
+<p>Facts always start with an upper-case letter and need not be declared explicitly. If their name is prefixed with an exclamation mark <code>!</code>, then they are persistent. Otherwise, they are linear. Note that every fact name must be used consistently; i.e., it must always be used with the same arity, case, persistence, and multiplicity. Otherwise, Tamarin complains that the theory is not well-formed.</p>
 <h2 id="modeling-protocols"><a href="#modeling-protocols">Modeling protocols</a></h2>
 <p>There are several ways in which the execution of security protocols can be defined, e.g., as in <span class="citation">(Cremers and Mauw 2012)</span>. In Tamarin, there is no pre-defined protocol concept and the user is free to model them as she or he chooses. Below we give an example of how protocols can be modeled and discuss alternatives afterwards.</p>
 <h3 id="public-key-infrastructure"><a href="#public-key-infrastructure">Public-key infrastructure</a></h3>
@@ -164,7 +164,7 @@ functions: h2/1</code></pre>
             [ 
               Out( &#39;g&#39;^h1(&lt; ~eskR, lkR &gt;) ) 
             ]</code></pre>
-<p>The computation of <code>kR</code> is not yet specified in the above. We could replace <code>kR</code> in the above rule by its full unfolding, but this would decrease readability. Instead, we use let binding to avoid duplication and reduce possible mismatches. Additionally, for the key computation we need the public key of the communication parter <code>$I</code>, which we bind to a unique thread identifier <code>~tid</code>; we use the resulting action fact to specify security properties, as we will see in the next section. This leads to:</p>
+<p>The computation of <code>kR</code> is not yet specified in the above. We could replace <code>kR</code> in the above rule by its full unfolding, but this would decrease readability. Instead, we use let binding to avoid duplication and reduce possible mismatches. Additionally, for the key computation we need the public key of the communication partner <code>$I</code>, which we bind to a unique thread identifier <code>~tid</code>; we use the resulting action fact to specify security properties, as we will see in the next section. This leads to:</p>
 <pre><code>    rule NaxosR_attempt3:
       let 
           exR = h1(&lt; ~eskR, lkR &gt;)
@@ -183,7 +183,7 @@ functions: h2/1</code></pre>
            Out( hkr )
        ]</code></pre>
 <p>The above rule models the responder role accurately, and computes the appropriate key.</p>
-<p>We note one further optimisation that helps Tamarin's backwards search. In <code>NaxosR_attempt3</code>, the rule specifies that <code>lkR</code> might be instantiated with any term, hence also non-fresh terms. However, since the key generation rule is the only rule that produces <code>Ltk</code> facts, and it will always use a fresh value for the key, it is clear that in any reachable state of the system, <code>lkR</code> can only become instantiated by fresh values. We can therefore mark <code>lkR</code> as being of sort fresh, therefore replacing it by <code>~lkR</code>.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<p>We note one further optimization that helps Tamarin's backwards search. In <code>NaxosR_attempt3</code>, the rule specifies that <code>lkR</code> might be instantiated with any term, hence also non-fresh terms. However, since the key generation rule is the only rule that produces <code>Ltk</code> facts, and it will always use a fresh value for the key, it is clear that in any reachable state of the system, <code>lkR</code> can only become instantiated by fresh values. We can therefore mark <code>lkR</code> as being of sort fresh, therefore replacing it by <code>~lkR</code>.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
 <pre class="tamarin"><code>rule NaxosR:
   let 
       exR = h1(&lt; ~eskR, ~lkR &gt;)
