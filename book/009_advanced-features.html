@@ -288,12 +288,46 @@ end</code></pre>
 <p>to your Tamarin call, e.g.,</p>
 <pre><code>tamarin-prover Example.spthy --prove +RTS -N2 -RTS</code></pre>
 <p>to prove the lemmas in file <code>Example.spthy</code> using two cores.</p>
-<!-- One should add information on injective instances and the equation
-store from the old "doc/MANUAL.md" in the Tamarin source code
-repository here.  -->
+<h2 id="reasoning-about-exclusivity-facts-symbols-with-injective-instances"><a href="#reasoning-about-exclusivity-facts-symbols-with-injective-instances">Reasoning about Exclusivity: Facts Symbols with Injective Instances</a></h2>
+<p>We say that a fact symbol <code>f</code> has <em>injective instances</em> with respect to a multiset rewriting system <code>R</code>, if there is no reachable state of the multiset rewriting system <code>R</code> with more than one instance of an <code>f</code>-fact with the same term as a first argument. Injective facts typically arise from modeling databases using linear facts. An example of an fact with injective instances, is the <code>Store</code>-fact in the following multiset rewriting system.</p>
+<pre><code>  rule CreateKey: [ Fr(handle), Fr(key) ] --&gt; [ Store(handle, key) ]
 
+  rule NextKey:   [ Store(handle, key) ] --&gt; [ Store(handle, h(key)) ]
 
+  rule DelKey:    [ Store(handle,key) ] --&gt; []</code></pre>
+<p>When reasoning about the above multiset rewriting system, we exploit that <code>Store</code> has injective instances to prove that after the <code>DelKey</code> rule no other rule using the same handle can be applied. This proof uses trace induction and the following constraint-reduction rule that exploits facts with unique instances.</p>
+<p>Let <code>f</code> be a fact symbol with injective instances. Let <code>i</code>, <code>j</code>, and <code>k</code> be temporal variables ordered according to</p>
+<pre><code>  i &lt; j &lt; k</code></pre>
+<p>and let there be an edge from <code>(i,u)</code> to <code>(k,w)</code> for some indices <code>u</code> and <code>v</code>. Then, we have a contradiction, if the premise <code>(k,w)</code> requires a fact <code>f(t,...)</code> and there is a premise <code>(j,v)</code> requiring a fact <code>f(t,...)</code>. These two premises must be merged because the edge <code>(i,u) &gt;-&gt; (k,w)</code> crosses <code>j</code> and the state at <code>j</code> therefore contains <code>f(t,...)</code>. This merging is not possible due to the ordering constraints <code>i &lt; j &lt; k</code>.</p>
+<p>Note that computing the set of fact symbols with injective instances is undecidable in general. We therefore compute an under-approximation to this set using the following simple heuristic. A fact tag is guaranteed to have injective instance, if</p>
+<ol style="list-style-type: decimal">
+<li>the fact-symbol is linear,</li>
+<li>every introduction of such a fact is protected by a <code>Fr</code>-fact of the first term, and</li>
+<li>every rule has at most one copy of this fact-tag in the conclusion and the first term arguments agree.</li>
+</ol>
+<p>We exclude facts that are not copied in a rule, as they are already handled properly by the naive backwards reasoning.</p>
+<p>Note that this support for reasoning about exclusivity was sufficient for our case studies, but it is likely that more complicated case studies require additional support. For example, that fact symbols with injective instances can be specified by the user and the soundness proof that these symbols have injective instances is constructed explicitly using the Tamarin prover. Please tell us, if you encounter limitations in your case studies: https://github.com/tamarin-prover/tamarin-prover/issues.</p>
+<h2 id="equation-store"><a href="#equation-store">Equation Store</a></h2>
+<p>Tamarin stores equations in a special form to allow delaying case splits on them. This allows us for example to determine the shape of a signed message without case splitting on its variants. In the GUI, you can see the equation store being pretty printed as follows.</p>
+<pre><code>  free-substitution
 
+  1. fresh-substitution-group
+  ...
+  n. fresh substitution-group</code></pre>
+<p>The free-substitution represents the equalities that hold for the free variables in the constraint system in the usual normal form, i.e., a substitution. The variants of a protocol rule are represented as a group of substitutions mapping free variables of the constraint system to terms containing only fresh variables. The different fresh-substitutions in a group are interpreted as a disjunction.</p>
+<p>Logically, the equation store represents expression of the form</p>
+<pre><code>      x_1 = t_free_1
+    &amp; ...
+    &amp; x_n = t_free_n
+    &amp; ( (Ex y_111 ... y_11k. x_111 = t_fresh_111 &amp; ... &amp; x_11m = t_fresh_11m)
+      | ...
+      | (Ex y_1l1 ... y_1lk. x_1l1 = t_fresh_1l1 &amp; ... &amp; x_1lm = t_fresh_1lm)
+      )
+    &amp; ..
+    &amp; ( (Ex y_o11 ... y_o1k. x_o11 = t_fresh_o11 &amp; ... &amp; x_o1m = t_fresh_o1m)
+      | ...
+      | (Ex y_ol1 ... y_olk. x_ol1 = t_fresh_ol1 &amp; ... &amp; x_1lm = t_fresh_1lm)
+      )</code></pre>
 <div class="references">
 
 </div>
