@@ -49,7 +49,7 @@
     <div id='page'>
 <p class="halfbreak">
 </p>
-<h1 id="initial-example"><a href="#initial-example">Initial Example</a></h1>
+<h1 id="initial-example">Initial Example</h1>
 <p>We will start with a simple example of a protocol that consists of just two messages, written here in so-called Alice-and-Bob notation:</p>
 <pre><code>C -&gt; S: aenc(k, pkS)
 C &lt;- S: h(k)</code></pre>
@@ -60,7 +60,7 @@ C &lt;- S: h(k)</code></pre>
 begin</code></pre>
 <p>After the keyword <code>begin</code>, we first declare the cryptographic primitives the protocol uses. Afterward, we declare multiset rewriting rules that model the protocol, and finally we write the properties to be proven (called <em>lemmas</em> within the Tamarin framework), which specify the protocol's desired security properties. Note that we have also inserted comments to structure the theory.</p>
 <p>We next explain in detail the protocol model.</p>
-<h2 id="cryptographic-primitives"><a href="#cryptographic-primitives">Cryptographic primitives</a></h2>
+<h2 id="cryptographic-primitives">Cryptographic primitives</h2>
 <p>We are working in a symbolic model of security protocols. This means that we model messages as terms, built from functions, that satisfy an underlying equational theory describing their properties. This will be explained in detail in the part on <a href="004_cryptographic-messages.html#sec:cryptographic-messages">Cryptographic Messages</a>.</p>
 <p>In this example, we use Tamarin's built-in functions for hashing and asymmetric-encryption, declared in the following line:</p>
 <pre class="tamarin"><code>builtins: hashing, asymmetric-encryption</code></pre>
@@ -72,7 +72,7 @@ begin</code></pre>
 <li>a unary function <code>pk</code> denoting the public key corresponding to a private key.</li>
 </ul>
 <p>Moreover the built-in also specifies that the decryption of the ciphertext using the correct private key returns the initial plaintext, i.e., <code>adec(aenc(m, pk(sk)), sk)</code> is reduced to <code>m</code>.</p>
-<h2 id="modeling-a-public-key-infrastructure"><a href="#modeling-a-public-key-infrastructure">Modeling a Public Key Infrastructure</a></h2>
+<h2 id="modeling-a-public-key-infrastructure">Modeling a Public Key Infrastructure</h2>
 <p>In Tamarin, the protocol and its environment are modeled using <em>multiset rewriting rules</em>. The rules operate on the system's state, which is expressed as a multiset (i.e., a bag) of facts. Facts can be seen as predicates storing state information. For example, the fact <code>Out(h(k))</code> models that the protocol sent out the message <code>h(k)</code> on the public channel, and the fact <code>In(x)</code> models that the protocol receives the message <code>x</code> on the public channel.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
 <p>The example starts with the model of a public key infrastructure (PKI). Again, we use facts to store information about the state given by their arguments. The rules have a premise and a conclusion, separated by the arrow symbol <code>--&gt;</code>. Executing the rule requires that all facts in the premise are present in the current state and, as a result of the execution, the facts in the conclusion will be added to the state, while the premises are removed. Now consider the first rule, modeling the registration of a public key:</p>
 <pre class="tamarin"><code>rule Register_pk:
@@ -99,7 +99,7 @@ begin</code></pre>
     [ !Ltk(A, ltk) ]
   --[ LtkReveal(A) ]-&gt;
     [ Out(ltk) ]</code></pre>
-<h2 id="modeling-the-protocol"><a href="#modeling-the-protocol">Modeling the protocol</a></h2>
+<h2 id="modeling-the-protocol">Modeling the protocol</h2>
 <p>Recall the Alice-and-Bob notation of the protocol we want to model:</p>
 <pre><code>C -&gt; S: aenc(k, pkS)
 C &lt;- S: h(k)</code></pre>
@@ -133,7 +133,7 @@ rule Serv_1:
                                                   // decrypted request.</code></pre>
 <p>Here, the first rule models the client sending its message, while the second rule models it receiving a response. The third rule models the server, both receiving the message and responding in one single rule.</p>
 <p>Several explanations are in order. First, Tamarin uses C-style comments, so everything between <code>/*</code> and <code>*/</code> or the line following <code>//</code> is a comment. Second, we log the session-key setup requests received by servers using an action to allow the formalization of the authentication property for the client later.</p>
-<h2 id="modeling-security-properties"><a href="#modeling-security-properties">Modeling security properties</a></h2>
+<h2 id="modeling-security-properties">Modeling security properties</h2>
 <p>Security properties are defined over traces of the action facts of a protocol execution.</p>
 <p>We have two properties that we would like to evaluate. In the Tamarin framework, properties to be evaluated are denoted by lemmas. The first of these is on the secrecy of session key secrecy from the client point of view. The lemma <code>Client_session_key_secrecy</code> says that it cannot be that a client has set up a session key <code>k</code> with a server <code>S</code> and the adversary learned that <code>k</code> unless the adversary performed a long-term key reveal on the server <code>S</code>. The second lemma <code>Client_auth</code> specifies client authentication. This is the statement that, for all session keys <code>k</code> that the clients have setup with a server <code>S</code>, there must be a server that has answered the request or the adversary has previously performed a long-term key reveal on <code>S</code>.</p>
 <pre class="tamarin"><code>lemma Client_session_key_secrecy:
@@ -184,7 +184,7 @@ lemma Client_auth:
         SessKeyC(S, k) @ #i
       &amp; not(Ex #r. LtkReveal(S) @ r)
   &quot;</code></pre>
-<h2 id="sec:gui"><a href="#sec:gui">Graphical User Interface</a></h2>
+<h2 id="sec:gui">Graphical User Interface</h2>
 <p>How do you now prove that your lemmas are correct? If you execute the command line</p>
 <pre><code>tamarin-prover interactive FirstExample.spthy</code></pre>
 <p>you will then see the following output on the command line:</p>
@@ -205,14 +205,17 @@ Finished loading theories ... server ready at
 21/Jun/2016:09:16:01 +0200 [Info#yesod-core] Application launched @(yesod_83PxojfItaB8w9Rj9nFdZm:Yesod.Core.Dispatch ./Yesod/Core/Dispatch.hs:157:11)</code></pre>
 <p>At this point, if there were any syntax or wellformedness errors (for example if the same fact is used with different arities an error would be displayed) they would be displayed. See the part on <a href="008_modeling-issues.html#sec:modeling-issues">Modeling Issues</a> for details on how to deal with such errors.</p>
 <p>However, there are no such errors in our example, and thus the above command will start a web-server that loads all security protocol theories in the same directory as FirstExample.spthy. Point your browser to</p>
-<p><a href="http://localhost:3001">http://localhost:3001</a></p>
+<p><a href="http://localhost:3001" class="uri">http://localhost:3001</a></p>
 <p>and you will see the following welcome screen:</p>
-<p><img src="../images/tamarin-welcome.jpg" title="Welcome Screen" alt="Tamarin Web Interface" />{width=80%}<br /> The table in the middle shows all loaded theories. You can either click on a theory to explore it and prove your security properties, or upload further theories using the upload form at the bottom. Do note that no warnings will be displayed if you use the GUI in such a manner to load further theories, so we do recommend starting Tamarin from the command line in the appropriate directory.</p>
+<p><img src="../images/tamarin-welcome.jpg" title="Welcome Screen" alt="Tamarin Web Interface" style="width:80.0%" /><br />
+The table in the middle shows all loaded theories. You can either click on a theory to explore it and prove your security properties, or upload further theories using the upload form at the bottom. Do note that no warnings will be displayed if you use the GUI in such a manner to load further theories, so we do recommend starting Tamarin from the command line in the appropriate directory.</p>
 <p>If you click on the 'FirstExample' entry in the table of loaded theories, you should see the following:</p>
-<p><img src="../images/tamarin-tutorial-overview.jpg" title="FirstExample Theory Overview" alt="FirstExample Theory Overview" />{width=100%}<br /> On the left hand side, you see the theory: links to the message theory describing the adversary, the multiset rewrite rules and axioms describing your protocol, and the typed and untyped case distinctions, followed by the lemmas you want to prove. We will explain each of these in the following.</p>
+<p><img src="../images/tamarin-tutorial-overview.jpg" title="FirstExample Theory Overview" alt="FirstExample Theory Overview" style="width:100.0%" /><br />
+On the left hand side, you see the theory: links to the message theory describing the adversary, the multiset rewrite rules and axioms describing your protocol, and the typed and untyped case distinctions, followed by the lemmas you want to prove. We will explain each of these in the following.</p>
 <p>On the right hand side, you have a quick summary of the available commands and keyboard shortcuts you can use to navigate inside the theory. In the top right corner there are some links: <code>Index</code> leads back to the welcome page, <code>Download</code> allows you to download the current theory (including partial proofs if they exist), <code>Actions</code> and the sub-bullet <code>Show source</code> shows the theory's source code, and <code>Options</code> allows you to configure the level of details in the graph visualisation (see below for examples).</p>
 <p>If you click on <code>Message theory</code> on the left, you should see the following:</p>
-<p><img src="../images/tamarin-tutorial-message-theory.jpg" title="FirstExample Message Theory" alt="FirstExample Message Theory" />{width=100%}<br /> On the right side, you can now see the message theory, starting with the so-called <em>Signature</em>, which consists of all the functions and equations. These can be either user-defined or imported using the built-ins, as in our example. Note that Tamarin automatically adds a function <code>pair</code> to create pairs, and the functions <code>fst</code> and <code>snd</code> together with two equations to access the first and second parts of a pair. There is a shorthand for the <code>pair</code> using <code>&lt;</code> and <code>&gt;</code>, which is used here for example for <code>fst(&lt;x.1, x.2&gt;)</code>.</p>
+<p><img src="../images/tamarin-tutorial-message-theory.jpg" title="FirstExample Message Theory" alt="FirstExample Message Theory" style="width:100.0%" /><br />
+On the right side, you can now see the message theory, starting with the so-called <em>Signature</em>, which consists of all the functions and equations. These can be either user-defined or imported using the built-ins, as in our example. Note that Tamarin automatically adds a function <code>pair</code> to create pairs, and the functions <code>fst</code> and <code>snd</code> together with two equations to access the first and second parts of a pair. There is a shorthand for the <code>pair</code> using <code>&lt;</code> and <code>&gt;</code>, which is used here for example for <code>fst(&lt;x.1, x.2&gt;)</code>.</p>
 <p>Just below come the <em>Construction rules</em>. These rules describe the functions that the adversary can apply. Consider, for example, the following rule:</p>
 <pre><code>rule (modulo AC) ch:
  [ !KU( x ) ] --[ !KU( h(x) ) ]-&gt; [ !KU( h(x) ) ]</code></pre>
@@ -222,28 +225,35 @@ Finished loading theories ... server ready at
  [ !KD( &lt;x.1, x.2&gt; ) ] --&gt; [ !KD( x.1 ) ]</code></pre>
 <p>In a nutshell, this rule says that if the adversary knows the pair <code>&lt;x.1, x.2&gt;</code> (represented by the fact <code>!KD( &lt;x.1, x.2&gt; )</code>), then he can extract the first value <code>x.1</code> (represented by the fact <code>!KD( x.1 )</code>) from it. This results from applying <code>fst</code> to the pair and then using the equation <code>fst(&lt;x.1, x.2&gt;) = x.1</code>. The precise difference between <code>!KD( )</code> and <code>!KU( )</code> facts is not important for now, and will be explained below. As a first approximation, both represent they adversary's knowledge and the distinction is only used to make the tool's reasoning more efficient.</p>
 <p>Now click on <em>Multiset rewriting rules</em> on the left.</p>
-<p><img src="../images/tamarin-tutorial-multiset-rules.jpg" title="FirstExample Multiset Rewriting Rules" alt="FirstExample Multiset Rewriting Rules" />{width=100%}<br /> On the right side of the screen are the protocol's rewriting rules, plus two additional rules: <code>isend</code> and <code>irecv</code><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>. These two extra rules provide an interface between the protocols output and input and the adversary deduction. The rule <code>isend</code> takes a fact <code>!KU(x)</code>, i.e., a value <code>x</code> that the adversary knows, and passes it to a protocol input <code>In(x)</code>. The rule <code>irecv</code> takes a protocol output <code>Out(x)</code> and passes it to the adversary knowledge, represented by the <code>!KD(x)</code> fact. Note that the rule <code>Serv_1</code> from the protocol has two <em>variants (modulo AC)</em>. The precise meaning of this is unimportant right now (it stems from the way Tamarin deals with equations) and will be explained in the <a href="004_cryptographic-messages.html#sec:cryptographic-messages">section on cryptographic messages</a>.</p>
+<p><img src="../images/tamarin-tutorial-multiset-rules.jpg" title="FirstExample Multiset Rewriting Rules" alt="FirstExample Multiset Rewriting Rules" style="width:100.0%" /><br />
+On the right side of the screen are the protocol's rewriting rules, plus two additional rules: <code>isend</code> and <code>irecv</code><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>. These two extra rules provide an interface between the protocols output and input and the adversary deduction. The rule <code>isend</code> takes a fact <code>!KU(x)</code>, i.e., a value <code>x</code> that the adversary knows, and passes it to a protocol input <code>In(x)</code>. The rule <code>irecv</code> takes a protocol output <code>Out(x)</code> and passes it to the adversary knowledge, represented by the <code>!KD(x)</code> fact. Note that the rule <code>Serv_1</code> from the protocol has two <em>variants (modulo AC)</em>. The precise meaning of this is unimportant right now (it stems from the way Tamarin deals with equations) and will be explained in the <a href="004_cryptographic-messages.html#sec:cryptographic-messages">section on cryptographic messages</a>.</p>
 <p>Now click on <code>Untyped case distinctions (10 cases, all chains solved)</code> to see the following:</p>
 <!-- FIX: When we switch to raw/refined sources, change this whole thing to look
 at the second set (refined/type case distinctions) also in the pictures, since
 those are the ones actually used in the proof, and 'raw' is just an
 uninteresting intermediate result. -->
-
-<p><img src="../images/tamarin-tutorial-case-distinctions.jpg" title="FirstExample Case Distinctions" alt="FirstExample Case Distinctions Rules" />{width=100%}<br /> To improve the efficiency of its internal reasoning, Tamarin precomputes case distinctions. A case distinction gives all possible sources for a fact, i.e., all rules (or combinations of rules) that produce this fact, and can then be used during Tamarin's backward search. These case distinctions are used to avoid repeatedly computing the same things. On the right hand side is the result of the precomputations for our FirstExample theory.</p>
+<p><img src="../images/tamarin-tutorial-case-distinctions.jpg" title="FirstExample Case Distinctions" alt="FirstExample Case Distinctions Rules" style="width:100.0%" /><br />
+To improve the efficiency of its internal reasoning, Tamarin precomputes case distinctions. A case distinction gives all possible sources for a fact, i.e., all rules (or combinations of rules) that produce this fact, and can then be used during Tamarin's backward search. These case distinctions are used to avoid repeatedly computing the same things. On the right hand side is the result of the precomputations for our FirstExample theory.</p>
 <p>For example, here Tamarin tells us that there is one possible source of the fact <code>!Ltk( t.1, t.2 )</code>, namely the rule <code>Register_pk</code>. The image shows the (incomplete) graph representing the execution. The green box symbolizes the instance of the <code>Register_pk</code> rule, and the trapezoid on the bottom stands for the &quot;sink&quot; of the <code>!Ltk( t.1, t.2 )</code> fact. Here the case distinction consists of only one rule instance, but there can be potentially multiple rule instances, and multiple cases inside the case distinction, as in the following images.</p>
 <p>The technical information given below the image is unimportant for now, it provides details about how the case distinction was computed and if there are other constraints such as equations or substitutions that still must be resolved.</p>
-<p><img src="../images/tamarin-tutorial-case-distinctions-1.jpg" title="FirstExample Case Distinctions 1 of 3" alt="FirstExample Case Distinctions 1 of 3" />{width=60%}<br /> Here the fact <code>!KU( ~t.1 )</code> has three sources, the first one is the rule <code>Reveal_ltk</code>, which requires an instance of the rule <code>Register_pk</code> to create the necessary <code>!Ltk</code> fact. The other two sources are given below.</p>
-<p><img src="../images/tamarin-tutorial-case-distinctions-2.jpg" title="FirstExample Case Distinctions 2 of 3" alt="FirstExample Case Distinctions 2 of 3" />{width=70%}<br /> <img src="../images/tamarin-tutorial-case-distinctions-3.jpg" title="FirstExample Case Distinctions 3 of 3" alt="FirstExample Case Distinctions 3 of 3" />{width=40%}<br /> Now we will see how to prove lemmas in the interactive mode. For that, click on <code>sorry</code> (indicating that the proof has not been started) after the first lemma in the left frame to obtain the following screen:</p>
-<p><img src="../images/tamarin-tutorial-lemma-1.jpg" title="FirstExample Lemma 1" alt="FirstExample Lemma 1" />{width=100%}<br /> Tamarin proves lemmas using constraint solving. Namely, it refines the knowledge it has about the property and the protocol (called a <em>constraint system</em>) until it can either conclude that the property holds in all possible cases, or until it finds a counterexample to the lemma.</p>
+<p><img src="../images/tamarin-tutorial-case-distinctions-1.jpg" title="FirstExample Case Distinctions 1 of 3" alt="FirstExample Case Distinctions 1 of 3" style="width:60.0%" /><br />
+Here the fact <code>!KU( ~t.1 )</code> has three sources, the first one is the rule <code>Reveal_ltk</code>, which requires an instance of the rule <code>Register_pk</code> to create the necessary <code>!Ltk</code> fact. The other two sources are given below.</p>
+<p><img src="../images/tamarin-tutorial-case-distinctions-2.jpg" title="FirstExample Case Distinctions 2 of 3" alt="FirstExample Case Distinctions 2 of 3" style="width:70.0%" /><br />
+<img src="../images/tamarin-tutorial-case-distinctions-3.jpg" title="FirstExample Case Distinctions 3 of 3" alt="FirstExample Case Distinctions 3 of 3" style="width:40.0%" /><br />
+Now we will see how to prove lemmas in the interactive mode. For that, click on <code>sorry</code> (indicating that the proof has not been started) after the first lemma in the left frame to obtain the following screen:</p>
+<p><img src="../images/tamarin-tutorial-lemma-1.jpg" title="FirstExample Lemma 1" alt="FirstExample Lemma 1" style="width:100.0%" /><br />
+Tamarin proves lemmas using constraint solving. Namely, it refines the knowledge it has about the property and the protocol (called a <em>constraint system</em>) until it can either conclude that the property holds in all possible cases, or until it finds a counterexample to the lemma.</p>
 <p>On the right, we now have the possible proof steps at the top, and the current state of the constraint system just below (which is empty, as we have not started the proof yet). A proof always starts with either a simplification step (<code>1. simplify</code>), which translates the lemma into an initial constraint system that needs to be resolved, or an induction setup step (<code>2. induction</code>), which generates the necessary constraints to prove the lemma using induction on the length of the trace. Here we use the default strategy, i.e., a simplification step by clicking on <code>1. simplify</code>, to obtain the following screen:</p>
-<p><img src="../images/tamarin-tutorial-lemma-1-simplify.jpg" title="FirstExample Lemma 1 Step 1" alt="FirstExample Lemma 1 Step 1" />{width=100%}<br /> Tamarin has now translated the lemma into a constraint system. Since Tamarin looks for counterexamples to the lemma, it looks for a protocol execution that contains a <code>SessKeyC( S, k )</code> and a <code>K( k )</code> action, but does not use an <code>LtkReveal( S )</code>. This is visualized in the graph as follows. The only way of getting a <code>SessKeyC( S, k )</code> action is using an instance of the <code>Client_2</code> rule on the left, and the <code>K( k )</code> rule is symbolized on the right using a round box (adversary reasoning is always visualized using round boxes). Just below the graph, the formula</p>
+<p><img src="../images/tamarin-tutorial-lemma-1-simplify.jpg" title="FirstExample Lemma 1 Step 1" alt="FirstExample Lemma 1 Step 1" style="width:100.0%" /><br />
+Tamarin has now translated the lemma into a constraint system. Since Tamarin looks for counterexamples to the lemma, it looks for a protocol execution that contains a <code>SessKeyC( S, k )</code> and a <code>K( k )</code> action, but does not use an <code>LtkReveal( S )</code>. This is visualized in the graph as follows. The only way of getting a <code>SessKeyC( S, k )</code> action is using an instance of the <code>Client_2</code> rule on the left, and the <code>K( k )</code> rule is symbolized on the right using a round box (adversary reasoning is always visualized using round boxes). Just below the graph, the formula</p>
 <pre><code>formulas: ∀ #r. (LtkReveal( S ) @ #r) ⇒ ⊥</code></pre>
 <p>now states that any occurrence of <code>LtkReveal( S )</code> will lead to a contradiction.</p>
 <p>To finish the proof, we can either continue manually by selecting the constraint to resolve next, or by calling the <code>autoprove</code> command, which selects the next steps based on a heuristic. Here we have two constraints to resolve: <code>Client_1( S, k )</code> and <code>KU( k )</code>, both of which are premises for the rules in the unfinished current constraint system.</p>
 <p>Note that that the proof methods in the GUI are sorted according to the same heuristic as is used by the <code>autoprove</code> command. Any proof found by always selecting the first proof method will be identical to the one constructed by the <code>autoprove</code> command. However, because the general problem is undecidable, the algorithm may not terminate for every protocol and property.</p>
 <p>In this example, both by clicking multiple times on the first constraint or by using the autoprover, we end with the following final state, where the constructed graph leads to a contradiction as it contains <code>LtkReveal( S )</code>:</p>
-<p><img src="../images/tamarin-tutorial-lemma-1-finished.jpg" title="FirstExample Lemma 1 Finished" alt="FirstExample Lemma 1 Finished" />{width=100%}<br /> The lemma is now colored in green as it was successfully proven. If we had found a counterexample, it would be colored in red. You can prove the other lemmas in the same way.</p>
-<h2 id="running-tamarin-on-the-command-line"><a href="#running-tamarin-on-the-command-line">Running Tamarin on the Command Line</a></h2>
+<p><img src="../images/tamarin-tutorial-lemma-1-finished.jpg" title="FirstExample Lemma 1 Finished" alt="FirstExample Lemma 1 Finished" style="width:100.0%" /><br />
+The lemma is now colored in green as it was successfully proven. If we had found a counterexample, it would be colored in red. You can prove the other lemmas in the same way.</p>
+<h2 id="running-tamarin-on-the-command-line">Running Tamarin on the Command Line</h2>
 <p>The call</p>
 <pre><code>tamarin-prover FirstExample.spthy</code></pre>
 <p>parses the <code>FirstExample.spthy</code> file, checks its wellformedness, and pretty-prints the theory. The declaration of the signature and the equations can be found at the top of the pretty-printed theory.</p>
@@ -258,7 +268,7 @@ analyzed: FirstExample.spthy
   Client_auth (all-traces): verified (11 steps)
   Client_auth_injective (all-traces): verified (15 steps)
   Client_session_key_honest_setup (exists-trace): verified (5 steps)</code></pre>
-<h2 id="complete-example"><a href="#complete-example">Complete Example</a></h2>
+<h2 id="complete-example">Complete Example</h2>
 <p>Here is the complete input file:</p>
 <pre class="tamarin"><code>/*
 Initial Example for the Tamarin Manual
@@ -372,9 +382,6 @@ lemma Client_session_key_honest_setup:
   &quot;
 
 end</code></pre>
-<div class="references">
-
-</div>
 <div class="footnotes">
 <hr />
 <ol>

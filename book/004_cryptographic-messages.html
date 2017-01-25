@@ -49,20 +49,19 @@
     <div id='page'>
 <p class="halfbreak">
 </p>
-<h1 id="sec:cryptographic-messages"><a href="#sec:cryptographic-messages">Cryptographic Messages</a></h1>
+<h1 id="sec:cryptographic-messages">Cryptographic Messages</h1>
 <p>Tamarin analyzes protocols with respect to a symbolic model of cryptography. This means cryptographic messages are modeled as terms rather than bit strings.</p>
 <!--  
 [^1]: FIXME: Should we write more about terms and equations.
 -->
-
 <p>The properties of the employed cryptographic algorithms are modeled by equations. More concretely, a cryptographic message is either a constant <code>c</code> or a message <code>f(m1,...,mn)</code> corresponding to the application of the <code>n</code>-ary function symbol <code>f</code> to <code>n</code> cryptographic messages <code>m1</code>, ..., <code>mn</code>. When specifying equations, we also allow for variables in addition to constants.</p>
-<h2 id="constants"><a href="#constants">Constants</a></h2>
+<h2 id="constants">Constants</h2>
 <p>We distinguish between two types of constants:</p>
 <ul>
 <li><em>Public constants</em> model publicly known atomic messages such as agent identities and labels. We use the notation <code>'ident'</code> to denote public constants in Tamarin.</li>
 <li><em>Fresh constants</em> model random values such as secret keys or random nonces. We use the notation <code>~'ident'</code> to denote fresh constants in Tamarin. Note that fresh <em>constants</em> are rarely used in protocol specifications. A fresh <em>variable</em> is almost always the right choice.</li>
 </ul>
-<h2 id="function-symbols"><a href="#function-symbols">Function Symbols</a></h2>
+<h2 id="function-symbols">Function Symbols</h2>
 <p>Tamarin supports a fixed set of built-in function symbols and additional user-defined function symbols. The only function symbols available in every Tamarin file are for pairing and projection. The binary function symbol <code>pair</code> models the pair of two messages and the function symbols <code>fst</code> and <code>snd</code> model the projections of the first and second argument. The properties of projection are captured by the following equations:</p>
 <pre><code>fst(pair(x,y)) = x
 snd(pair(x,y)) = y</code></pre>
@@ -74,38 +73,48 @@ snd(pair(x,y)) = y</code></pre>
 <p>Tamarin also supports <em>private function symbols</em>. In contrast to regular function symbols, Tamarin assumes that private function symbols cannot be applied by the adversary. Private functions can be used to model functions that implicitly use some secret that is shared between all (honest) users. To make a function private, simply add the attribute <code>[private]</code> after the function declaration. For example, the line</p>
 <pre><code>functions: f/3, g/2 [private], h/1</code></pre>
 <p>defines the private function <code>g</code> and the public functions <code>f</code> and <code>h</code>. We will describe in the next section how you can define equations that formalize properties of functions.</p>
-<h2 id="sec:equational-theories"><a href="#sec:equational-theories">Equational theories</a></h2>
+<h2 id="sec:equational-theories">Equational theories</h2>
 <p>Equational theories can be used to model properties of functions, e.g., that symmetric decryption is the inverse of symmetric encryption whenever both use the same key. The syntax for adding equations to the context is:</p>
 <pre><code>equations: lhs1 = rhs1, ..., lhsn = rhsn</code></pre>
 <p>Both <code>lhs</code> and <code>rhs</code> can contain variables. The symbolic proof search used by Tamarin only supports a restricted class of user-defined equations. Concretely, the right-hand-side must be either a ground term (i.e., it does not contain any variables) or a proper subterm of the left-hand-side. Note that the equations modeled by the built-in message theories <code>diffie-hellman</code>, <code>bilinear-pairing</code>, and <code>multiset</code> do not belong to this restricted class since they include for example associativity and commutativity. All other built-in message theories can be equivalently defined by using <code>functions: ...</code> and <code>equations: ...</code> and we will see some examples of allowed equations in the next section.</p>
-<h2 id="sec:builtin-theories"><a href="#sec:builtin-theories">Built-in message theories</a></h2>
+<h2 id="sec:builtin-theories">Built-in message theories</h2>
 <p>In the following, we write <code>f/n</code> to denote that the function symbol <code>f</code> is <code>n</code>-ary.</p>
-<p><code>hashing</code>:</p>
-<p>: This theory models a hash function. It defines the function symbol <code>h/1</code> and no equations.</p>
-<p><code>asymmetric-encryption</code>:</p>
-<p>: This theory models a public key encryption scheme. It defines the function symbols <code>aenc/2</code>, <code>adec/2</code>, and <code>pk/1</code>, which are related by the equation <code>adec(aenc(m, pk(sk)), sk) = m</code>. Note that as described in <a href="014_syntax_description.html">Syntax Description</a>, <code>aenc{x,y}pkB</code> is syntactic sugar for <code>aenc(&lt;x,y&gt;, pkB)</code>. <!-- This is otherwise not mentioned until Ch14: Syntax Description --></p>
-<p><code>signing</code>:</p>
-<p>: This theory models a signature scheme. It defines the function symbols <code>sign/2</code>, <code>verify/3</code>, <code>pk/1</code>, and <code>true</code>, which are related by the equation <code>verify(sign(m,sk),m,pk(sk)) = true</code>.</p>
-<p><code>symmetric-encryption</code>:</p>
-<p>: This theory models a symmetric encryption scheme. It defines the function symbols <code>senc/2</code> and <code>sdec/2</code>, which are related by the equation <code>sdec(senc(m,k),k) = m</code>.</p>
-<p><code>diffie-hellman</code>:</p>
-<p>: This theory models Diffie-Hellman groups. It defines the function symbols <code>inv/1</code>, <code>1/0</code>, and the symbols <code>^</code> and <code>*</code>. We use <code>g ^ a</code> to denote exponentiation in the group and <code>*</code>, <code>inv</code> and <code>1</code> to model the (multiplicative) abelian group of exponents (the integers modulo the group order). The set of defined equations is:</p>
+<dl>
+<dt><code>hashing</code>:</dt>
+<dd><p>This theory models a hash function. It defines the function symbol <code>h/1</code> and no equations.</p>
+</dd>
+<dt><code>asymmetric-encryption</code>:</dt>
+<dd><p>This theory models a public key encryption scheme. It defines the function symbols <code>aenc/2</code>, <code>adec/2</code>, and <code>pk/1</code>, which are related by the equation <code>adec(aenc(m, pk(sk)), sk) = m</code>. Note that as described in <a href="014_syntax_description.html">Syntax Description</a>, <code>aenc{x,y}pkB</code> is syntactic sugar for <code>aenc(&lt;x,y&gt;, pkB)</code>. <!-- This is otherwise not mentioned until Ch14: Syntax Description --></p>
+</dd>
+<dt><code>signing</code>:</dt>
+<dd><p>This theory models a signature scheme. It defines the function symbols <code>sign/2</code>, <code>verify/3</code>, <code>pk/1</code>, and <code>true</code>, which are related by the equation <code>verify(sign(m,sk),m,pk(sk)) = true</code>.</p>
+</dd>
+<dt><code>symmetric-encryption</code>:</dt>
+<dd><p>This theory models a symmetric encryption scheme. It defines the function symbols <code>senc/2</code> and <code>sdec/2</code>, which are related by the equation <code>sdec(senc(m,k),k) = m</code>.</p>
+</dd>
+<dt><code>diffie-hellman</code>:</dt>
+<dd><p>This theory models Diffie-Hellman groups. It defines the function symbols <code>inv/1</code>, <code>1/0</code>, and the symbols <code>^</code> and <code>*</code>. We use <code>g ^ a</code> to denote exponentiation in the group and <code>*</code>, <code>inv</code> and <code>1</code> to model the (multiplicative) abelian group of exponents (the integers modulo the group order). The set of defined equations is:</p>
+</dd>
+</dl>
 <pre><code>(x^y)^z  = x^(y*z)
 x^1      = x
 x*y      = y*x
 x*1      = x
 x*inv(x) = 1</code></pre>
-<p><code>bilinear-pairing</code>:</p>
-<p>: This theory models bilinear groups. It extends the <code>diffie-hellman</code> theory with the function symbols <code>pmult/2</code> and <code>em/2</code>. Here, <code>pmult(x,p)</code> denotes the multiplication of the point <code>p</code> by the scalar <code>x</code> and <code>em(p,q)</code> denotes the application of the bilinear map to the points <code>p</code> and <code>q</code>. The additional equations are:</p>
+<dl>
+<dt><code>bilinear-pairing</code>:</dt>
+<dd><p>This theory models bilinear groups. It extends the <code>diffie-hellman</code> theory with the function symbols <code>pmult/2</code> and <code>em/2</code>. Here, <code>pmult(x,p)</code> denotes the multiplication of the point <code>p</code> by the scalar <code>x</code> and <code>em(p,q)</code> denotes the application of the bilinear map to the points <code>p</code> and <code>q</code>. The additional equations are:</p>
+</dd>
+</dl>
 <pre><code>pmult(x,(pmult(y,p)) = pmult(x*y,p)
 pmult(1,p)           = p
 em(p,q)              = em(q,p)
 em(pmult(x,p),q)     = pmult(x,em(q,p))</code></pre>
-<p><code>multiset</code>:</p>
-<p>: This theory introduces the associative-commutative operator <code>+</code> which is usually used to model multisets.</p>
-<div class="references">
-
-</div>
+<dl>
+<dt><code>multiset</code>:</dt>
+<dd><p>This theory introduces the associative-commutative operator <code>+</code> which is usually used to model multisets.</p>
+</dd>
+</dl>
     </div>
   </div>
 </body>

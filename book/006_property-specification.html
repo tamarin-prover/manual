@@ -49,9 +49,9 @@
     <div id='page'>
 <p class="halfbreak">
 </p>
-<h1 id="sec:property_specification"><a href="#sec:property_specification">Property Specification</a></h1>
+<h1 id="sec:property_specification">Property Specification</h1>
 <p>In this section we present how to specify protocol properties as trace and observational equivalence properties, based on the action facts given in the model. Trace properties are given as guarded first-order logic formulas and observational equivalence properties are specified using the <code>diff</code> operator, both of which we will see in detail below.</p>
-<h2 id="trace-properties"><a href="#trace-properties">Trace Properties</a></h2>
+<h2 id="trace-properties">Trace Properties</h2>
 <p>The Tamarin multiset rewriting rules define a labeled transition system. The system's state is a multiset (bag) of facts and the initial system state is the empty multiset. The rules define how the system can make a transition to a new state. The types of facts and their use are described in Section <a href="005_protocol-specification.html#sec:rules">Rules</a>. Here we focus on the <em>action facts</em> which are used to reason about a protocol's behaviour.</p>
 <p>A rule can be applied to a state if it can be instantiated such that its left hand side is contained in the current state. In this case, the left-hand side facts are removed from the state, and replaced by the instantiated right hand side. The application of the rule is recorded in the <em>trace</em> by appending the instantiated action facts to the trace.</p>
 <p>For instance, consider the following fictitious rule</p>
@@ -87,7 +87,7 @@
 <pre><code>lemma distinct_nonces: 
   exists-trace 
     &quot;not All n #i #j. Act1(n)@i &amp; Act1(n)@j ==&gt; #i=#j&quot;</code></pre>
-<h3 id="secrecy"><a href="#secrecy">Secrecy</a></h3>
+<h3 id="secrecy">Secrecy</h3>
 <p>In this section we briefly explain how you can express standard secrecy properties in Tamarin and give a short example. See <a href="#sec:elsewhere">Protocol and Standard Security Property Specification Templates</a> for an in-depth discussion.</p>
 <p>Tamarin's built-in message deduction rule</p>
 <pre><code>rule isend: 
@@ -163,7 +163,7 @@ lemma secret_B:
 
 end</code></pre>
 <p>In the above example the lemma <code>secret_A</code> holds as the initiator generated the fresh value, while the responder has no guarantees, i.e., lemma <code>secret_B</code> yields an attack.</p>
-<h3 id="sec:message-authentication"><a href="#sec:message-authentication">Authentication</a></h3>
+<h3 id="sec:message-authentication">Authentication</h3>
 <p>In this section we show how to specify a simple message authentication property. For specifications of the properties in Lowe's hierarchy of authentication specifications <span class="citation">(Lowe 1997)</span> see the Section <a href="#sec:elsewhere">Protocol and Standard Security Property Specification Templates</a>.</p>
 <p>We specify the following <em>message authentication</em> property: If an agent <code>a</code> believes that a message <code>m</code> was sent by an agent <code>b</code>, then <code>m</code> was indeed sent by <code>b</code>. To specify <code>a</code>'s belief we label an appropriate rule in <code>a</code>'s role specification with the action <code>Authentic(b,m)</code>. The following lemma defines the set of traces that satisfy the message authentication property.</p>
 <pre><code>lemma message_authentication: 
@@ -224,7 +224,7 @@ lemma message_authentication:
      ==&gt; (Ex #j. Send(b,m) @j &amp; j&lt;i)&quot;
 
 end</code></pre>
-<h2 id="observational-equivalence"><a href="#observational-equivalence">Observational Equivalence</a></h2>
+<h2 id="observational-equivalence">Observational Equivalence</h2>
 <p>All the previous properties are trace properties, i.e., properties that are defined on each trace independently. For example, the definition of secrecy required that there is no trace where the adversary could compute the secret without having previously corrupted the agent.</p>
 <p>In contrast, Observational Equivalence properties reason about two systems (for example two instances of a protocol), by showing that an intruder cannot distinguish these two systems. This can be used to express privacy-type properties, or cryptographic indistinguishability properties.</p>
 <p>For example, a simple definition of privacy for voting requires that an adversary cannot distinguish two instances of a voting protocol where two voters swap votes. That is, in the first instance, voter <code>A</code> votes for candidate <code>a</code> and voter <code>B</code> votes for <code>b</code>, and in the second instance voter <code>A</code> votes for candidate <code>b</code> and voter <code>B</code> votes for <code>a</code>. If the intruder cannot tell both instances apart, he does not know which voter votes for which candidate, even though he might learn the result, i.e., that there is one vote for a and one for b.</p>
@@ -235,22 +235,31 @@ end</code></pre>
 <p>However, he can know whether in the last message <code>~a</code> or <code>~b</code> was encrypted by simply taking the output <code>~a</code>, encrypting it with the public key and comparing it to the published ciphertext. This is captured using observational equivalence.</p>
 <p>To see how this works, we need to start Tamarin in observational equivalence mode by adding a <code>--diff</code> to the command:</p>
 <pre><code>tamarin-prover interactive --diff ObservationalEquivalenceExample.spthy</code></pre>
-<p>Now point you browser to <a href="http://localhost:3001">http://localhost:3001</a>. After clicking on the theory <code>ObservationalEquivalenceExample</code>, you should see the following.</p>
-<p><img src="../images/tamarin-obseq-overview.jpg" title="Observational Equivalence Overview" alt="Observational Equivalence Overview" />{width=100%}<br /> There are mutiple differences to the 'normal' trace mode.</p>
+<p>Now point you browser to <a href="http://localhost:3001" class="uri">http://localhost:3001</a>. After clicking on the theory <code>ObservationalEquivalenceExample</code>, you should see the following.</p>
+<p><img src="../images/tamarin-obseq-overview.jpg" title="Observational Equivalence Overview" alt="Observational Equivalence Overview" style="width:100.0%" /><br />
+There are mutiple differences to the 'normal' trace mode.</p>
 <p>First, there is a new option <code>Diff Rules</code>, which will simply present the rewrite rules from the <code>.spthy</code> file. (See image below.)</p>
 <p>Second, all the other points (Message Theory, Multiset Rewrite Rules, Untyped/Typed Case Distinctions) have been quadruplicated. The reason for this is that any input file with the <code>diff</code> operator actually specifies two models: one model where each instance of <code>diff(x,y)</code> is replaced with <code>x</code> (the <em>left hand side</em>, or LHS for short), and one model where each instance of <code>diff(x,y)</code> is replaced with <code>y</code> (the <em>right hand side</em>, or RHS for short). Moreover, as the observational equivalence mode requires different precomputations, each of the two models is treated twice. For examle, the point <code>RHS: Untyped case distinctions [Diff]</code> gives the untyped case distinctions for the RHS interpretation of the model in observational equivalence mode, whereas <code>LHS: Untyped case distinctions</code> gives the untyped case distinctions for the LHS interpretation of the model in the 'trace' mode.</p>
 <p>Third, all lemmas have been duplicated: the lemma <code>B_is_secret</code> exists once on the left hand side (marked using <code>[left]</code>) and once on the right hand side (marked using <code>[right]</code>), as both models can differ and thus the lemma needs to be proven on both sides.</p>
 <p>Finally, there is a new lemma <code>Observational_equivalence</code>, added automatically by Tamarin (so no need to define it in the <code>.spthy</code> input file). By proving this lemma we can prove observational equivalence between the LHS and RHS models.</p>
 <p>In the <code>Diff Rules</code>, we have the rules as written in the input file:</p>
-<p><img src="../images/tamarin-obseq-diff-rules.jpg" title="Observational Equivalence Diff Rules" alt="Observational Equivalence Diff Rules" />{width=100%}<br /> If we click on <code>LHS: Multiset rewriting rules</code>, we get the LHS interpretation of the rules (here <code>diff(~a, ~b)</code> was replaced by <code>~a</code>):</p>
-<p><img src="../images/tamarin-obseq-lhs-rules.jpg" title="Observational Equivalence LHS Rules" alt="Observational Equivalence LHS Rules" />{width=100%}<br /> If we click on <code>RHS: Multiset rewriting rules</code>, we get the RHS interpretation of the rules (here <code>diff(~a, ~b)</code> was replaced by <code>~b</code>):</p>
-<p><img src="../images/tamarin-obseq-rhs-rules.jpg" title="Observational Equivalence RHS Rules" alt="Observational Equivalence RHS Rules" />{width=100%}<br /> We can easily prove the <code>B_is_secret</code> lemma on both sides:</p>
-<p><img src="../images/tamarin-obseq-lemmas.jpg" title="Observational Equivalence Lemmas" alt="Observational Equivalence Lemmas" />{width=100%}<br /> To start proving observational equivalence, we only have the proof step <code>1.  rule-equivalence</code>. This generates multiple subcases:</p>
-<p><img src="../images/tamarin-obseq-lemma-step1.jpg" title="Proving the Observational Equivalence Lemma" alt="Proving the Observational Equivalence Lemma" />{width=100%}<br /> Essentially, there is a subcase per protocol rule, and there are also cases for several adversary rules. The idea of the proof is to show that whenever a rule can be executed on either the LHS or RHS, it can also be executed on the other side. Thus, no matter what the adversary does, he will always see 'equivalent' executions. To prove this, Tamarin computes for each rule all possible executions on both sides, and verifies whether an 'equivalent' execution exists on the other side. If we continue our proof by clicking on <code>backward-search</code>, Tamarin generates two sub-cases, one for each side. For each side, Tamarin will continue by constructing all possible executions of this rule.</p>
-<p><img src="../images/tamarin-obseq-lemma-step2.jpg" title="Proving the Observational Equivalence Lemma" alt="Proving the Observational Equivalence Lemma" />{width=100%}<br /> During this search, Tamarin can encounter executions that can be 'mirrored' on the other side, for example the following execution where the published key is successfully compared to itself:</p>
-<p><img src="../images/tamarin-obseq-lemma-mirrored.jpg" title="Proving the Observational Equivalence Lemma: Mirrored" alt="Proving the Observational Equivalence Lemma: Mirrored" />{width=100%}<br /> Or, Tamarin can encounter executions that do not map to the other side. For example the following execution on the LHS that encrypts <code>~a</code> using the public key and successfully compares the result to the published ciphertext, is not possible on the RHS (as there the ciphertext contains <code>~b</code>). Such an execution corresponds to a potential attack, and thus invalidates the &quot;Observational_equivalence&quot; lemma.</p>
-<p><img src="../images/tamarin-obseq-lemma-attack.jpg" title="Proving the Observational Equivalence Lemma: Attack" alt="Proving the Observational Equivalence Lemma: Attack" />{width=100%}<br /> Note that Tamarin needs to potentially consider numerous possible executions, which can result in long proof times or even non-termination. If possible it tries not to resolve parts of the execution that are irrelevant, but this is not always sufficient.</p>
-<h2 id="axioms"><a href="#axioms">Axioms</a></h2>
+<p><img src="../images/tamarin-obseq-diff-rules.jpg" title="Observational Equivalence Diff Rules" alt="Observational Equivalence Diff Rules" style="width:100.0%" /><br />
+If we click on <code>LHS: Multiset rewriting rules</code>, we get the LHS interpretation of the rules (here <code>diff(~a, ~b)</code> was replaced by <code>~a</code>):</p>
+<p><img src="../images/tamarin-obseq-lhs-rules.jpg" title="Observational Equivalence LHS Rules" alt="Observational Equivalence LHS Rules" style="width:100.0%" /><br />
+If we click on <code>RHS: Multiset rewriting rules</code>, we get the RHS interpretation of the rules (here <code>diff(~a, ~b)</code> was replaced by <code>~b</code>):</p>
+<p><img src="../images/tamarin-obseq-rhs-rules.jpg" title="Observational Equivalence RHS Rules" alt="Observational Equivalence RHS Rules" style="width:100.0%" /><br />
+We can easily prove the <code>B_is_secret</code> lemma on both sides:</p>
+<p><img src="../images/tamarin-obseq-lemmas.jpg" title="Observational Equivalence Lemmas" alt="Observational Equivalence Lemmas" style="width:100.0%" /><br />
+To start proving observational equivalence, we only have the proof step <code>1.  rule-equivalence</code>. This generates multiple subcases:</p>
+<p><img src="../images/tamarin-obseq-lemma-step1.jpg" title="Proving the Observational Equivalence Lemma" alt="Proving the Observational Equivalence Lemma" style="width:100.0%" /><br />
+Essentially, there is a subcase per protocol rule, and there are also cases for several adversary rules. The idea of the proof is to show that whenever a rule can be executed on either the LHS or RHS, it can also be executed on the other side. Thus, no matter what the adversary does, he will always see 'equivalent' executions. To prove this, Tamarin computes for each rule all possible executions on both sides, and verifies whether an 'equivalent' execution exists on the other side. If we continue our proof by clicking on <code>backward-search</code>, Tamarin generates two sub-cases, one for each side. For each side, Tamarin will continue by constructing all possible executions of this rule.</p>
+<p><img src="../images/tamarin-obseq-lemma-step2.jpg" title="Proving the Observational Equivalence Lemma" alt="Proving the Observational Equivalence Lemma" style="width:100.0%" /><br />
+During this search, Tamarin can encounter executions that can be 'mirrored' on the other side, for example the following execution where the published key is successfully compared to itself:</p>
+<p><img src="../images/tamarin-obseq-lemma-mirrored.jpg" title="Proving the Observational Equivalence Lemma: Mirrored" alt="Proving the Observational Equivalence Lemma: Mirrored" style="width:100.0%" /><br />
+Or, Tamarin can encounter executions that do not map to the other side. For example the following execution on the LHS that encrypts <code>~a</code> using the public key and successfully compares the result to the published ciphertext, is not possible on the RHS (as there the ciphertext contains <code>~b</code>). Such an execution corresponds to a potential attack, and thus invalidates the &quot;Observational_equivalence&quot; lemma.</p>
+<p><img src="../images/tamarin-obseq-lemma-attack.jpg" title="Proving the Observational Equivalence Lemma: Attack" alt="Proving the Observational Equivalence Lemma: Attack" style="width:100.0%" /><br />
+Note that Tamarin needs to potentially consider numerous possible executions, which can result in long proof times or even non-termination. If possible it tries not to resolve parts of the execution that are irrelevant, but this is not always sufficient.</p>
+<h2 id="axioms">Axioms</h2>
 <p>Axioms restrict the set of traces to be considered in the protocol analysis. They can be used for purposes ranging from modeling branching behavior of protocols to the verification of signatures. We give a brief example of the latter. Consider the simple message authentication protocol, where an agent <code>A</code> sends a signed message to an agent <code>B</code>. We use Tamarin's built-in equational <a href="004_cryptographic-messages.html#sec:builtin-theories">theory for signing</a>.</p>
 <pre class="tamarin"><code>// Role A sends first message
 rule A_1_send:
@@ -352,25 +361,24 @@ lemma message_authentication:
 end</code></pre>
 <p>Note that axioms can also be used to verify observational equivalence properties. As there are no user-specifiable lemmas for observational equivalence, axioms can be used to remove state space, which essentially removes degenerate cases.</p>
 <!-- Finally, one can use also use axioms to simplify the writing of lemmas. -->
-
-<h2 id="common-axioms"><a href="#common-axioms">Common axioms</a></h2>
+<h2 id="common-axioms">Common axioms</h2>
 <p>Here is a list of common axioms. Do note that you need to add the appropriate action facts to your rules for these axioms to have impact.</p>
-<h3 id="unique"><a href="#unique">Unique</a></h3>
+<h3 id="unique">Unique</h3>
 <p>First, let us show an axiom forcing an action (with a particular value) to be unique:</p>
 <pre><code>axiom unique:
   &quot;All x #i #j. UniqueFact(x) @#i &amp; UniqueFact(x) @#j ==&gt; #i = #j&quot;</code></pre>
 <p>We call the action <code>UniqueFact</code> and give it one argument. If it appears on the trace twice, it actually is only once, as the two time points are identified.</p>
-<h3 id="equality"><a href="#equality">Equality</a></h3>
+<h3 id="equality">Equality</h3>
 <p>Next, let us consider an equality axiom. This is useful if you do not want to use pattern-matching explicitly, but maybe want to ensure that the decryption of an encrypted value is the original value, assuming correct keys. The axiom looks like this:</p>
 <pre><code>axiom Equality:
   &quot;All x y #i. Eq(x,y) @#i ==&gt; x = y&quot;</code></pre>
 <p>which means that all instances of the <code>Eq</code> action on the trace have the same value as both its arguments.</p>
-<h3 id="inequality"><a href="#inequality">Inequality</a></h3>
+<h3 id="inequality">Inequality</h3>
 <p>Now, let us consider an inequality axiom, which ensures that the two arguments of <code>Neq</code> are different:</p>
 <pre><code>axiom Inequality:
   &quot;All x #i. Neq(x,x) @ #i ==&gt; F&quot;</code></pre>
 <p>This is very useful to ensure that certain arguments are different.</p>
-<h3 id="onlyonce"><a href="#onlyonce">OnlyOnce</a></h3>
+<h3 id="onlyonce">OnlyOnce</h3>
 <p>If you have a rule that should only be executed once, put <code>OnlyOnce()</code> as an action fact for that rule and add this axiom:</p>
 <pre><code>axiom OnlyOnce:
   &quot;All #i #j. OnlyOnce()@#i &amp; OnlyOnce()@#j ==&gt; #i = #j&quot;</code></pre>
@@ -378,7 +386,7 @@ end</code></pre>
 <p>A similar construction can be used to limit multiple occurrences of an action for specific instantiations of variables, by adding these as arguments to the action. For example, one could put <code>OnlyOnceV('Initiator')</code> in a rule creating an initiator process, and <code>OnlyOnceV('Responder')</code> in the rule for the responder. If used with the following axiom, this would then yield the expected result of at most one initiator and at most one responder:</p>
 <pre><code>axiom OnlyOnceV:
   &quot;All #i #j x. OnlyOnceV(x)@#i &amp; OnlyOnceV(x)@#j ==&gt; #i = #j&quot;</code></pre>
-<h3 id="less-than"><a href="#less-than">Less than</a></h3>
+<h3 id="less-than">Less than</h3>
 <p>If we use the <code>multiset</code> built-in we can construct numbers as &quot;1+1+...+1&quot;, and have an axiom enforcing that one number is less than another, say <code>LessThan</code>:</p>
 <pre><code>axiom LessThan:
   &quot;All x y #i. LessThan(x,y)@#i ==&gt; Ex z. x + z = y&quot;</code></pre>
@@ -386,10 +394,10 @@ end</code></pre>
 <p>Similarly you can use a <code>GreaterThan</code> where we want <code>x</code> to be strictly larger than <code>y</code>:</p>
 <pre><code>axiom GreaterThan:
   &quot;All x y #i. GreaterThan(x,y)@#i ==&gt; Ex z. x = y + z&quot;</code></pre>
-<h2 id="lemma-annotations"><a href="#lemma-annotations">Lemma Annotations</a></h2>
+<h2 id="lemma-annotations">Lemma Annotations</h2>
 <p>Tamarin supports a number of annotations to its lemmas, which change their meaning. Any combination of them is allowed. We explain them in this section. The usage is that any annotation goes into square brackets after the lemma name, i.e., for a lemma called &quot;Name&quot; and the added annotations &quot;Annotation1&quot; and &quot;Annotation2&quot;, this looks like so:</p>
 <pre><code>lemma Name [Annotation1,Annotation2]:</code></pre>
-<h3 id="typing"><a href="#typing"><code>typing</code></a></h3>
+<h3 id="typing"><code>typing</code></h3>
 <p>To declare a lemma as a typing lemma, we use the annotation <code>typing</code>:</p>
 <pre><code>lemma example [typing]:
   &quot;...&quot;</code></pre>
@@ -401,11 +409,11 @@ end</code></pre>
 </ul>
 <p>Typing lemmas are necessary whenever the analysis reports <code>open chains</code> in the <code>Untyped case distinctions</code>. See section on <a href="007_precomputation.html#sec:openchains">Open chains</a> for details on this.</p>
 <p>All <code>typing</code> lemmas are used only for the case distinctions and do not benefit from other lemmas being marked as <code>reuse</code>.</p>
-<h3 id="use_induction"><a href="#use_induction"><code>use_induction</code></a></h3>
+<h3 id="use_induction"><code>use_induction</code></h3>
 <p>As you have seen before, the first choice in any proof is whether to use simplification (the default) or induction. If you know that a lemma will require induction, you just annotate it with <code>use_induction</code>, which will make it use induction instead of simplification.</p>
-<h3 id="reuse"><a href="#reuse"><code>reuse</code></a></h3>
+<h3 id="reuse"><code>reuse</code></h3>
 <p>A lemma marked <code>reuse</code> will be used in the proofs of all lemmas syntactically following it (except <code>typing</code> lemmas as above). This includes other <code>reuse</code> lemmas that can transitively depend on each other.</p>
-<h3 id="hide_lemmal"><a href="#hide_lemmal"><code>hide_lemma=L</code></a></h3>
+<h3 id="hide_lemmal"><code>hide_lemma=L</code></h3>
 <p>It can sometimes be helpful to have lemmas that are used only for the proofs of other lemmas. For example, assume 3 lemmas, called <code>A</code>, <code>B</code>, and <code>C</code>. They appear in that order, and <code>A</code> and <code>B</code> are marked reuse. Then, during the proof of <code>C</code> both <code>A</code> and <code>B</code> are reused, but sometimes you might only want to use <code>B</code>, but the proof of <code>B</code> needs <code>A</code>. The solution then is to hide the lemma <code>A</code> in <code>C</code>:</p>
 <pre><code>lemma A [reuse]:
   ...
@@ -416,11 +424,11 @@ lemma B [reuse]:
 lemma C [hide_lemma=A]:
   ...</code></pre>
 <p>This way, <code>C</code> uses <code>B</code> which in turn uses <code>A</code>, but <code>C</code> does not use <code>A</code> directly.</p>
-<h3 id="left-and-right"><a href="#left-and-right"><code>left</code> and <code>right</code></a></h3>
+<h3 id="left-and-right"><code>left</code> and <code>right</code></h3>
 <p>In the observational equivalence mode you have two protocols, the left instantiation of the <em>diff-terms</em> and their right instantiation. If you want to consider a lemma only on the left or right instantiation you annotate it with <code>left</code>, respectively <code>right</code>. If you annotate a lemma with <code>[left,right]</code> then both lemmas get generated, just as if you did not annotate it with either of <code>left</code> or <code>right</code>.</p>
-<h2 id="sec:elsewhere"><a href="#sec:elsewhere">Protocol and Standard Security Property Specification Templates</a></h2>
+<h2 id="sec:elsewhere">Protocol and Standard Security Property Specification Templates</h2>
 <p>In this section we provide templates for specifying protocols and standard security properties in a unified manner.</p>
-<h3 id="protocol-rules"><a href="#protocol-rules">Protocol Rules</a></h3>
+<h3 id="protocol-rules">Protocol Rules</h3>
 <p>A protocol specifies two or more roles. For each role we specify an initialization rule that generates a fresh run identifier <code>id</code> (to distinguish parallel protocol runs of an agent) and sets up an agent's initial knowledge including long term keys, private keys, shared keys, and other agent's public keys. We label such a rule with the action fact <code>Create(A,id)</code>, where <code>A</code> is the agent name (a public constant) and <code>id</code> the run identifier and the action fact <code>Role('A')</code>, where <code>'A'</code> is a public constant string. An example of this is the following initialization rule:</p>
 <pre class="tamarin"><code>// Initialize Role A
 rule Init_A:
@@ -445,7 +453,7 @@ rule Register_pk:
 rule Reveal_ltk:
   [ !Ltk(A, ltkA) ] --[ Reveal(A) ]-&gt; [ Out(ltkA) ]
 </code></pre>
-<h3 id="secrecy-1"><a href="#secrecy-1">Secrecy</a></h3>
+<h3 id="secrecy-1">Secrecy</h3>
 <p>We use the <code>Secret(x)</code> action fact to indicate that the message <code>x</code> is supposed to be secret. The simple secrecy property <code>&quot;All x #i. Secret(x) @i ==&gt; not (Ex #j. K(x)@j)&quot;</code> may not be satisfiable when agents' keys are compromised. We call an agent whose keys are not compromised an <em>honest</em> agent. We indicate assumptions on honest agents by labeling the same rule that the <code>Secret</code> action fact appears in with an <code>Honest(B)</code> action fact, where <code>B</code> is the agent name that is assumed to be honest. For instance, in the following rule the agent in role <code>'A'</code> is sending a message, where the nonce <code>~na</code> is supposed to be secret assuming that both agents <code>A</code> and <code>B</code> are honest.</p>
 <pre class="tamarin"><code>// Role A sends first message
 rule A_1_send:
@@ -560,7 +568,7 @@ lemma secrecy_PFS_A:
         | (Ex B #r. Reveal(B)@r &amp; Honest(B) @i &amp; r &lt; i)&quot;
 
 end</code></pre>
-<h3 id="authentication"><a href="#authentication">Authentication</a></h3>
+<h3 id="authentication">Authentication</h3>
 <p>In this section we show how to formalize the entity authentication properties of Lowe's hierarchy of authentication specifications <span class="citation">(Lowe 1997)</span> for two-party protocols.</p>
 <p>All the properties defined below concern the authentication of an agent in role <code>'B'</code> to an agent in role <code>'A'</code>. To analyze a protocol with respect to these properties we label an appropriate rule in role <code>A</code> with a <code>Commit(a,b,&lt;'A','B',t&gt;)</code> action and in role <code>B</code> with the <code>Running(b,a,&lt;'A','B',t&gt;)</code> action. Here <code>a</code> and <code>b</code> are the agent names (public constants) of roles <code>A</code> and <code>B</code>, respectively and <code>t</code> is a term.</p>
 <ol style="list-style-type: decimal">
@@ -602,8 +610,10 @@ end</code></pre>
         &amp; not (Ex A2 B2 #i2. Commit(A2,B2,t) @i2
                            &amp; not (#i2 = #i)))
               | (Ex C #r. Reveal(C)@r &amp; Honest(C) @i)&quot;</code></pre>
-<div class="references">
-<p>Lowe, Gavin. 1997. “A Hierarchy of Authentication Specifications.” In <em>10th Computer Security Foundations Workshop (CSFW 1997), June 10-12, 1997, Rockport, Massachusetts, USA</em>, 31–44. IEEE Computer Society. <a href="http://www.cs.ox.ac.uk/people/gavin.lowe/Security/Papers/authentication.ps">http://www.cs.ox.ac.uk/people/gavin.lowe/Security/Papers/authentication.ps</a>.</p>
+<div id="refs" class="references">
+<div id="ref-Lowe">
+<p>Lowe, Gavin. 1997. “A Hierarchy of Authentication Specifications.” In <em>10th Computer Security Foundations Workshop (Csfw 1997), June 10-12, 1997, Rockport, Massachusetts, Usa</em>, 31–44. IEEE Computer Society. <a href="http://www.cs.ox.ac.uk/people/gavin.lowe/Security/Papers/authentication.ps" class="uri">http://www.cs.ox.ac.uk/people/gavin.lowe/Security/Papers/authentication.ps</a>.</p>
+</div>
 </div>
     </div>
   </div>

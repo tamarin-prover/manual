@@ -49,8 +49,8 @@
     <div id='page'>
 <p class="halfbreak">
 </p>
-<h1 id="sec:modeling-issues"><a href="#sec:modeling-issues">Modeling Issues</a></h1>
-<h2 id="first-time-users"><a href="#first-time-users">First-time users</a></h2>
+<h1 id="sec:modeling-issues">Modeling Issues</h1>
+<h2 id="first-time-users">First-time users</h2>
 <p>In this section we discuss some problems that a first-time user might face. This includes error messages and how one might fix them. We also discuss how certain 'sanity' lemmas can be proven to provide some confidence in the protocol specification.</p>
 <p>To illustrate these concepts, consider the following protocol, where an initiator <code>$I</code> and a receiver <code>$R</code> share a symmetric key <code>~k</code>. <code>$I</code> then sends the message <code>~m</code>, encrypted with their shared key <code>~k</code> to <code>$R</code>.</p>
 <pre class="tamarin"><code>builtins: symmetric-encryption
@@ -76,7 +76,7 @@ lemma nonce_secret:
     &quot;All m #i #j. Secret(m) @i &amp; K(m) @j ==&gt; F&quot;
 </code></pre>
 <p>With the lemma <code>nonce_secret</code>, we examine if the message is secret from the receiver's perspective.</p>
-<h3 id="exist-trace-lemmas"><a href="#exist-trace-lemmas">Exist-Trace Lemmas</a></h3>
+<h3 id="exist-trace-lemmas">Exist-Trace Lemmas</h3>
 <p>Imagine that in the setup rule you forgot the agent state fact for the receiver <code>AgSt($R,~k)</code> as follows:</p>
 <pre class="tamarin"><code>// WARNING: this rule illustrates a non-functional protocol
 rule setup:
@@ -91,9 +91,9 @@ rule setup:
         &amp; Receive(R,m) @j &quot;
 </code></pre>
 <p>If we try to prove this with Tamarin in the model with the error, the lemma statement will be falsified. This indicates that there exists no trace where the initiator sends a message to the receiver. Such errors arise, for example, when we forget to add a fact that connects several rules and some rules can never be reached. Generally it is recommended first to prove an <code>exists-trace</code> lemma before other properties are examined.</p>
-<h3 id="error-messages"><a href="#error-messages">Error Messages</a></h3>
+<h3 id="error-messages">Error Messages</h3>
 <p>In this section, we review common error messages produced by Tamarin. To this end, we will intentionally add mistakes to the above protocol, presenting a modified rule and explaining the corresponding error message.</p>
-<h3 id="inconsistent-fact-usage"><a href="#inconsistent-fact-usage">Inconsistent Fact usage</a></h3>
+<h3 id="inconsistent-fact-usage">Inconsistent Fact usage</h3>
 <p>First we change the setup rule as follows:</p>
 <pre class="tamarin"><code>// WARNING: this rule illustrates an error message
 rule setup:
@@ -122,7 +122,7 @@ fact usage:
         AgSt( $R, ~k )
 */</code></pre>
 <p>The problem lists all the fact usages of fact <code>AgSt</code>. The statement <code>1. rule 'setup', fact &quot;agst&quot;:(&quot;AgSt&quot;,3,Linear)</code> means that in the rule <code>setup</code> the fact <code>AgSt</code> is used as a linear fact with 3 arguments. This is not consistent with its use in other rules. For example <code>2. rule 'setup', fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)</code> indicates that it is also used with 2 arguments in the <code>setup</code> rule. To solve this problem we must ensure that we only use the same fact with the same number of arguments.</p>
-<h3 id="unbound-variables"><a href="#unbound-variables">Unbound variables</a></h3>
+<h3 id="unbound-variables">Unbound variables</h3>
 <p>If we change the rule <code>R_1</code> to</p>
 <pre class="tamarin"><code>// WARNING: this rule illustrates an error message      
 rule R_1:
@@ -138,7 +138,7 @@ unbound:
     ~n
 */</code></pre>
 <p>The warning <code>unbound variables</code> indicates that there is a term, here the fresh <code>~n</code>, in the action or conclusion that never appeared in the premise. Here this is the case because we mistyped <code>~n</code> instead of <code>~m</code>. Generally, when such a warning appears, you should check that all the fresh variables variables already occur in the premise. If it is a fresh variable that appears for the first time in this rule, a <code>Fr(~n)</code> fact should be added to the premise.</p>
-<h3 id="free-term-in-formula"><a href="#free-term-in-formula">Free Term in formula</a></h3>
+<h3 id="free-term-in-formula">Free Term in formula</h3>
 <p>Next, we change the functional lemma as follows</p>
 <pre class="tamarin"><code>// WARNING: this lemma illustrates an error message
 lemma functional: exists-trace
@@ -158,7 +158,7 @@ formula terms:
   this is unambiguous.
 */</code></pre>
 <p>The warning indicates that in this lemma the term <code>m</code> is occurs free. This means that it is not bound to any quantifier. Often such an error occurs when one forgets to list all the variables that are used in the formula after the <code>Ex</code> or <code>All</code> quantifier. In our example, the problem occured because we deleted the <code>m</code> in <code>Ex I R m #i #j.</code></p>
-<h3 id="undefined-action-fact-in-lemma"><a href="#undefined-action-fact-in-lemma">Undefined Action Fact in Lemma</a></h3>
+<h3 id="undefined-action-fact-in-lemma">Undefined Action Fact in Lemma</h3>
 <p>Next, we change the lemma <code>nonce_secret</code>.</p>
 <pre class="tamarin"><code>// WARNING: this lemma illustrates an error message
 lemma nonce_secret: 
@@ -173,14 +173,14 @@ lemma actions:
   but no rule has such an action.
 */</code></pre>
 <p>Such a warning always occurs when a lemma uses a fact that never appears as an action fact in any rule. The cause of this is either that the fact is spelled differently (here <code>Secr</code> instead of <code>Secret</code>) or that one forgot to add the action fact to the protocol rules. Generally, it is a good advice to double check that the facts that are used in the lemmas appear in the relevant protocol rules as actions.</p>
-<h3 id="undeclared-function-symbols"><a href="#undeclared-function-symbols">Undeclared function symbols</a></h3>
+<h3 id="undeclared-function-symbols">Undeclared function symbols</h3>
 <p>If we omit the line</p>
 <pre class="tamarin"><code>builtins: symmetric-encryption</code></pre>
 <p>the following warning will be output</p>
 <pre><code>unexpected &quot;(&quot;
 expecting letter or digit, &quot;.&quot;, &quot;,&quot; or &quot;)&quot;</code></pre>
 <p>The warning indicates that Tamarin did not expect opening brackets. This means that a function is used that Tamarin does not recognize. This can be the case if a function <code>f</code> is used that has not been declared with <code>functions: f/1</code>. Also, this warning occurs when a built-in function is used but not declared. In this example, the problem arises because we used the symmetric encryption <code>senc</code>, but omitted the line where we declare that we use this built-in function.</p>
-<h3 id="inconsistent-sorts"><a href="#inconsistent-sorts">Inconsistent sorts</a></h3>
+<h3 id="inconsistent-sorts">Inconsistent sorts</h3>
 <p>If we change the <code>setup</code> rule to</p>
 <pre class="tamarin"><code>// WARNING: this rule illustrates an error message
 rule setup:
@@ -200,25 +200,18 @@ sorts:
     1. ~m, m
 */</code></pre>
 <p>This indicates that the sorts of a message were inconsistently used. In the rule <code>setup</code>, this is the case because we used m once as a fresh value <code>~m</code> and another time without the <code>~</code>.</p>
-<h3 id="what-to-do-when-tamarin-does-not-terminate"><a href="#what-to-do-when-tamarin-does-not-terminate">What to do when Tamarin does not terminate</a></h3>
+<h3 id="what-to-do-when-tamarin-does-not-terminate">What to do when Tamarin does not terminate</h3>
 <p>Tamarin may fail to terminate when it automatically constructs proofs. One reason for this is that there are open chains. For advice on how to find and remove open chains, see <a href="007_precomputation.html#sec:openchains">open chains</a>.</p>
 <!-- 
 ### functions ###
 function-> where does it go? doesn have support:
 local to rule with "let"
 -->
- 
-
 <!-- Using rewrite rules to 'share'
   ------------------------------
 
   TODO: Katriel?
 -->
-
-
-<div class="references">
-
-</div>
     </div>
   </div>
 </body>

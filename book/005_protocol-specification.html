@@ -50,7 +50,7 @@
     <div id='page'>
 <p class="halfbreak">
 </p>
-<h1 id="sec:model-specification"><a href="#sec:model-specification">Model Specification</a></h1>
+<h1 id="sec:model-specification">Model Specification</h1>
 <p>In this section, we now provide an informal description of the underlying model. The full details of this model can be found in <span class="citation">(Schmidt 2012)</span>.</p>
 <p>Tamarin models are specified using three main ingredients:</p>
 <ol style="list-style-type: decimal">
@@ -59,12 +59,13 @@
 <li>Terms</li>
 </ol>
 <p>We have already seen the definition of terms in the previous section. Here we will discuss facts and rules, and illustrate their use with respect to the Naxos protocol, displayed below.</p>
-<p><img src="../images/naxos.png" alt="The Naxos protocol" />{ width=80% }<br /> <!-- **FIX Cas: Picture should be updated and use vector graphics, ideally.**
+<p><img src="../images/naxos.png" alt="The Naxos protocol" style="width:80.0%" /><br />
+<!-- **FIX Cas: Picture should be updated and use vector graphics, ideally.**
 --></p>
 <p>In this protocol, each party <code>x</code> has a long-term private key <code>lkx</code> and a corresponding public key <code>pkx = 'g'^lkx</code>, where <code>'g'</code> is a generator of the Diffie-Hellman group. Because <code>'g'</code> can be public, we model it as a public constant.</p>
 <p>To start a session, the initiator <code>I</code> first creates a fresh nonce <code>eskI</code>, also known as <code>I</code>’s ephemeral (private) key. He then concatenates <code>eskI</code> with <code>I</code>’s long-term private key <code>lkI</code>, hashes the result using the hash function <code>h1</code>, and sends <code>'g'^h1(eskI ,lkI)</code> to the responder. The responder <code>R</code> stores the received value in a variable <code>X</code>, computes a similar value based on his own nonce <code>eskR</code> and long-term private key <code>lkR</code>, and sends the result to the initiator, who stores the received value in the variable <code>Y</code>. Finally, both parties compute a session key (<code>kI</code> and <code>kR</code>, respectively) whose computation includes their own long-term private keys, such that only the intended partner can compute the same key.</p>
 <p>Note that the messages exchanged are not authenticated as the recipients cannot verify that the expected long-term key was used in the construction of the message. The authentication is implicit and only guaranteed through ownership of the correct key. Explicit authentication (e.g., the intended partner was recently alive or agrees on some values) is commonly achieved in authenticated key exchange protocols by adding a key-confirmation step, where the parties exchange a MAC of the exchanged messages that is keyed with (a variant of) the computed session key.</p>
-<h2 id="sec:rules"><a href="#sec:rules">Rules</a></h2>
+<h2 id="sec:rules">Rules</h2>
 <p>We use multiset rewriting to specify the concurrent execution of the protocol and the adversary. Multiset rewriting is a formalism that is commonly used to model concurrent systems since it naturally supports independent transitions.</p>
 <p>A multiset rewriting system defines a transition system, where, in our case, the transitions will be labeled. The system's state is a multiset (bag) of facts. We will explain the types of facts and their use below.</p>
 <p>A rewrite rule in Tamarin has a name and three parts, each of which is a sequence of facts: one for the rule's left-hand side, one labelling the transition (which we call 'action facts'), and one for the rule's right-hand side. For example:</p>
@@ -75,12 +76,12 @@ rule MyRule2:
   [ F(u,v) ] --[ M(u,v) ]-&gt; [ H(u), G(&#39;3&#39;,h(v)) ]</code></pre>
 <p>For now, we will ignore the action facts (<code>L(...)</code> and <code>M(...)</code>) and return to them when discussing properties in the next section. If a rule is not labelled by action facts, the arrow notation <code>--[ ]-&gt;</code> can be abbreviated to <code>--&gt;</code>.</p>
 <p>The rule names are only used for referencing specific rules. They have no specific meaning and can be chosen arbitrarily, as long as each rule has a unique name.</p>
-<h3 id="executions"><a href="#executions">Executions</a></h3>
+<h3 id="executions">Executions</h3>
 <p>The initial state of the transition system is the empty multiset.</p>
 <p>The rules define how the system can make a transition to a new state. A rule can be applied to a state if it can be instantiated such that its left hand side is contained in the current state. In this case, the left-hand side facts are removed from the state, and replaced by the instantiated right hand side.</p>
 <p>For example, in the initial state, <code>MyRule1</code> can be instantiated repeatedly.</p>
 <p>For any instantiation of <code>MyRule1</code>, this leads to follow-up state that contains <code>F('1','x')</code> and <code>F('2','y')</code>. <code>MyRule2</code> cannot be applied in the initial state since it contains no <code>F</code> facts. In the successor state, the rule <code>MyRule2</code> can now be applied twice. It can be instantiated either by <code>u</code> equal to <code>'1'</code> (with <code>v</code> equal to <code>'x'</code>) or to <code>'2'</code> (with <code>v</code> equal to <code>'y'</code>). Each of these instantiations leads to a new successor state.</p>
-<h3 id="using-let-binding-in-rules-for-local-macros"><a href="#using-let-binding-in-rules-for-local-macros">Using 'let' binding in rules for local macros</a></h3>
+<h3 id="using-let-binding-in-rules-for-local-macros">Using 'let' binding in rules for local macros</h3>
 <p>When modeling more complex protocols, a term may occur multiple times (possibly as a subterm) within the same rule. To make such specifications more readable, Tamarin offers support for <code>let ... in</code>, as in the following example:</p>
 <pre><code>rule MyRuleName:
     let foo1 = h(bar)
@@ -90,7 +91,7 @@ rule MyRule2:
     in
     [ ... ] --[ ... ]-&gt; [ ... ]</code></pre>
 <p>Such let-binding expressions can be used to specify local term macros within the context of a rule. Each macro should occur on a separate line and defines a substitution: the left-hand side of the <code>=</code> sign must be a variable and the right-hand side is an arbitrary term. The rule will be interpreted after substituting all variables occurring in the let by their right-hand sides. As the above example indicates, macros may use the right-hand sides of earlier defined macros.</p>
-<h2 id="facts"><a href="#facts">Facts</a></h2>
+<h2 id="facts">Facts</h2>
 <p>Facts are of the form <code>F(t1,...,tn)</code> for a fact symbol <code>F</code> and terms <code>ti</code>. They have a fixed arity (in this case <code>n</code>). Note that if a Tamarin model uses the same fact with two different arities, Tamarin will report an error.</p>
 <p>There are three types of special facts built in to Tamarin. These are used to model interaction with the untrusted network and to model the generation of unique fresh (random) values.</p>
 <dl>
@@ -105,14 +106,14 @@ rule MyRule2:
 </dd>
 </dl>
 <p>For the above three facts, Tamarin has built-in rules. In particular, there is a fresh rule that produces unique <code>Fr(...)</code> facts, and there is a set of rules for adversary knowledge derivation, which consume <code>Out(...)</code> facts and produce <code>In(...)</code> facts.</p>
-<h3 id="linear-versus-persistent-facts"><a href="#linear-versus-persistent-facts">Linear versus persistent facts</a></h3>
+<h3 id="linear-versus-persistent-facts">Linear versus persistent facts</h3>
 <p>The facts mentioned above are called 'linear facts'. They are not only produced by rules, they also can be consumed by rules. Hence they might appear in one state but not in the next.</p>
 <p>In contrast, some facts in our models will never be removed from the state once they are introduced. Modeling this using linear facts would require that every rule that has such a fact in the left-hand-side, also has an exact copy of this fact in the right-hand side. While there is no fundamental problem with this modeling, it is inconvenient for the user and it also might lead Tamarin to explore rule instantiations that are irrelevant for tracing such facts.</p>
 <p>For the above two reasons, we introduce 'persistent facts', which are never removed from the state. We denote these facts by prefixing them with a bang (<code>!</code>).</p>
 <p>Facts always start with an upper-case letter and need not be declared explicitly. If their name is prefixed with an exclamation mark <code>!</code>, then they are persistent. Otherwise, they are linear. Note that every fact name must be used consistently; i.e., it must always be used with the same arity, case, persistence, and multiplicity. Otherwise, Tamarin complains that the theory is not well-formed.</p>
-<h2 id="modeling-protocols"><a href="#modeling-protocols">Modeling protocols</a></h2>
+<h2 id="modeling-protocols">Modeling protocols</h2>
 <p>There are several ways in which the execution of security protocols can be defined, e.g., as in <span class="citation">(Cremers and Mauw 2012)</span>. In Tamarin, there is no pre-defined protocol concept and the user is free to model them as she or he chooses. Below we give an example of how protocols can be modeled and discuss alternatives afterwards.</p>
-<h3 id="public-key-infrastructure"><a href="#public-key-infrastructure">Public-key infrastructure</a></h3>
+<h3 id="public-key-infrastructure">Public-key infrastructure</h3>
 <p>In the Tamarin model, there is no pre-defined notion of public key infrastructure (PKI). A pre-distributed PKI with asymmetric keys for each party can be modeled by a single rule that generates a key for a party. The party's identity and public/private keys are then stored as facts in the state, enabling protocol rules to retrieve them. For the public key, we commonly use the <code>Pk</code> fact, and for the corresponding long-term private key we use the <code>Ltk</code> fact. Since these facts will only be used by other rules to retrieve the keys, but never updated, we model them as persistent facts. We use the abstract function <code>pk(x)</code> to denote the public key corresponding to the private key <code>x</code>, leading to the following rule. Note that we also directly give all public keys to the attacker, modeled by the <code>Out</code> on the right-hand side.</p>
 <pre><code>rule Generate_key_pair:
   [ Fr(~x) ] 
@@ -121,7 +122,7 @@ rule MyRule2:
   , Out(pk(~x))
   , !Ltk($A,~x)
   ]</code></pre>
-<p>Some protocols, such as Naxos, rely on the algebraic properties of the key pairs. In many DH-based protocols, the public key is <span class="math">\(g^x\)</span> for the private key <span class="math">\(x\)</span>, which enables exploiting the commutativity of the exponents to establish keys. In this case, we specify the following rule instead.</p>
+<p>Some protocols, such as Naxos, rely on the algebraic properties of the key pairs. In many DH-based protocols, the public key is <span class="math inline">\(g^x\)</span> for the private key <span class="math inline">\(x\)</span>, which enables exploiting the commutativity of the exponents to establish keys. In this case, we specify the following rule instead.</p>
 <pre><code>rule Generate_DH_key_pair:
   [ Fr(~x) ] 
   --&gt; 
@@ -129,9 +130,9 @@ rule MyRule2:
   , Out(&#39;g&#39;^~x)
   , !Ltk($A,~x)
   ]</code></pre>
-<h3 id="modeling-a-protocol-step"><a href="#modeling-a-protocol-step">Modeling a protocol step</a></h3>
+<h3 id="modeling-a-protocol-step">Modeling a protocol step</h3>
 <p>Protocols describe the behavior of agents in the system. Agents can perform protocol steps, such as receiving a message and responding by sending a message, or starting a session.</p>
-<h3 id="modeling-the-naxos-responder-role"><a href="#modeling-the-naxos-responder-role">Modeling the Naxos responder role</a></h3>
+<h3 id="modeling-the-naxos-responder-role">Modeling the Naxos responder role</h3>
 <p>We first model the responder role, which is simpler than the initiator role since it can be done in one rule.</p>
 <p>The protocol uses a Diffie-Hellman exponentiation, and two hash functions <code>h1</code> and <code>h2</code>, which we must declare. We can model this using:</p>
 <pre><code>builtins: diffie-hellman</code></pre>
@@ -202,7 +203,7 @@ functions: h2/1</code></pre>
        Out( hkr )
    ]</code></pre>
 <p>The above rule suffices to model basic security properties, as we will see later.</p>
-<h3 id="modeling-the-naxos-initiator-role"><a href="#modeling-the-naxos-initiator-role">Modeling the Naxos initiator role</a></h3>
+<h3 id="modeling-the-naxos-initiator-role">Modeling the Naxos initiator role</h3>
 <p>The initiator role of the Naxos protocol consists of sending a message and waiting for the response. While the initiator is waiting for a response, other agents might also perform steps. We therefore model the initiator using two rules.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
 <p>The first rule models an agent starting the initiator role, generating a fresh value, and sending the appropriate message. As before, we use let binding to simplify the presentation and use <code>~lkI</code> instead of <code>lkI</code> since we know that <code>!Ltk</code> facts are only produced with a fresh value as the second argument.</p>
 <pre><code>    rule NaxosI_1_attempt1:
@@ -213,7 +214,7 @@ functions: h2/1</code></pre>
            !Ltk( $I, ~lkI ) ]
        --&gt;
        [   Out( hkI ) ]</code></pre>
-<h4 id="using-state-facts-to-model-progress"><a href="#using-state-facts-to-model-progress">Using state facts to model progress</a></h4>
+<h4 id="using-state-facts-to-model-progress">Using state facts to model progress</h4>
 <p>After triggering the previous rule, an initiator will wait for the response message. We still need to model the second part, in which the response is received and the key is computed. To model the second part of the initiator rule, we must be able to specify that it was preceded by the first part and with specific parameters. Intuitively, we must store in the state of the transition system that there is an initiator thread that has performed the first send with specific parameters, so it can continue where it left off.</p>
 <p>To model this, we introduce a new fact, which we often refer to as a <em>state fact</em>: a fact that indicates that a certain process or thread is at a specific point in its execution, effectively operating both as a program counter and as a container for the contents of the memory of the process or thread. Since there can be any number of initiators in parallel, we need to provide a unique handle for each of their state facts.</p>
 <p>Below we provide an updated version of the initiator's first rule that produces a state fact <code>Init_1</code> and introduces a unique thread identifier <code>~tid</code> for each instance of the rule.</p>
@@ -319,12 +320,13 @@ TODO:
   * An explanation/examples of the difference between K, KU, and KD, and when
     you would use each. (This should go in the next section)
 -->
-
-
-
-<div class="references">
-<p>Cremers, Cas, and Sjouke Mauw. 2012. <em>Operational Semantics and Verification of Security Protocols</em>. Springer-Verlag Berlin Heidelberg. doi:<a href="http://dx.doi.org/10.1007/978-3-540-78636-8">10.1007/978-3-540-78636-8</a>.</p>
-<p>Schmidt, Benedikt. 2012. “Formal Analysis of Key Exchange Protocols and Physical Protocols.” PhD thesis, ETH Zurich. <a href="http://dx.doi.org/10.3929/ethz-a-009898924">http://dx.doi.org/10.3929/ethz-a-009898924</a>.</p>
+<div id="refs" class="references">
+<div id="ref-opsem2012">
+<p>Cremers, Cas, and Sjouke Mauw. 2012. <em>Operational Semantics and Verification of Security Protocols</em>. Springer-Verlag Berlin Heidelberg. doi:<a href="https://doi.org/10.1007/978-3-540-78636-8">10.1007/978-3-540-78636-8</a>.</p>
+</div>
+<div id="ref-benediktthesis">
+<p>Schmidt, Benedikt. 2012. “Formal Analysis of Key Exchange Protocols and Physical Protocols.” PhD thesis, ETH Zurich. <a href="http://dx.doi.org/10.3929/ethz-a-009898924" class="uri">http://dx.doi.org/10.3929/ethz-a-009898924</a>.</p>
+</div>
 </div>
 <div class="footnotes">
 <hr />
