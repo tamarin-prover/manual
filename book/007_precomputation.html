@@ -49,8 +49,8 @@
     <div id='page'>
 <p class="halfbreak">
 </p>
-<h1 id="sec:precomputation">Precomputation</h1>
-<p>In this section, we will explain some of the aspects of the precomputation performed by Tamarin. This is relevant for users that model complex protocols since they may at some point run into so-called <a href="#sec:openchains">open chains</a>, which can be problematic for verification.</p>
+<h1 id="sec:precomputation">Precomputation: refining sources</h1>
+<p>In this section, we will explain some of the aspects of the precomputation performed by Tamarin. This is relevant for users that model complex protocols since they may at some point run into so-called remaining <a href="#sec:openchains">partial deconstructions</a>, which can be problematic for verification.</p>
 <p>To illustrate the concepts, consider the example of the Needham-Schroeder-Lowe Public Key Protocol, given here in Alice&amp;Bob notation:</p>
 <pre class="tamarin"><code>  protocol NSLPK3 {
     1. I -&gt; R: {&#39;1&#39;,ni,I}pk(R)
@@ -114,7 +114,7 @@ lemma nonce_secrecy:
         &amp; not (Ex #r. RevLtk(B) @ r)
        )&quot;
 </code></pre>
-<p>This proof attempt will not terminate due to there being <code>12 chains left</code> when looking at this example in the GUI as described in detail below.</p>
+<p>This proof attempt will not terminate due to there being <code>12 partial deconstructions left</code> when looking at this example in the GUI as described in detail below.</p>
 <h2 id="sec:openchains">Partial deconstructions left</h2>
 <p>In the precomputation phase, Tamarin goes through all rules and inspects their premises. For each of these facts, Tamarin will precompute a set of possible <em>sources</em>. Each such source represents combinations of rules from which the fact could be obtained. For each fact, this leads to a set of possible sources and we refer to these sets as the <em>raw sources</em>, respectively <em>refined sources</em>.</p>
 <p>However, for some rules Tamarin cannot resolve where a fact must have come from. We say that a partial deconstruction is left in the raw sources, and we will explain them in more detail below.</p>
@@ -131,7 +131,7 @@ this?**-->
 <p><img src="../images/FindOpenChains3_RepetitionHilighted.jpg" title="`I_2` repeatedly" alt="Secret derived by using I_2" style="width:90.0%" /><br />
 As Tamarin is unable to conclude that the secret key could not have come from the rule <code>I_2</code>, the algorithm derives the secret key that is needed. The proof uses the same strategy recursively but will not terminate.</p>
 <h2 id="using-sources-lemmas-to-mitigate-partial-deconstructions">Using Sources Lemmas to Mitigate Partial Deconstructions</h2>
-<p>Once we identified the rules and cases in which partial deconstructions occur, we can try to avoid them. A good mechanism to get rid of open chains is the use of so-called <em>sources lemmas</em>.</p>
+<p>Once we identified the rules and cases in which partial deconstructions occur, we can try to avoid them. A good mechanism to get rid of partial deconstructions is the use of so-called <em>sources lemmas</em>.</p>
 <p>Sources lemmas are a special case of lemmas, and are applied during Tamarin's pre-computation. Roughly, verification in Tamarin involves the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Tamarin first determines the possible sources of all premises. We call these the raw sources.</p></li>
