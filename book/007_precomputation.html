@@ -115,34 +115,33 @@ lemma nonce_secrecy:
        )&quot;
 </code></pre>
 <p>This proof attempt will not terminate due to there being <code>12 chains left</code> when looking at this example in the GUI as described in detail below.</p>
-<h2 id="sec:openchains">Open Chains</h2>
-<p>In the precomputation phase, Tamarin goes through all rules and inspects their premises. For each of these facts, Tamarin will precompute a set of possible <em>sources</em>. Each such source is called a <em>chain</em> and represents combinations of rules from which the fact could be obtained. For each fact, this leads to a set of possible sources and we refer to these sets as the <em>case distinctions</em>.</p>
-<!--**FIX: above notions are confusing: chain versus sources versus case distinctions.**-->
-<p>However, for some rules Tamarin cannot resolve where a fact must have come from. We call such a chain an <em>open chain</em>, and we will explain them in more detail below.</p>
-<p>The existence of open chains complicates automated proof generation and often (but not always) means that no proof will be found automatically. For this reason, it is useful for users to be able to find open chains and examine if it is possible to remove them.</p>
-<p>In the interactive mode you can find open chains as follows. On the top left, under &quot;Untyped case distinction&quot;, one can find the chains that were precomputed by Tamarin.</p>
-<p><img src="../images/FindOpenChains1.png" title="Untyped case distinctions" alt="Tamarin GUI" style="width:50.0%" /><br />
-The unsolved chains can be identified by the light green arrows as in the following example:</p>
-<p><img src="../images/FindOpenChains2.png" title="Open chain visible" alt="Open chain visible in green" style="width:100.0%" /><br />
+<h2 id="sec:openchains">Partial deconstructions left</h2>
+<p>In the precomputation phase, Tamarin goes through all rules and inspects their premises. For each of these facts, Tamarin will precompute a set of possible <em>sources</em>. Each such source represents combinations of rules from which the fact could be obtained. For each fact, this leads to a set of possible sources and we refer to these sets as the <em>raw sources</em>, respectively <em>refined sources</em>.</p>
+<p>However, for some rules Tamarin cannot resolve where a fact must have come from. We say that a partial deconstruction is left in the raw sources, and we will explain them in more detail below.</p>
+<p>The existence of such partial deconstructions complicates automated proof generation and often (but not always) means that no proof will be found automatically. For this reason, it is useful for users to be able to find these and examine if it is possible to remove them.</p>
+<p>In the interactive mode you can find such partial deconstructions as follows. On the top left, under &quot;Raw sources&quot;, one can find the precomputed sources by Tamarin.</p>
+<p><img src="../images/FindOpenChains1.png" title="Raw sources" alt="Tamarin GUI" style="width:80.0%" /><br />
+The partial deconstructions can be identified by the light green arrows as in the following example:</p>
+<p><img src="../images/FindOpenChains2.png" title="Partial deconstructions visible" alt="Partial deconstruction visible in green" style="width:100.0%" /><br />
 The green arrow indicates that Tamarin cannot exclude the possibility that the adversary can derive any fresh term <code>~t.1</code> with this rule <code>I_2</code>. As we are using an untyped protocol model, the tool cannot determine that <code>nr.7</code> should be a fresh nonce, but that it could be any message. For this reason Tamarin concludes that it can derive any message with this rule.</p>
 <!--**FIX Cas: In the above, we mention untyped protocol model. Did we explain
 this?**-->
-<h3 id="why-open-chains-complicate-proofs">Why open chains complicate proofs</h3>
+<h3 id="why-partial-deconstructions-complicate-proofs">Why partial deconstructions complicate proofs</h3>
 <p>To get a better understanding of the problem, consider what happens if we try to prove the lemma <code>nonce_secrecy</code>. If we manually always choose the first case for the proof, we can see that Tamarin derives the secret key to decrypt the output of rule <code>I_2</code> by repeatedly using this rule <code>I_2</code>. More specifically, in <code>a)</code> the output of rule <code>I_2</code> is decrypted by the adversary. To get the relevant key for this, in part <code>b)</code> again the output from rule <code>I_2</code> is decrypted by the adversary. This is done with a key coming from part <code>c)</code> where the same will happen repeatedly.</p>
 <p><img src="../images/FindOpenChains3_RepetitionHilighted.jpg" title="`I_2` repeatedly" alt="Secret derived by using I_2" style="width:90.0%" /><br />
 As Tamarin is unable to conclude that the secret key could not have come from the rule <code>I_2</code>, the algorithm derives the secret key that is needed. The proof uses the same strategy recursively but will not terminate.</p>
-<h2 id="using-typing-lemmas-to-mitigate-open-chains">Using Typing Lemmas to Mitigate Open Chains</h2>
-<p>Once we identified the rules and cases in which open chains occur, we can try to avoid them. A good mechanism to get rid of open chains is the use of so-called <em>typing lemmas</em>.</p>
-<p>Typing lemmas are a special case of lemmas, and are applied during Tamarin's pre-computation. Roughly, verification in Tamarin involves the following steps:</p>
+<h2 id="using-sources-lemmas-to-mitigate-partial-deconstructions">Using Sources Lemmas to Mitigate Partial Deconstructions</h2>
+<p>Once we identified the rules and cases in which partial deconstructions occur, we can try to avoid them. A good mechanism to get rid of open chains is the use of so-called <em>sources lemmas</em>.</p>
+<p>Sources lemmas are a special case of lemmas, and are applied during Tamarin's pre-computation. Roughly, verification in Tamarin involves the following steps:</p>
 <ol style="list-style-type: decimal">
-<li><p>Tamarin first determines the possible sources of all premises. We call these the untyped case distinctions.</p></li>
-<li><p>Next, automatic proof mode is used to discharge any typing lemmas using induction.</p></li>
-<li><p>The typing lemmas are applied to the untyped case distinctions, yielding a new set of sources, which we call the typed case distinctions.</p></li>
-<li><p>Depending on the mode, the other (non-typing) lemmas are now considered manually or automatically using the typed case distinctions.</p></li>
+<li><p>Tamarin first determines the possible sources of all premises. We call these the raw sources.</p></li>
+<li><p>Next, automatic proof mode is used to discharge any sources lemmas using induction.</p></li>
+<li><p>The sources lemmas are applied to the raw sources, yielding a new set of sources, which we call the refined sources.</p></li>
+<li><p>Depending on the mode, the other (non-sources) lemmas are now considered manually or automatically using the refined sources.</p></li>
 </ol>
-<p>For full technical details, we refer the reader to <span class="citation">(Meier 2012)</span>.</p>
+<p>For full technical details, we refer the reader to <span class="citation">(Meier 2012)</span>, where these are called typing lemmas and open chains.</p>
 <p>In our example, we can add the following lemma:</p>
-<pre class="tamarin"><code>lemma types [typing]:
+<pre class="tamarin"><code>lemma types [sources]:
   &quot; (All ni m1 #i.
        IN_R_1_ni( ni, m1) @ i
        ==&gt;
@@ -159,10 +158,10 @@ As Tamarin is unable to conclude that the secret key could not have come from th
     )
   &quot;
 </code></pre>
-<p>This typing lemma is applied to the untyped case distinctions to compute the typed case distinctions. All non-typing lemmas are proven with the resulting typed case distinctions, while typing lemmas must be proved with the untyped case distinctions.</p>
-<p>This lemma relates the point of instantiation to the point of sending by either the adversary or the communicating partner. In other words, it says that whenever the responder receives the first nonce, either the nonce was known to the adversary or the initiator sent the first message prior to that moment. Similarly, the second part states that whenever the initiator receives the second message, either the adversary knew the corresponding nonce or the responder has sent the second message before. Generally, in a protocol with open chains it is advisable to try if the problem can be solved by a typing lemma that considers where a term could be coming from. As in the above example, one idea to do so is by stating that a used term must either have occured in one of a list of rules before, or it must have come from the adversary.</p>
-<p>The above typing lemma can be automatically proven by Tamarin. With the typing lemma, Tamarin can then automatically prove the lemma <code>nonce_secrecy</code>.</p>
-<p>Another possibility is that the open chains only occur in an undesired application of a rule that we do not wish to consider in our model. In such a case, we can explicitly exclude this application of the rule with an axiom. But, we should ensure that the resulting model is the one we want; so use this with care.</p>
+<p>This sources lemma is applied to the raw sources to compute the refined sources. All non-sources lemmas are proven with the resulting refined sources, while sources lemmas must be proved with the raw sources.</p>
+<p>This lemma relates the point of instantiation to the point of sending by either the adversary or the communicating partner. In other words, it says that whenever the responder receives the first nonce, either the nonce was known to the adversary or the initiator sent the first message prior to that moment. Similarly, the second part states that whenever the initiator receives the second message, either the adversary knew the corresponding nonce or the responder has sent the second message before. Generally, in a protocol with partial deconstructions left it is advisable to try if the problem can be solved by a sources lemma that considers where a term could be coming from. As in the above example, one idea to do so is by stating that a used term must either have occured in one of a list of rules before, or it must have come from the adversary.</p>
+<p>The above sources lemma can be automatically proven by Tamarin. With the sources lemma, Tamarin can then automatically prove the lemma <code>nonce_secrecy</code>.</p>
+<p>Another possibility is that the partial deconstructions only occur in an undesired application of a rule that we do not wish to consider in our model. In such a case, we can explicitly exclude this application of the rule with a restriction. But, we should ensure that the resulting model is the one we want; so use this with care.</p>
 <div id="refs" class="references">
 <div id="ref-meierthesis">
 <p>Meier, Simon. 2012. “Advancing Automated Security Protocol Verification.” PhD dissertation, ETH Zurich. <a href="http://dx.doi.org/10.3929/ethz-a-009790675" class="uri">http://dx.doi.org/10.3929/ethz-a-009790675</a>.</p>

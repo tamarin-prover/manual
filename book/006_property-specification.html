@@ -168,7 +168,7 @@ end</code></pre>
 <p>We specify the following <em>message authentication</em> property: If an agent <code>a</code> believes that a message <code>m</code> was sent by an agent <code>b</code>, then <code>m</code> was indeed sent by <code>b</code>. To specify <code>a</code>'s belief we label an appropriate rule in <code>a</code>'s role specification with the action <code>Authentic(b,m)</code>. The following lemma defines the set of traces that satisfy the message authentication property.</p>
 <pre><code>lemma message_authentication: 
     &quot;All b m #j. Authentic(b,m) @j ==&gt; Ex #i. Send(b,m) @i &amp;i&lt;j&quot;</code></pre>
-<p>A simple message authentication example is the following one-message protocol. Agent <code>A</code> sends a signed message to agent <code>B</code>. We model the signature using asymmetric encryption. A better model is shown in the section on Axioms.</p>
+<p>A simple message authentication example is the following one-message protocol. Agent <code>A</code> sends a signed message to agent <code>B</code>. We model the signature using asymmetric encryption. A better model is shown in the section on Restrictions.</p>
 <pre class="tamarin"><code>theory auth_signing_simple
 begin
 
@@ -239,7 +239,7 @@ end</code></pre>
 <p><img src="../images/tamarin-obseq-overview.jpg" title="Observational Equivalence Overview" alt="Observational Equivalence Overview" style="width:100.0%" /><br />
 There are mutiple differences to the 'normal' trace mode.</p>
 <p>First, there is a new option <code>Diff Rules</code>, which will simply present the rewrite rules from the <code>.spthy</code> file. (See image below.)</p>
-<p>Second, all the other points (Message Theory, Multiset Rewrite Rules, Untyped/Typed Case Distinctions) have been quadruplicated. The reason for this is that any input file with the <code>diff</code> operator actually specifies two models: one model where each instance of <code>diff(x,y)</code> is replaced with <code>x</code> (the <em>left hand side</em>, or LHS for short), and one model where each instance of <code>diff(x,y)</code> is replaced with <code>y</code> (the <em>right hand side</em>, or RHS for short). Moreover, as the observational equivalence mode requires different precomputations, each of the two models is treated twice. For examle, the point <code>RHS: Untyped case distinctions [Diff]</code> gives the untyped case distinctions for the RHS interpretation of the model in observational equivalence mode, whereas <code>LHS: Untyped case distinctions</code> gives the untyped case distinctions for the LHS interpretation of the model in the 'trace' mode.</p>
+<p>Second, all the other points (Message Theory, Multiset Rewrite Rules, Raw/Refined Sources) have been quadruplicated. The reason for this is that any input file with the <code>diff</code> operator actually specifies two models: one model where each instance of <code>diff(x,y)</code> is replaced with <code>x</code> (the <em>left hand side</em>, or LHS for short), and one model where each instance of <code>diff(x,y)</code> is replaced with <code>y</code> (the <em>right hand side</em>, or RHS for short). Moreover, as the observational equivalence mode requires different precomputations, each of the two models is treated twice. For examle, the point <code>RHS: Raw sources [Diff]</code> gives the raw sources for the RHS interpretation of the model in observational equivalence mode, whereas <code>LHS: Raw sources</code> gives the raw sources for the LHS interpretation of the model in the 'trace' mode.</p>
 <p>Third, all lemmas have been duplicated: the lemma <code>B_is_secret</code> exists once on the left hand side (marked using <code>[left]</code>) and once on the right hand side (marked using <code>[right]</code>), as both models can differ and thus the lemma needs to be proven on both sides.</p>
 <p>Finally, there is a new lemma <code>Observational_equivalence</code>, added automatically by Tamarin (so no need to define it in the <code>.spthy</code> input file). By proving this lemma we can prove observational equivalence between the LHS and RHS models.</p>
 <p>In the <code>Diff Rules</code>, we have the rules as written in the input file:</p>
@@ -259,8 +259,8 @@ During this search, Tamarin can encounter executions that can be 'mirrored' on t
 Or, Tamarin can encounter executions that do not map to the other side. For example the following execution on the LHS that encrypts <code>~a</code> using the public key and successfully compares the result to the published ciphertext, is not possible on the RHS (as there the ciphertext contains <code>~b</code>). Such an execution corresponds to a potential attack, and thus invalidates the &quot;Observational_equivalence&quot; lemma.</p>
 <p><img src="../images/tamarin-obseq-lemma-attack.jpg" title="Proving the Observational Equivalence Lemma: Attack" alt="Proving the Observational Equivalence Lemma: Attack" style="width:100.0%" /><br />
 Note that Tamarin needs to potentially consider numerous possible executions, which can result in long proof times or even non-termination. If possible it tries not to resolve parts of the execution that are irrelevant, but this is not always sufficient.</p>
-<h2 id="axioms">Axioms</h2>
-<p>Axioms restrict the set of traces to be considered in the protocol analysis. They can be used for purposes ranging from modeling branching behavior of protocols to the verification of signatures. We give a brief example of the latter. Consider the simple message authentication protocol, where an agent <code>A</code> sends a signed message to an agent <code>B</code>. We use Tamarin's built-in equational <a href="004_cryptographic-messages.html#sec:builtin-theories">theory for signing</a>.</p>
+<h2 id="restrictions">Restrictions</h2>
+<p>Restrictions restrict the set of traces to be considered in the protocol analysis. They can be used for purposes ranging from modeling branching behavior of protocols to the verification of signatures. We give a brief example of the latter. Consider the simple message authentication protocol, where an agent <code>A</code> sends a signed message to an agent <code>B</code>. We use Tamarin's built-in equational <a href="004_cryptographic-messages.html#sec:builtin-theories">theory for signing</a>.</p>
 <pre class="tamarin"><code>// Role A sends first message
 rule A_1_send:
   let m = &lt;A, ~na&gt;
@@ -288,8 +288,8 @@ rule B_1_receive:
   [ St_B_1(B, ltkB, pkA, A, m)
   ]
 </code></pre>
-<p>In the above protocol, agent <code>B</code> verifies the signature <code>sig</code> on the received message <code>m</code>. We model this by considering only those traces of the protocol in which the application of the <code>verify</code> function to the received message equals the constant <code>true</code>. To this end, we specify the equality axiom</p>
-<pre class="tamarin"><code>axiom Equality:
+<p>In the above protocol, agent <code>B</code> verifies the signature <code>sig</code> on the received message <code>m</code>. We model this by considering only those traces of the protocol in which the application of the <code>verify</code> function to the received message equals the constant <code>true</code>. To this end, we specify the equality restriction</p>
+<pre class="tamarin"><code>restriction Equality:
   &quot;All x y #i. Eq(x,y) @i ==&gt; x = y&quot;
 </code></pre>
 <p>The full protocol theory is given below.</p>
@@ -346,7 +346,7 @@ rule B_1_receive:
   [ St_B_1(B, ltkB, pkA, A, m)
   ]
 
-axiom Equality:
+restriction Equality:
   &quot;All x y #i. Eq(x,y) @i ==&gt; x = y&quot;
 
 lemma executable:
@@ -359,60 +359,60 @@ lemma message_authentication:
          | (Ex B #r. Reveal(B)@r &amp; Honest(B) @i &amp; r &lt; i)&quot;
 
 end</code></pre>
-<p>Note that axioms can also be used to verify observational equivalence properties. As there are no user-specifiable lemmas for observational equivalence, axioms can be used to remove state space, which essentially removes degenerate cases.</p>
-<!-- Finally, one can use also use axioms to simplify the writing of lemmas. -->
-<h2 id="common-axioms">Common axioms</h2>
-<p>Here is a list of common axioms. Do note that you need to add the appropriate action facts to your rules for these axioms to have impact.</p>
+<p>Note that restrictions can also be used to verify observational equivalence properties. As there are no user-specifiable lemmas for observational equivalence, restrictions can be used to remove state space, which essentially removes degenerate cases.</p>
+<!-- Finally, one can use also use restrictions to simplify the writing of lemmas. -->
+<h2 id="common-restrictions">Common restrictions</h2>
+<p>Here is a list of common restrictions. Do note that you need to add the appropriate action facts to your rules for these restrictions to have impact.</p>
 <h3 id="unique">Unique</h3>
-<p>First, let us show an axiom forcing an action (with a particular value) to be unique:</p>
-<pre><code>axiom unique:
+<p>First, let us show a restriction forcing an action (with a particular value) to be unique:</p>
+<pre><code>restriction unique:
   &quot;All x #i #j. UniqueFact(x) @#i &amp; UniqueFact(x) @#j ==&gt; #i = #j&quot;</code></pre>
 <p>We call the action <code>UniqueFact</code> and give it one argument. If it appears on the trace twice, it actually is only once, as the two time points are identified.</p>
 <h3 id="equality">Equality</h3>
-<p>Next, let us consider an equality axiom. This is useful if you do not want to use pattern-matching explicitly, but maybe want to ensure that the decryption of an encrypted value is the original value, assuming correct keys. The axiom looks like this:</p>
-<pre><code>axiom Equality:
+<p>Next, let us consider an equality restriction. This is useful if you do not want to use pattern-matching explicitly, but maybe want to ensure that the decryption of an encrypted value is the original value, assuming correct keys. The restriction looks like this:</p>
+<pre><code>restriction Equality:
   &quot;All x y #i. Eq(x,y) @#i ==&gt; x = y&quot;</code></pre>
 <p>which means that all instances of the <code>Eq</code> action on the trace have the same value as both its arguments.</p>
 <h3 id="inequality">Inequality</h3>
-<p>Now, let us consider an inequality axiom, which ensures that the two arguments of <code>Neq</code> are different:</p>
-<pre><code>axiom Inequality:
+<p>Now, let us consider an inequality restriction, which ensures that the two arguments of <code>Neq</code> are different:</p>
+<pre><code>restriction Inequality:
   &quot;All x #i. Neq(x,x) @ #i ==&gt; F&quot;</code></pre>
 <p>This is very useful to ensure that certain arguments are different.</p>
 <h3 id="onlyonce">OnlyOnce</h3>
-<p>If you have a rule that should only be executed once, put <code>OnlyOnce()</code> as an action fact for that rule and add this axiom:</p>
-<pre><code>axiom OnlyOnce:
+<p>If you have a rule that should only be executed once, put <code>OnlyOnce()</code> as an action fact for that rule and add this restriction:</p>
+<pre><code>restriction OnlyOnce:
   &quot;All #i #j. OnlyOnce()@#i &amp; OnlyOnce()@#j ==&gt; #i = #j&quot;</code></pre>
 <p>Then that rule can only be executed once. Note that if you have multiple rules that all have this action fact, at most one of them can be executed a single time.</p>
-<p>A similar construction can be used to limit multiple occurrences of an action for specific instantiations of variables, by adding these as arguments to the action. For example, one could put <code>OnlyOnceV('Initiator')</code> in a rule creating an initiator process, and <code>OnlyOnceV('Responder')</code> in the rule for the responder. If used with the following axiom, this would then yield the expected result of at most one initiator and at most one responder:</p>
-<pre><code>axiom OnlyOnceV:
+<p>A similar construction can be used to limit multiple occurrences of an action for specific instantiations of variables, by adding these as arguments to the action. For example, one could put <code>OnlyOnceV('Initiator')</code> in a rule creating an initiator process, and <code>OnlyOnceV('Responder')</code> in the rule for the responder. If used with the following restriction, this would then yield the expected result of at most one initiator and at most one responder:</p>
+<pre><code>restriction OnlyOnceV:
   &quot;All #i #j x. OnlyOnceV(x)@#i &amp; OnlyOnceV(x)@#j ==&gt; #i = #j&quot;</code></pre>
 <h3 id="less-than">Less than</h3>
-<p>If we use the <code>multiset</code> built-in we can construct numbers as &quot;1+1+...+1&quot;, and have an axiom enforcing that one number is less than another, say <code>LessThan</code>:</p>
-<pre><code>axiom LessThan:
+<p>If we use the <code>multiset</code> built-in we can construct numbers as &quot;1+1+...+1&quot;, and have a restriction enforcing that one number is less than another, say <code>LessThan</code>:</p>
+<pre><code>restriction LessThan:
   &quot;All x y #i. LessThan(x,y)@#i ==&gt; Ex z. x + z = y&quot;</code></pre>
 <p>You would then add the <code>LessThan</code> action fact to a rule where you want to enforce that a counter has strictly increased.</p>
 <p>Similarly you can use a <code>GreaterThan</code> where we want <code>x</code> to be strictly larger than <code>y</code>:</p>
-<pre><code>axiom GreaterThan:
+<pre><code>restriction GreaterThan:
   &quot;All x y #i. GreaterThan(x,y)@#i ==&gt; Ex z. x = y + z&quot;</code></pre>
 <h2 id="lemma-annotations">Lemma Annotations</h2>
 <p>Tamarin supports a number of annotations to its lemmas, which change their meaning. Any combination of them is allowed. We explain them in this section. The usage is that any annotation goes into square brackets after the lemma name, i.e., for a lemma called &quot;Name&quot; and the added annotations &quot;Annotation1&quot; and &quot;Annotation2&quot;, this looks like so:</p>
 <pre><code>lemma Name [Annotation1,Annotation2]:</code></pre>
-<h3 id="typing"><code>typing</code></h3>
-<p>To declare a lemma as a typing lemma, we use the annotation <code>typing</code>:</p>
-<pre><code>lemma example [typing]:
+<h3 id="sources"><code>sources</code></h3>
+<p>To declare a lemma as a source lemma, we use the annotation <code>sources</code>:</p>
+<pre><code>lemma example [sources]:
   &quot;...&quot;</code></pre>
 <p>This means a number of things:</p>
 <ul>
 <li>The lemma's verification will use induction.</li>
-<li>The lemma will be verified using the <code>Untyped case distinctions</code>.</li>
-<li>The lemma will be used to generate the <code>Typed case distinctions</code>, which are used for verification of all non-<code>typing</code> lemmas.</li>
+<li>The lemma will be verified using the <code>Raw sources</code>.</li>
+<li>The lemma will be used to generate the <code>Refined sources</code>, which are used for verification of all non-<code>sources</code> lemmas.</li>
 </ul>
-<p>Typing lemmas are necessary whenever the analysis reports <code>open chains</code> in the <code>Untyped case distinctions</code>. See section on <a href="007_precomputation.html#sec:openchains">Open chains</a> for details on this.</p>
-<p>All <code>typing</code> lemmas are used only for the case distinctions and do not benefit from other lemmas being marked as <code>reuse</code>.</p>
+<p>Source lemmas are necessary whenever the analysis reports <code>partial deconstructions left</code> in the <code>Raw sources</code>. See section on <a href="007_precomputation.html#sec:openchains">Open chains</a> for details on this.</p>
+<p>All <code>sources</code> lemmas are used only for the case distinctions and do not benefit from other lemmas being marked as <code>reuse</code>.</p>
 <h3 id="use_induction"><code>use_induction</code></h3>
 <p>As you have seen before, the first choice in any proof is whether to use simplification (the default) or induction. If you know that a lemma will require induction, you just annotate it with <code>use_induction</code>, which will make it use induction instead of simplification.</p>
 <h3 id="reuse"><code>reuse</code></h3>
-<p>A lemma marked <code>reuse</code> will be used in the proofs of all lemmas syntactically following it (except <code>typing</code> lemmas as above). This includes other <code>reuse</code> lemmas that can transitively depend on each other.</p>
+<p>A lemma marked <code>reuse</code> will be used in the proofs of all lemmas syntactically following it (except <code>sources</code> lemmas as above). This includes other <code>reuse</code> lemmas that can transitively depend on each other.</p>
 <h3 id="hide_lemmal"><code>hide_lemma=L</code></h3>
 <p>It can sometimes be helpful to have lemmas that are used only for the proofs of other lemmas. For example, assume 3 lemmas, called <code>A</code>, <code>B</code>, and <code>C</code>. They appear in that order, and <code>A</code> and <code>B</code> are marked reuse. Then, during the proof of <code>C</code> both <code>A</code> and <code>B</code> are reused, but sometimes you might only want to use <code>B</code>, but the proof of <code>B</code> needs <code>A</code>. The solution then is to hide the lemma <code>A</code> in <code>C</code>:</p>
 <pre><code>lemma A [reuse]:

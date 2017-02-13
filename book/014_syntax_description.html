@@ -56,7 +56,7 @@
 // for a line-comment</code></pre>
 <p>All security protocol theory are named and delimited by 'begin' and 'end'. We explain the non-terminals of the body in the following paragraphs.</p>
 <pre><code>security_protocol_theory := &#39;theory&#39; ident &#39;begin&#39; body &#39;end&#39;
-body := (signature_spec | rule | axiom | lemma | formal_comment)+</code></pre>
+body := (signature_spec | rule | restriction | lemma | formal_comment)+</code></pre>
 <p>Here, we use the term signature more liberally to denote both the defined function symbols and the equalities describing their interaction. Note that our parser is stateful and remembers what functions have been defined. It will only parse function applications of defined functions.</p>
 <pre><code>signature_spec := functions | equations | built_in
 functions      := &#39;functions&#39; &#39;:&#39; (ident &#39;/&#39; arity) list
@@ -78,22 +78,22 @@ let_block := &#39;let&#39; (ident &#39;=&#39; term)+ &#39;in&#39;</code></pre>
     y = &lt;z,x&gt;
 in [] --&gt; [ A(y)]    is desugared to    [] --&gt; [ A(&lt;z,y&gt;) ]</code></pre>
 <p>This becomes a lot less confusing if you keep the set of variables on the left-hand side separate from the free variables on the right-hand side.</p>
-<p>Axioms specify restrictions on the set of traces considered, i.e., they filter the set of traces of a protocol. The formula of an axiom is available as an assumption in the proofs of <em>all</em> security properties specified in this security protocol theory.</p>
-<pre><code>axiom := &#39;axiom&#39; ident &#39;:&#39; &#39;&quot;&#39; formula &#39;&quot;&#39;</code></pre>
-<p>In observational equivalence mode, axioms can be associated to one side.</p>
-<pre><code>axiom := &#39;axiom&#39; ident [axiom_attrs] &#39;:&#39; &#39;&quot;&#39; formula &#39;&quot;&#39;
-axiom_attrs      := &#39;[&#39; (&#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
+<p>Restrictions specify restrictions on the set of traces considered, i.e., they filter the set of traces of a protocol. The formula of a restriction is available as an assumption in the proofs of <em>all</em> security properties specified in this security protocol theory.</p>
+<pre><code>restriction := &#39;restriction&#39; ident &#39;:&#39; &#39;&quot;&#39; formula &#39;&quot;&#39;</code></pre>
+<p>In observational equivalence mode, restrictions can be associated to one side.</p>
+<pre><code>restriction := &#39;restriction&#39; ident [restriction_attrs] &#39;:&#39; &#39;&quot;&#39; formula &#39;&quot;&#39;
+restriction_attrs      := &#39;[&#39; (&#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
 <p>Lemmas specify security properties. By default, the given formula is interpreted as a property that must hold for all traces of the protocol of the security protocol theory. You can change this using the 'exists-trace' trace quantifier.</p>
 <pre><code>lemma := &#39;lemma&#39; ident [lemma_attrs] &#39;:&#39;
          [trace_quantifier]
          &#39;&quot;&#39; formula &#39;&quot;&#39;
          proof
-lemma_attrs      := &#39;[&#39; (&#39;typing&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
+lemma_attrs      := &#39;[&#39; (&#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
                          &#39;hide_lemma=&#39; ident) &#39;]&#39;
 trace_quantifier := &#39;all-traces&#39; | &#39;exists-trace&#39;
 proof            := ... a proof as output by the Tamarin prover ..</code></pre>
 <p>In observational equivalence mode, lemmas can be associated to one side.</p>
-<pre><code>lemma_attrs      := &#39;[&#39; (&#39;typing&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
+<pre><code>lemma_attrs      := &#39;[&#39; (&#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
                          &#39;hide_lemma=&#39; ident | &#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
 <p>Formal comments are used to make the input more readable. In contrast to /<em>...</em>/ and //... comments, formal comments are stored and output again when pretty-printing a security protocol theory.</p>
 <pre><code>formal_comment := ident &#39;{*&#39; ident* &#39;*}&#39;</code></pre>

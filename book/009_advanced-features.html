@@ -239,7 +239,7 @@ end</code></pre>
 ...
 #endif</code></pre>
 <p>and then running Tamarin with the option <code>-DKEYWORD</code> to have this part included.</p>
-<p>If you use this feature to exclude typing lemmas, your case distinctions will change, and you may no longer be able to construct some proofs automatically. Similarly, if you have <code>reuse</code> marked lemmas that are removed, then other following lemmas may no longer be provable.</p>
+<p>If you use this feature to exclude source lemmas, your case distinctions will change, and you may no longer be able to construct some proofs automatically. Similarly, if you have <code>reuse</code> marked lemmas that are removed, then other following lemmas may no longer be provable.</p>
 <p>The following is an example of a lemma that will be included when <code>timethis</code> is given as parameter to <code>-D</code>:</p>
 <pre class="tamarin"><code>#ifdef timethis
 lemma tobemeasured:
@@ -253,7 +253,7 @@ lemma otherlemma2:
   &quot;Ex r #i. Action2(r)@i&quot;
 #endif</code></pre>
 <h2 id="how-to-time-proofs-in-tamarin">How to Time Proofs in Tamarin</h2>
-<p>If you want to measure the time taken to verify a particular lemma you can use the previously described preprocessor to mark each lemma, and only include the one you wish to time. This can be done, for example, by wrapping the relevant lemma within <code>#ifdef timethis</code>. Also make sure to include <code>reuse</code> and <code>typing</code> lemmas in this. All other lemmas should be covered under a different keyword; in the example here we use <code>nottimed</code>.</p>
+<p>If you want to measure the time taken to verify a particular lemma you can use the previously described preprocessor to mark each lemma, and only include the one you wish to time. This can be done, for example, by wrapping the relevant lemma within <code>#ifdef timethis</code>. Also make sure to include <code>reuse</code> and <code>sources</code> lemmas in this. All other lemmas should be covered under a different keyword; in the example here we use <code>nottimed</code>.</p>
 <p>By running</p>
 <pre><code>time tamarin-prover -Dtimethis TimingExample.spthy --prove</code></pre>
 <p>the timing are computed for just the lemmas of interest. Here is the complete input file, with an artificial protocol:</p>
