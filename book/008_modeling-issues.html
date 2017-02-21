@@ -100,7 +100,7 @@ rule setup:
     [ Fr(~k), Fr(~m) ]
     --[]-&gt;
     [ AgSt($I,~k,~m), AgSt($R,~k) ]</code></pre>
-<p>Note that the the first <code>AgSt(...)</code> in the conclusion has arity three, with variables <code>$I,~k,~m</code>, rather than the original arity two, with variables <code>$I,&lt;~k,~m&gt;</code> where the second argument is paired.</p>
+<p>Note that the first <code>AgSt(...)</code> in the conclusion has arity three, with variables <code>$I,~k,~m</code>, rather than the original arity two, with variables <code>$I,&lt;~k,~m&gt;</code> where the second argument is paired.</p>
 <p>The following statement that some wellformedness check failed will appear at the very end of the text when loading this theory.</p>
 <pre><code>WARNING: 1 wellformedness check failed!
          The analysis results might be wrong!</code></pre>
@@ -137,7 +137,7 @@ unbound:
   rule `R_1&#39; has unbound variables: 
     ~n
 */</code></pre>
-<p>The warning <code>unbound variables</code> indicates that there is a term, here the fresh <code>~n</code>, in the action or conclusion that never appeared in the premise. Here this is the case because we mistyped <code>~n</code> instead of <code>~m</code>. Generally, when such a warning appears, you should check that all the fresh variables variables already occur in the premise. If it is a fresh variable that appears for the first time in this rule, a <code>Fr(~n)</code> fact should be added to the premise.</p>
+<p>The warning <code>unbound variables</code> indicates that there is a term, here the fresh <code>~n</code>, in the action or conclusion that never appeared in the premise. Here this is the case because we mistyped <code>~n</code> instead of <code>~m</code>. Generally, when such a warning appears, you should check that all the fresh variables already occur in the premise. If it is a fresh variable that appears for the first time in this rule, a <code>Fr(~n)</code> fact should be added to the premise.</p>
 <h3 id="free-term-in-formula">Free Term in formula</h3>
 <p>Next, we change the functional lemma as follows</p>
 <pre class="tamarin"><code>// WARNING: this lemma illustrates an error message
@@ -157,7 +157,7 @@ formula terms:
   have forgotten a #-prefix. Sort prefixes can only be dropped where
   this is unambiguous.
 */</code></pre>
-<p>The warning indicates that in this lemma the term <code>m</code> is occurs free. This means that it is not bound to any quantifier. Often such an error occurs when one forgets to list all the variables that are used in the formula after the <code>Ex</code> or <code>All</code> quantifier. In our example, the problem occured because we deleted the <code>m</code> in <code>Ex I R m #i #j.</code></p>
+<p>The warning indicates that in this lemma the term <code>m</code> is occurs free. This means that it is not bound to any quantifier. Often such an error occurs when one forgets to list all the variables that are used in the formula after the <code>Ex</code> or <code>All</code> quantifier. In our example, the problem occurred because we deleted the <code>m</code> in <code>Ex I R m #i #j.</code></p>
 <h3 id="undefined-action-fact-in-lemma">Undefined Action Fact in Lemma</h3>
 <p>Next, we change the lemma <code>nonce_secret</code>.</p>
 <pre class="tamarin"><code>// WARNING: this lemma illustrates an error message
