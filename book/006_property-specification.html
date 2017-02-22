@@ -320,7 +320,7 @@ builtins: signing
 
     1. A -&gt; B: {A,na}sk(A)
 
-using Tamarin&#39;s builtin signin and verification functions.
+using Tamarin&#39;s builtin signing and verification functions.
 
 */
 
@@ -628,6 +628,7 @@ end</code></pre>
         &amp; not (Ex A2 B2 #i2. Commit(A2,B2,t) @i2
                            &amp; not (#i2 = #i)))
               | (Ex C #r. Reveal(C)@r &amp; Honest(C) @i)&quot;</code></pre>
+<p>The idea behind injective agreement is to prevent replay attacks. Therefore, new freshness will have to be involved in each run, meaning the term <code>t</code> must contain such a fresh value.</p>
 <div id="refs" class="references">
 <div id="ref-Lowe">
 <p>Lowe, Gavin. 1997. “A Hierarchy of Authentication Specifications.” In <em>10th Computer Security Foundations Workshop (Csfw 1997), June 10-12, 1997, Rockport, Massachusetts, Usa</em>, 31–44. IEEE Computer Society. <a href="http://www.cs.ox.ac.uk/people/gavin.lowe/Security/Papers/authentication.ps" class="uri">http://www.cs.ox.ac.uk/people/gavin.lowe/Security/Papers/authentication.ps</a>.</p>
