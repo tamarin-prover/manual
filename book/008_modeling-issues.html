@@ -172,7 +172,7 @@ lemma actions:
     (ProtoFact Linear &quot;Secr&quot; 2,2,Linear)
   but no rule has such an action.
 */</code></pre>
-<p>Such a warning always occurs when a lemma uses a fact that never appears as an action fact in any rule. The cause of this is either that the fact is spelled differently (here <code>Secr</code> instead of <code>Secret</code>) or that one forgot to add the action fact to the protocol rules. Generally, it is a good advice to double check that the facts that are used in the lemmas appear in the relevant protocol rules as actions.</p>
+<p>Such a warning always occurs when a lemma uses a fact that never appears as an action fact in any rule. The cause of this is either that the fact is spelled differently (here <code>Secr</code> instead of <code>Secret</code>) or that one forgot to add the action fact to the protocol rules. Generally, it is good practice to double check that the facts that are used in the lemmas appear in the relevant protocol rules as actions.</p>
 <h3 id="undeclared-function-symbols">Undeclared function symbols</h3>
 <p>If we omit the line</p>
 <pre class="tamarin"><code>builtins: symmetric-encryption</code></pre>
