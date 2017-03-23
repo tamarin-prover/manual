@@ -121,7 +121,7 @@ lemma nonce_secrecy:
 <p>The existence of such partial deconstructions complicates automated proof generation and often (but not always) means that no proof will be found automatically. For this reason, it is useful for users to be able to find these and examine if it is possible to remove them.</p>
 <p>In the interactive mode you can find such partial deconstructions as follows. On the top left, under &quot;Raw sources&quot;, one can find the precomputed sources by Tamarin.</p>
 <p><img src="../images/FindOpenChains1.png" title="Raw sources" alt="Tamarin GUI" style="width:80.0%" /><br />
-The partial deconstructions can be identified by the light green arrows as in the following example:</p>
+Cases with partial deconstructions will be listed with the text <code>(partial deconstructions)</code> after the case name. The partial deconstructions can be identified by light green arrows in the graph, as in the following example:</p>
 <p><img src="../images/FindOpenChains2.png" title="Partial deconstructions visible" alt="Partial deconstruction visible in green" style="width:100.0%" /><br />
 The green arrow indicates that Tamarin cannot exclude the possibility that the adversary can derive any fresh term <code>~t.1</code> with this rule <code>I_2</code>. As we are using an untyped protocol model, the tool cannot determine that <code>nr.7</code> should be a fresh nonce, but that it could be any message. For this reason Tamarin concludes that it can derive any message with this rule.</p>
 <!--**FIX Cas: In the above, we mention untyped protocol model. Did we explain
