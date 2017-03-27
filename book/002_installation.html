@@ -131,6 +131,37 @@ The tamarin-prover should work as intended.
 <p>If you have access to a faster desktop or server, but prefer using Tamarin on your laptop, you can do that. The cpu/memory intensive reasoning part of the tool will then run on the faster machine, while you just run the GUI locally, i.e., the web browser of your choice. To do this, you forward your port 3001 to the port 3001 of your server with the following command, replacing <code>SERVERNAME</code> appropriately.</p>
 <pre><code>ssh -L 3001:localhost:3001 SERVERNAME</code></pre>
 <p>If you do this, we recommend that you run your Tamarin instance on the server in a <a href="https://www.gnu.org/software/screen/manual/screen.html">screen</a> environment, which will continue running even if the network drops your connection as you can later reconnect to it. Otherwise, any network failure may require you to restart Tamarin and start over on the proof.</p>
+<h2 id="tamarin-code-editors">Tamarin Code Editors</h2>
+<p>Under the <a href="https://github.com/tamarin-prover/tamarin-prover/tree/develop/etc">etc</a> folder contained in the Tamarin Prover project, plug-ins are available for VIM, Sublime Text 3 and Notepad++. Below we details the steps required to install your preferred plug-in.</p>
+<h3 id="vim">VIM</h3>
+<ol style="list-style-type: decimal">
+<li>Create <code>~/.vim/</code> directory if not already existing, which is the typical location for <code>$VIMRUNTIME</code></li>
+<li>Change directory to <code>~/.vim/</code></li>
+<li>Place the <a href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/filetype.vim">filetype.vim</a> file</li>
+<li>Create another directory <code>syntax</code> within <code>~/.vim/</code> directory and change directory to it.</li>
+<li>Place the <a href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/spthy.vim">spthy.vim</a> and <a href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/sapic.vim">sapic.vim</a> files in <code>~/.vim/syntax</code></li>
+</ol>
+<h3 id="sublime-text-3">Sublime Text 3</h3>
+<p><a href="http://jwhitefield.co.uk/TamarinAssist/">TamarinAssist</a> is a plug-in developed for the Sublime Text 3 editor. The plug-in has the following functionality: - Basic Syntaxes - Run Tamarin within Sublime - Snippets for Theory, Rule, Axiom and Lemma</p>
+<p>TamarinAssist can be install in two ways:</p>
+<p>The first and preferred method is with <a href="https://packagecontrol.io/">PackageControl.io</a>. TamarinAssist can now be installed via the sublime package manager. See the <a href="https://packagecontrol.io/installation">install</a> and <a href="https://packagecontrol.io/docs/usage">usage</a> documentation, then search and install TamarinAssist.</p>
+<p>Alternatively it can be installed from source. For Linux / OS X this process can be followed. We assume you have the <code>git</code> tool installed.</p>
+<ol style="list-style-type: decimal">
+<li>Change Directory to Sublime Text packages directory:
+<ul>
+<li>Mac OS X: <code>cd ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/</code></li>
+<li>Linux: <code>~/.Sublime\ Text\ 3/Packages/</code></li>
+</ul></li>
+<li>Pull directory into Packages folder.
+<ul>
+<li>SSH: <code>git pull git@github.com:lordqwerty/TamarinAssist.git</code></li>
+<li>HTTPS: <code>https://github.com/lordqwerty/TamarinAssist.git</code></li>
+</ul></li>
+<li>Open Sublime and bottom right syntaxes 'Tamarin' should be in the list.</li>
+</ol>
+<p><em>Please be aware that TamarinAssist is still under active development and as such, several of the features are still implemented in a prototypical manner. If you experience any problems or have any questions on running any parts of the plug-in please <a href="https://github.com/lordqwerty/TamarinAssist/">visit the project GitHub page</a>.</em></p>
+<h3 id="notepad">Notepad++</h3>
+<p>Follow steps from the <a href="http://docs.notepad-plus-plus.org/index.php/User_Defined_Language_Files#How_to_install_user_defined_language_files">Notepad++ Wiki</a> using the <a href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/notepad_plus_plus_spthy.xml">notepad_plus_plus_spthy.xml</a> file.</p>
     </div>
   </div>
 </body>
