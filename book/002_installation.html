@@ -61,8 +61,9 @@
 <h2 id="sec:macosx">Mac OS X</h2>
 <h3 id="sec:MacOSBinInstall">Automatic Installation of the Tamarin binary</h3>
 <p>The fastest way to install Tamarin on Mac OS X is to use <a href="http://brew.sh/">Homebrew</a> <a href="https://caskroom.github.io/">Cask</a>.</p>
-<p>If you already have this installed, it is as simple as running the following in your terminal:</p>
+<p>If you already have this installed, it is as simple as running the following two commands in your terminal:</p>
 <ul>
+<li><code>brew update</code></li>
 <li><code>brew cask install tamarin-prover</code></li>
 </ul>
 <p>You can now run Tamarin from the command line by typing <code>tamarin-prover</code>. Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time. (Warning: the previous stable version of Tamarin (v1.0.0) does not realize that Maude v2.7.1 is more than sufficient; it will currently give you a warning when you run <code>tamarin-prover test</code> but it is safe to ignore this.)</p>
@@ -70,7 +71,7 @@
 <p>If you don't have Homebrew and/or Cask installed:</p>
 <ol style="list-style-type: decimal">
 <li><p>Install <a href="http://brew.sh/">Homebrew</a>, by following the instructions on their website (this is a one-line copy paste install). Update everything with: <code>brew update</code>. Any issues, run <code>brew doctor</code> for more information.</p></li>
-<li><p>Install Tamarin: <code>brew cask install tamarin-prover</code></p>
+<li>Install Tamarin: <code>brew cask install tamarin-prover</code>
 <ul>
 <li>If for any reason this doesn't work, you might have to 'tap' (add) Homebrew <a href="https://caskroom.github.io/">Cask</a> manually. This is currently achieved by <code>brew tap caskroom/cask</code>, but might change. Check <a href="https://caskroom.github.io/">the website</a> for the latest instructions.</li>
 <li>Tamarin's dependencies Maude and GraphViz are automatically installed and added to your path.</li>
@@ -115,7 +116,7 @@ maude tool: &#39;maude&#39;
  checking installation: OK.
 
 GraphViz tool: &#39;dot&#39;
- checking version: dot - graphviz version 2.39.20150613.2112 
+ checking version: dot - graphviz version 2.39.20150613.2112
                    (20150613.2112). OK.
 
 *** Testing the unification infrastructure ***
