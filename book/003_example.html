@@ -91,9 +91,9 @@ begin</code></pre>
 <p>The above rule can therefore be read as follows. First, generate a fresh name <code>~ltk</code> (of sort fresh), which is the new private key, and non-deterministically choose a public name <code>A</code>, for the agent for whom we are generating the key-pair. Afterward, generate the fact <code>!Ltk($A, ~ltk)</code> (the exclamation mark <code>!</code> denotes that the fact is persistent, i.e., it can be consumed arbitrarily often), which denotes the association between agent <code>A</code> and its private key <code>~ltk</code>, and generate the fact <code>!Pk($A, pk(~ltk))</code>, which associates agent <code>A</code> and its public key <code>pk(~ltk)</code>.</p>
 <p>In the example, we allow the adversary to retrieve any public key using the following rule. Essentially, it reads a public-key database entry and sends the public key to the network using the built-in fact <code>Out</code>, which denotes sending a message to the network (see the section on <a href="005_protocol-specification.html#sec:model-specification">Model Specification</a> for more information).</p>
 <pre class="tamarin"><code>rule Get_pk:
-    [ !Pk(A, pk) ]
+    [ !Pk(A, pubkey) ]
   --&gt;
-    [ Out(pk) ]</code></pre>
+    [ Out(pubkey) ]</code></pre>
 <p>We model the dynamic compromise of long-term private keys using the following rule. Intuitively, it reads a private-key database entry and sends it to the adversary. This rule has an observable <code>LtkReveal</code> action stating that the long-term key of agent <code>A</code> was compromised. Action facts are just like facts, but unlike the other facts do not appear in state, but only on the trace. The security properties are specified on the traces, and the action <code>LtkReveal</code> is used below to determine which agents are compromised. The rule now has a premise, conclusion, and action facts within the arrow: <code>--[  ACTIONFACT ]-&gt;</code>:</p>
 <pre class="tamarin"><code>rule Reveal_ltk:
     [ !Ltk(A, ltk) ]
@@ -294,9 +294,9 @@ rule Register_pk:
     [ !Ltk($A, ~ltk), !Pk($A, pk(~ltk)) ]
 
 rule Get_pk:
-    [ !Pk(A, pk) ]
+    [ !Pk(A, pubkey) ]
   --&gt;
-    [ Out(pk) ]
+    [ Out(pubkey) ]
 
 rule Reveal_ltk:
     [ !Ltk(A, ltk) ]
