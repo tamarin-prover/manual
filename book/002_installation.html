@@ -52,12 +52,21 @@
 <h1 id="sec:installation">Installation</h1>
 <p>We explain below how to install Tamarin on different operating systems: <a href="#sec:linux">Linux</a>, <a href="#sec:macosx">Mac OS X</a>, and <a href="#sec:windows">Microsoft Windows</a>.</p>
 <h2 id="sec:linux">Linux</h2>
+<h3 id="sec:LinuxSrcInstall">Compiling from source</h3>
 <p>To run Tamarin on Linux, a number of dependencies must be installed, namely GraphViz and Maude 2.7. You can install GraphViz using your standard package manager or directly from <a href="http://www.graphviz.org/" class="uri">http://www.graphviz.org/</a>. You can also install Maude using your package manager. However, if your package manager installs Maude 2.6, then you must install version 2.7.1, <a href="http://maude.cs.illinois.edu/w/index.php?title=Maude_download_and_installation#Core_Maude_2.7.1">Core Maude 2.7.1</a>, directly from <a href="http://maude.cs.illinois.edu/" class="uri">http://maude.cs.illinois.edu/</a>. In this case, you should ensure that your <code>PATH</code> includes the install path, so that calling <code>maude</code> starts version 2.7.1. Note that even though the Maude executable is movable, the <code>prelude.maude</code> file must be in the same folder that you start Maude from.</p>
 <p>Once these dependencies have been installed, you can then compile Tamarin from source, using either the stable master or current development version.</p>
-<h3 id="compiling-from-source">Compiling from source</h3>
 <p>To help compile Tamarin from source, we manage Haskell dependencies automatically using the tool <code>stack</code>. You must first install <code>stack</code>, following the instructions given at <a href="https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md">Stack's install page</a>. In case you are installing <code>stack</code> with your package manager (particularly on Ubuntu), you must run <code>stack upgrade</code> afterwards, as that version of stack is usually out-of-date.</p>
 <p>After running <code>git clone</code> on the Tamarin repository, you have the current development version ready for compilation. If you would prefer to use the master version, just run <code>git checkout master</code>. In either case, you can then run <code>make default</code>, which will install an appropriate GHC (the Glasgow Haskell Compiler) for your system, including all dependencies, and the <code>tamarin-prover</code> executable will be copied to <code>~/.local/bin/tamarin-prover</code>. Note that this process will take between 30 and 60 minutes, as all dependencies (roughly 120) are compiled from scratch. If you later pull a newer version of Tamarin (or switch to/from the <code>master</code> branch), then only the tool itself needs to be recompiled, which takes a few minutes, at most.</p>
 <p>Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time.</p>
+<h3 id="sec:LinuxBinInstall">Automatic Installation of Tamarin</h3>
+<p>The fastest way to install Tamarin on Linux is to use <a href="http://linuxbrew.sh/">Linuxbrew</a>. Linuxbrew is a fork of Homebrew, the Mac OS package manager, for Linux.</p>
+<p>To install Linuxbrew follow the <a href="https://github.com/Linuxbrew/brew#install-linuxbrew-tldr">Installation Instructions</a>.</p>
+<p>If you already have this installed, it is as simple as running the following two commands in your terminal:</p>
+<ul>
+<li><code>brew update</code></li>
+<li><code>brew install homebrew/science/tamarin-prover</code></li>
+</ul>
+<p>You can now run Tamarin from the command line by typing <code>tamarin-prover</code>. Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time.</p>
 <h2 id="sec:macosx">Mac OS X</h2>
 <h3 id="sec:MacOSBinInstall">Automatic Installation of Tamarin</h3>
 <p>The fastest way to install Tamarin on Mac OS X is to use <a href="http://brew.sh/">Homebrew</a>.</p>
