@@ -76,7 +76,8 @@ snd(pair(x,y)) = y</code></pre>
 <h2 id="sec:equational-theories">Equational theories</h2>
 <p>Equational theories can be used to model properties of functions, e.g., that symmetric decryption is the inverse of symmetric encryption whenever both use the same key. The syntax for adding equations to the context is:</p>
 <pre><code>equations: lhs1 = rhs1, ..., lhsn = rhsn</code></pre>
-<p>Both <code>lhs</code> and <code>rhs</code> can contain variables. The symbolic proof search used by Tamarin only supports a restricted class of user-defined equations. Concretely, the right-hand-side must be either a ground term (i.e., it does not contain any variables) or a proper subterm of the left-hand-side. Note that the equations modeled by the built-in message theories <code>diffie-hellman</code>, <code>bilinear-pairing</code>, and <code>multiset</code> do not belong to this restricted class since they include for example associativity and commutativity. All other built-in message theories can be equivalently defined by using <code>functions: ...</code> and <code>equations: ...</code> and we will see some examples of allowed equations in the next section.</p>
+<p>Both <code>lhs</code> and <code>rhs</code> can contain variables, but all variables on the right hand side must also appear on the left hand side. The symbolic proof search used by Tamarin supports a certain class of user-defined equations, namely <em>convergent</em> equational theories that have the <em>finite variant property</em> <span class="citation">(Comon-Lundh and Delaune 2005)</span>. Note that Tamarin does <em>not</em> check whether the given equations belong to this class, so writing equations outside this class can cause non-termination or incorrect results <em>without any warning</em>.</p>
+<p>Also note that Tamarin's reasoning is particularly efficient when considering only subterm-convergent equations, i.e., if the right-hand-side is either a ground term (i.e., it does not contain any variables) or a proper subterm of the left-hand-side. These equations are thus preferred if they are sufficient to model the required properties. However, for example the equations modeled by the built-in message theories <code>diffie-hellman</code>, <code>bilinear-pairing</code>, and <code>multiset</code> do not belong to this restricted class since they include for example associativity and commutativity. All other built-in message theories can be equivalently defined by using <code>functions: ...</code> and <code>equations: ...</code> and we will see some examples of allowed equations in the next section.</p>
 <h2 id="sec:builtin-theories">Built-in message theories</h2>
 <p>In the following, we write <code>f/n</code> to denote that the function symbol <code>f</code> is <code>n</code>-ary.</p>
 <dl>
@@ -115,6 +116,11 @@ em(pmult(x,p),q)     = pmult(x,em(q,p))</code></pre>
 <dd><p>This theory introduces the associative-commutative operator <code>+</code> which is usually used to model multisets.</p>
 </dd>
 </dl>
+<div id="refs" class="references">
+<div id="ref-Comon-LundhD05">
+<p>Comon-Lundh, Hubert, and Stéphanie Delaune. 2005. “The Finite Variant Property: How to Get Rid of Some Algebraic Properties.” In <em>RTA</em>, 294–307.</p>
+</div>
+</div>
     </div>
   </div>
 </body>
