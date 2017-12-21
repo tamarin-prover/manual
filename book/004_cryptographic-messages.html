@@ -116,6 +116,9 @@ em(pmult(x,p),q)     = pmult(x,em(q,p))</code></pre>
 <dd><p>This theory introduces the associative-commutative operator <code>+</code> which is usually used to model multisets.</p>
 </dd>
 </dl>
+<h2 id="sec:reserved-names">Reserved function symbol names</h2>
+<p>Due to their use in built-in message theories, the following function names cannot be user-defined: <code>mun</code>, <code>one</code>, <code>exp</code>, <code>mult</code>, <code>inv</code>, <code>pmult</code>, <code>em</code>.</p>
+<p>If a theory contains any of these as user-defined function symbol the parser will reject the file, stating which reserved name was redeclared.</p>
 <div id="refs" class="references">
 <div id="ref-Comon-LundhD05">
 <p>Comon-Lundh, Hubert, and Stéphanie Delaune. 2005. “The Finite Variant Property: How to Get Rid of Some Algebraic Properties.” In <em>RTA</em>, 294–307.</p>
