@@ -54,7 +54,7 @@
 <p>Comments are C-style:</p>
 <pre><code>/* for a multi-line comment */
 // for a line-comment</code></pre>
-<p>All security protocol theory are named and delimited by 'begin' and 'end'. We explain the non-terminals of the body in the following paragraphs.</p>
+<p>All security protocol theory are named and delimited by <code>begin</code> and <code>end</code>. We explain the non-terminals of the body in the following paragraphs.</p>
 <pre><code>security_protocol_theory := &#39;theory&#39; ident &#39;begin&#39; body &#39;end&#39;
 body := (signature_spec | rule | restriction | lemma | formal_comment)+</code></pre>
 <p>Here, we use the term signature more liberally to denote both the defined function symbols and the equalities describing their interaction. Note that our parser is stateful and remembers what functions have been defined. It will only parse function applications of defined functions.</p>
@@ -62,7 +62,7 @@ body := (signature_spec | rule | restriction | lemma | formal_comment)+</code></
 functions      := &#39;functions&#39; &#39;:&#39; (ident &#39;/&#39; arity) list
 equations      := &#39;equations&#39; &#39;:&#39; (term &#39;=&#39; term) list
 arity          := digit+</code></pre>
-<p>Note that the equations must be subterm-convergent. Tamarin provides built-in sets of function definitions and subterm convergent equations. They are expanded upon parsing and you can therefore inspect them by pretty printing the file using 'tamarin-prover your_file.spthy'. The built-in 'diffie-hellman' is special. It refers to the equations given in Section <a href="004_cryptographic-messages.html#equational-theories">Cryptographic Messages</a>. You need to enable it to parse terms containing exponentiations, e.g., g ^ x.</p>
+<p>Note that the equations must be subterm-convergent. Tamarin provides built-in sets of function definitions and subterm convergent equations. They are expanded upon parsing and you can therefore inspect them by pretty printing the file using <code>tamarin-prover your_file.spthy</code>. The built-in <code>diffie-hellman</code> is special. It refers to the equations given in Section <a href="004_cryptographic-messages.html#equational-theories">Cryptographic Messages</a>. You need to enable it to parse terms containing exponentiations, e.g., g ^ x.</p>
 <pre><code>built_in       := &#39;builtins&#39; &#39;:&#39; built_ins list
 built_ins      := &#39;diffie-hellman&#39;
                 | &#39;hashing&#39; | &#39;symmetric-encryption&#39;
@@ -95,10 +95,10 @@ proof            := ... a proof as output by the Tamarin prover ..</code></pre>
 <p>In observational equivalence mode, lemmas can be associated to one side.</p>
 <pre><code>lemma_attrs      := &#39;[&#39; (&#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
                          &#39;hide_lemma=&#39; ident | &#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
-<p>Formal comments are used to make the input more readable. In contrast to /<em>...</em>/ and //... comments, formal comments are stored and output again when pretty-printing a security protocol theory.</p>
+<p>Formal comments are used to make the input more readable. In contrast to <code>/*...*/</code> and <code>//...</code> comments, formal comments are stored and output again when pretty-printing a security protocol theory.</p>
 <pre><code>formal_comment := ident &#39;{*&#39; ident* &#39;*}&#39;</code></pre>
 <p>For the syntax of terms, you best look at our examples. A common pitfall is to use an undefined function symbol. This results in an error message pointing to a position slightly before the actual use of the function due to some ambiguity in the grammar.</p>
-<p>We provide special syntax for tuples, multiplications, exponentiation, nullary and binary function symbols. An n-ary tuple &lt;t1,...,tn&gt; is parsed as n-ary, right-associative application of pairing. Multiplication and exponentiation are parsed left-associatively. For a binary operator 'enc' you can write 'enc{m}k' or 'enc(m,k)'. For nullary function symbols, there is no need to write 'nullary()'. Note that the number of arguments of an n-ary function application must agree with the arity given in the function definition.</p>
+<p>We provide special syntax for tuples, multiplications, exponentiation, nullary and binary function symbols. An n-ary tuple <code>&lt;t1,...,tn&gt;</code> is parsed as n-ary, right-associative application of pairing. Multiplication and exponentiation are parsed left-associatively. For a binary operator <code>enc</code> you can write <code>enc{m}k</code> or <code>enc(m,k)</code>. For nullary function symbols, there is no need to write <code>nullary()</code>. Note that the number of arguments of an n-ary function application must agree with the arity given in the function definition.</p>
 <pre><code>tupleterm := multterm list
 multterm  := expterm (&#39;*&#39; expterm)*
 expterm   := term    (&#39;^&#39; term   )*
@@ -120,7 +120,7 @@ literal := &quot;&#39;&quot;  ident &quot;&#39;&quot;      // a fixed, public na
          | &quot;~&quot;  ident          // a variable of sort &#39;fresh&#39;
          | &quot;#&quot;  ident          // a variable of sort &#39;temp&#39;
          | ident               // a variable of sort &#39;msg&#39;</code></pre>
-<p>Facts do not have to be defined up-front. This will probably change once we implement user-defined sorts. Facts prefixed with '!' are persistent facts. All other facts are linear. There are six reserved fact symbols: In, Out, KU, KD, and K. KU and KD facts are used for construction and deconstruction rules. KU-facts also log the messages deduced by construction rules. Note that KU-facts have arity 2. Their first argument is used to track the exponentiation tags. See the 'loops/Crypto_API_Simple.spthy' example for more information.</p>
+<p>Facts do not have to be defined up-front. This will probably change once we implement user-defined sorts. Facts prefixed with <code>!</code> are persistent facts. All other facts are linear. There are six reserved fact symbols: In, Out, KU, KD, and K. KU and KD facts are used for construction and deconstruction rules. KU-facts also log the messages deduced by construction rules. Note that KU-facts have arity 2. Their first argument is used to track the exponentiation tags. See the <code>loops/Crypto_API_Simple.spthy</code> example for more information.</p>
 <pre><code>facts := fact list
 fact := [&#39;!&#39;] ident &#39;(&#39; multterm list &#39;)&#39;</code></pre>
 <p>Formulas are trace formulas as described previously. Note that we are a bit more liberal with respect to guardedness. We accept a conjunction of atoms as guards.</p>
@@ -128,7 +128,7 @@ fact := [&#39;!&#39;] ident &#39;(&#39; multterm list &#39;)&#39;</code></pre>
 iff       := imp &#39;&lt;=&gt;&#39; imp
 imp       := disjuncts &#39;==&gt;&#39; disjuncts
 disjuncts := conjuncts (&#39;|&#39; disjuncts)+  // left-associative
-conjuncts := negation  (&#39;|&#39; conjuncts)+  // left-associative
+conjuncts := negation  (&#39;&amp;&#39; conjuncts)+  // left-associative
 negation  := &#39;not&#39; formula
 
 atom := tvar &#39;&lt;&#39; tvar              // ordering of temporal variables
@@ -141,7 +141,7 @@ atom := tvar &#39;&lt;&#39; tvar              // ordering of temporal variables
 
 // Where unambiguous the &#39;#&#39; sort prefix can be dropped.
 tvar := [&#39;#&#39;] ident</code></pre>
-<p>Identifiers always start with a character. Moreover, they must not be one of the reserved keywords 'let', 'in', or 'rule'.</p>
+<p>Identifiers always start with a character. Moreover, they must not be one of the reserved keywords <code>let</code>, <code>in</code>, or <code>rule</code>.</p>
 <pre><code>ident := alpha (alpha | digit)*</code></pre>
     </div>
   </div>
