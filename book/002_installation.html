@@ -84,9 +84,16 @@
 <p>If you already have this installed, it is as simple as running the following two commands in your terminal:</p>
 <ul>
 <li><code>brew update</code></li>
-<li><code>brew install homebrew/science/tamarin-prover</code></li>
+<li><code>brew tap brewsci/science</code></li>
+<li><code>brew install tamarin-prover</code></li>
 </ul>
 <p>You can now run Tamarin from the command line by typing <code>tamarin-prover</code>. Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time.</p>
+<p>Please note, if you previously used homebrew to install Tamarin from homebrew-science, you will have to uninstall and untap:</p>
+<ul>
+<li><code>brew uninstall tamarin-prover</code></li>
+<li><code>brew untap homebrew/science</code></li>
+</ul>
+<p>Once complete run the above instructions.</p>
 <h4 id="installing-homebrew">Installing Homebrew</h4>
 <p>If you don't have Homebrew installed:</p>
 <ol style="list-style-type: decimal">
