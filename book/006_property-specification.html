@@ -253,7 +253,7 @@ rule Example:
 <p>However, he can know whether in the last message <code>~a</code> or <code>~b</code> was encrypted by simply taking the output <code>~a</code>, encrypting it with the public key and comparing it to the published ciphertext. This is captured using observational equivalence.</p>
 <p>To see how this works, we need to start Tamarin in observational equivalence mode by adding a <code>--diff</code> to the command:</p>
 <pre><code>tamarin-prover interactive --diff ObservationalEquivalenceExample.spthy</code></pre>
-<p>Now point you browser to <a href="http://localhost:3001" class="uri">http://localhost:3001</a>. After clicking on the theory <code>ObservationalEquivalenceExample</code>, you should see the following.</p>
+<p>Now point your browser to <a href="http://localhost:3001" class="uri">http://localhost:3001</a>. After clicking on the theory <code>ObservationalEquivalenceExample</code>, you should see the following.</p>
 <p><img src="../images/tamarin-obseq-overview.jpg" title="Observational Equivalence Overview" alt="Observational Equivalence Overview" style="width:100.0%" /><br />
 There are multiple differences to the 'normal' trace mode.</p>
 <p>First, there is a new option <code>Diff Rules</code>, which will simply present the rewrite rules from the <code>.spthy</code> file. (See image below.)</p>
