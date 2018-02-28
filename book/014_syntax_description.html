@@ -68,11 +68,12 @@ built_ins      := &#39;diffie-hellman&#39;
                 | &#39;hashing&#39; | &#39;symmetric-encryption&#39;
                 | &#39;asymmetric-encryption&#39; | &#39;signing&#39;</code></pre>
 <p>Multiset rewriting rules are specified as follows. The protocol corresponding to a security protocol theory is the set of all multiset rewriting rules specified in the body of the theory.</p>
-<pre><code>rule := &#39;rule&#39; ident &#39;:&#39;
+<pre><code>rule := &#39;rule&#39; ident [rule_anot] &#39;:&#39;
         [let_block]
         &#39;[&#39; facts &#39;]&#39; ( &#39;--&gt;&#39; | &#39;--[&#39; facts &#39;]-&gt;&#39;) &#39;[&#39; facts &#39;]&#39;
-
+rule_anot := &#39;[&#39; (&#39;color=&#39; | &#39;colour=&#39;) hexcolor &#39;]&#39;
 let_block := &#39;let&#39; (ident &#39;=&#39; term)+ &#39;in&#39;</code></pre>
+<p>Rule annotations do not influence the rule's semantics. A color is represented as a triplet of 8 bit hexadecimal values optionally preceded by '#', and is used as the background color of the rule when it is rendered in graphs.</p>
 <p>The let-block allows more succinct specifications. The equations are applied in a bottom-up fashion. For example,</p>
 <pre><code>let x = y
     y = &lt;z,x&gt;
