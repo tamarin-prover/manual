@@ -59,14 +59,8 @@
 <p>After running <code>git clone</code> on the Tamarin repository, you have the current development version ready for compilation. If you would prefer to use the master version, just run <code>git checkout master</code>. In either case, you can then run <code>make default</code>, which will install an appropriate GHC (the Glasgow Haskell Compiler) for your system, including all dependencies, and the <code>tamarin-prover</code> executable will be copied to <code>~/.local/bin/tamarin-prover</code>. Note that this process will take between 30 and 60 minutes, as all dependencies (roughly 120) are compiled from scratch. If you later pull a newer version of Tamarin (or switch to/from the <code>master</code> branch), then only the tool itself needs to be recompiled, which takes a few minutes, at most.</p>
 <p>Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time.</p>
 <h3 id="sec:LinuxBinInstall">Automatic Installation of Tamarin</h3>
-<p>The fastest way to install Tamarin on Linux is to use <a href="http://linuxbrew.sh/">Linuxbrew</a>. Linuxbrew is a fork of Homebrew, the Mac OS package manager, for Linux.</p>
-<p>To install Linuxbrew follow the <a href="https://github.com/Linuxbrew/brew#install-linuxbrew-tldr">Installation Instructions</a>.</p>
-<p>If you already have this installed, it is as simple as running the following two commands in your terminal:</p>
-<ul>
-<li><code>brew update</code></li>
-<li><code>brew install brewsci/science/tamarin-prover</code></li>
-</ul>
-<p>You can now run Tamarin from the command line by typing <code>tamarin-prover</code>. Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time.</p>
+<p>The fastest way to install Tamarin on Linux is to use <a href="http://linuxbrew.sh/">Linuxbrew</a>. Linuxbrew is a fork of Homebrew, the Mac OS package manager, for Linux. To install Linuxbrew follow the <a href="https://github.com/Linuxbrew/brew#install-linuxbrew-tldr">Installation Instructions</a>.</p>
+<p>Once Linuxbrew is installed, follow the macOS Homebrew <a href="#sec:MacOSBinInstall">installation instructions</a> below.</p>
 <h3 id="sec:ArchLinuxBinInstall">Automatic Installation for Arch Linux</h3>
 <p>There is a package in the official repositories. To install it, simply type:</p>
 <ul>
@@ -80,34 +74,26 @@
 <p>This installs a per-user copy of Tamarin. If you're on NixOS, just add <code>tamarin-prover</code> to your <code>environment.systemPackages</code> for system-wide installation.</p>
 <h2 id="sec:macosx">Mac OS X</h2>
 <h3 id="sec:MacOSBinInstall">Automatic Installation of Tamarin</h3>
-<p>The fastest way to install Tamarin on Mac OS X is to use <a href="http://brew.sh/">Homebrew</a>.</p>
-<p>If you already have this installed, it is as simple as running the following two commands in your terminal:</p>
+<p>The fastest way to install Tamarin on Mac OS X is to use <a href="http://brew.sh/">Homebrew</a>:</p>
 <ul>
-<li><code>brew update</code></li>
-<li><code>brew tap brewsci/science</code></li>
-<li><code>brew install tamarin-prover</code></li>
+<li><code>brew install tamarin-prover/tap/tamarin-prover</code></li>
 </ul>
 <p>You can now run Tamarin from the command line by typing <code>tamarin-prover</code>. Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time.</p>
-<p>Please note, if you previously used homebrew to install Tamarin from homebrew-science, you will have to uninstall and untap:</p>
+<p>If you want to install Tamarin from source through Homebrew, simply use: <code>brew install --build-from-source tamarin-prover/tap/tamarin-prover</code>.</p>
+<p>To uninstall (and &quot;untap&quot; the Tamarin homebrew tap):</p>
+<ul>
+<li><code>brew uninstall tamarin-prover</code></li>
+<li><code>brew untap tamarin-prover/tap</code></li>
+</ul>
+<p>Note that Tamarin was previously distributed in the now-closed <code>homebrew-science</code> tap. If you have already installed it through Homebrew, you may have to uninstall and untap that version first:</p>
 <ul>
 <li><code>brew uninstall tamarin-prover</code></li>
 <li><code>brew untap homebrew/science</code></li>
 </ul>
-<p>Once complete run the above instructions.</p>
 <h4 id="installing-homebrew">Installing Homebrew</h4>
-<p>If you don't have Homebrew installed:</p>
-<ol style="list-style-type: decimal">
-<li><p>Install <a href="http://brew.sh/">Homebrew</a>, by following the instructions on their website (this is a one-line copy paste install). Update everything with: <code>brew update</code>. Any issues, run <code>brew doctor</code> for more information.</p></li>
-<li>Install Tamarin: <code>brew install homebrew/science/tamarin-prover</code>
-<ul>
-<li>This should just work. If for any reason this doesn't work, you might have to 'tap' (add) Homebrew <a href="https://github.com/Homebrew/homebrew-science/blob/master/README.md">Science</a> manually. This is currently achieved by <code>brew tap homebrew/science</code>, but could change. Check <a href="https://github.com/Homebrew/homebrew-science/blob/master/README.md">the website</a> for the latest instructions.</li>
-<li>Tamarin's dependencies Maude and GraphViz are automatically installed and added to your path.</li>
-</ul></li>
-<li><p>You can now run Tamarin from the terminal by typing <code>tamarin-prover</code></p></li>
-</ol>
-<p>That's it! Homebrew will automatically update Tamarin when new versions are released, if you <code>brew update &amp;&amp; brew upgrade</code> on a semi-regular basis.</p>
-<p>For reference, Homebrew will place a symlink to the binary in <code>/usr/local/bin/tamarin-prover</code>, but you should never need to touch this. To uninstall, just <code>brew remove tamarin-prover</code>, and if you want, also remove <code>maude</code> and <code>graphviz</code>, two dependencies which are automatically installed with Tamarin.</p>
-<p>If you want to install Tamarin from source (through Homebrew), simply use: <code>brew install --build-from-source homebrew/science/tamarin-prover</code>.</p>
+<p>If you don't have <a href="http://brew.sh/">Homebrew</a> installed, follow the instructions on their website (this is a one-line copy paste install). Update everything with: <code>brew update</code>. Any issues, run <code>brew doctor</code> for more information.</p>
+<p>That's it! Homebrew will automatically update Tamarin when new versions are released, if you <code>brew update</code> and <code>brew upgrade</code> on a semi-regular basis.</p>
+<p>For reference, Homebrew will place a symlink to the binary in <code>/usr/local/bin/tamarin-prover</code>, but you should never need to touch this. To uninstall, just <code>brew remove tamarin-prover</code>, and if you want, also remove <code>maude</code>, <code>libbuddy</code> and <code>graphviz</code>, dependencies which are automatically installed with Tamarin.</p>
 <h3 id="installing-tamarin-from-sources">Installing Tamarin from sources</h3>
 <ol style="list-style-type: decimal">
 <li>To compile Tamarin, you need the Haskell tool <a href="https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md#manual-download-1">stack</a>. To run Tamarin you need <a href="http://maude.cs.illinois.edu/w/index.php?title=Maude_download_and_installation">Maude 2.7</a> and <a href="http://www.graphviz.org/Download.php">GraphViz</a>. You can download these tools from their respective sites. Alternatively, you can use either the <a href="https://www.macports.org">MacPorts</a> or <a href="http://brew.sh">Homebrew</a> package managers.</li>
@@ -119,7 +105,7 @@
 <p>The Haskell tool <code>stack</code> is not in the MacPorts repository and must be installed by following the instructions at <a href="https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md" class="uri">https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md</a>.</p>
 <ul>
 <li><p>For Homebrew:</p>
-<pre><code>  brew install homebrew/science/maude graphviz haskell-stack</code></pre></li>
+<pre><code>  brew install tamarin-prover/tap/maude graphviz haskell-stack</code></pre></li>
 </ul>
 <ol start="2" style="list-style-type: decimal">
 <li><p>Clone the <code>tamarin-prover</code> repository by typing</p>
