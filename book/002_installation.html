@@ -50,105 +50,39 @@
 <p class="halfbreak">
 </p>
 <h1 id="sec:installation">Installation</h1>
-<p>We explain below how to install Tamarin on different operating systems: <a href="#sec:linux">Linux</a>, <a href="#sec:macosx">Mac OS X</a>, and <a href="#sec:windows">Microsoft Windows</a>.</p>
-<h2 id="sec:linux">Linux</h2>
-<h3 id="sec:LinuxSrcInstall">Compiling from source</h3>
-<p>To run Tamarin on Linux, a number of dependencies must be installed, namely GraphViz and Maude 2.7. You can install GraphViz using your standard package manager or directly from <a href="http://www.graphviz.org/" class="uri">http://www.graphviz.org/</a>. You can also install Maude using your package manager. However, if your package manager installs Maude 2.6, then you must install version 2.7.1, <a href="http://maude.cs.illinois.edu/w/index.php?title=Maude_download_and_installation#Core_Maude_2.7.1">Core Maude 2.7.1</a>, directly from <a href="http://maude.cs.illinois.edu/" class="uri">http://maude.cs.illinois.edu/</a>. In this case, you should ensure that your <code>PATH</code> includes the install path, so that calling <code>maude</code> starts version 2.7.1. Note that even though the Maude executable is movable, the <code>prelude.maude</code> file must be in the same folder that you start Maude from.</p>
-<p>Once these dependencies have been installed, you can then compile Tamarin from source, using either the stable master or current development version.</p>
-<p>To help compile Tamarin from source, we manage Haskell dependencies automatically using the tool <code>stack</code>. You must first install <code>stack</code>, following the instructions given at <a href="https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md">Stack's install page</a>. In case you are installing <code>stack</code> with your package manager (particularly on Ubuntu), you must run <code>stack upgrade</code> afterwards, as that version of stack is usually out-of-date.</p>
-<p>After running <code>git clone</code> on the Tamarin repository, you have the current development version ready for compilation. If you would prefer to use the master version, just run <code>git checkout master</code>. In either case, you can then run <code>make default</code>, which will install an appropriate GHC (the Glasgow Haskell Compiler) for your system, including all dependencies, and the <code>tamarin-prover</code> executable will be copied to <code>~/.local/bin/tamarin-prover</code>. Note that this process will take between 30 and 60 minutes, as all dependencies (roughly 120) are compiled from scratch. If you later pull a newer version of Tamarin (or switch to/from the <code>master</code> branch), then only the tool itself needs to be recompiled, which takes a few minutes, at most.</p>
-<p>Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time.</p>
-<h3 id="sec:LinuxBinInstall">Automatic Installation of Tamarin</h3>
-<p>The fastest way to install Tamarin on Linux is to use <a href="http://linuxbrew.sh/">Linuxbrew</a>. Linuxbrew is a fork of Homebrew, the Mac OS package manager, for Linux. To install Linuxbrew follow the <a href="https://github.com/Linuxbrew/brew#install-linuxbrew-tldr">Installation Instructions</a>.</p>
-<p>Once Linuxbrew is installed, follow the macOS Homebrew <a href="#sec:MacOSBinInstall">installation instructions</a> below.</p>
-<h3 id="sec:ArchLinuxBinInstall">Automatic Installation for Arch Linux</h3>
-<p>There is a package in the official repositories. To install it, simply type:</p>
-<ul>
-<li><code>pacman -S tamarin-prover</code></li>
-</ul>
-<h3 id="sec:NixBinInstall">Automatic Installation for Nix/NixOS</h3>
-<p>There is a package in the official Nixpkgs repository. To install it, simply type:</p>
-<ul>
-<li><code>nix-env -i tamarin-prover</code></li>
-</ul>
-<p>This installs a per-user copy of Tamarin. If you're on NixOS, just add <code>tamarin-prover</code> to your <code>environment.systemPackages</code> for system-wide installation.</p>
-<h2 id="sec:macosx">Mac OS X</h2>
-<h3 id="sec:MacOSBinInstall">Automatic Installation of Tamarin</h3>
-<p>The fastest way to install Tamarin on Mac OS X is to use <a href="http://brew.sh/">Homebrew</a>:</p>
+<p>The easiest way to install Tamarin on Mac or Linux is to use <a href="http://brew.sh/">Homebrew</a>/<a href="https://github.com/Linuxbrew/brew#install-linuxbrew-tldr">Linuxbrew</a>:</p>
 <ul>
 <li><code>brew install tamarin-prover/tap/tamarin-prover</code></li>
 </ul>
-<p>You can now run Tamarin from the command line by typing <code>tamarin-prover</code>. Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time.</p>
-<p>If you want to install Tamarin from source through Homebrew, simply use: <code>brew install --build-from-source tamarin-prover/tap/tamarin-prover</code>.</p>
-<p>To uninstall (and &quot;untap&quot; the Tamarin homebrew tap):</p>
+<p>You can also <a href="https://github.com/tamarin-prover/tamarin-prover/releases">download binaries directly from GitHub</a> and install dependencies yourself. It's separately packaged for</p>
 <ul>
-<li><code>brew uninstall tamarin-prover</code></li>
-<li><code>brew untap tamarin-prover/tap</code></li>
+<li>Arch Linux: <code>pacman -S tamarin-prover</code></li>
+<li>Nixpkgs: <code>nix-env -i tamarin-prover</code></li>
+<li>NixOS: add <code>tamarin-prover</code> to your <code>environment.systemPackages</code>.</li>
 </ul>
-<p>Note that Tamarin was previously distributed in the now-closed <code>homebrew-science</code> tap. If you have already installed it through Homebrew, you may have to uninstall and untap that version first:</p>
+<h2 id="sec:LinuxSrcInstall">Compiling from source</h2>
+<p>You don't need to compile Tamarin from source unless you are developing a new feature for it or you want to use an unreleased feature. However, if you do want to install it from source:</p>
+<h3 id="manually-install-dependencies.">Manually install dependencies.</h3>
+<p>Tamarin requires Haskell Stack to build and GraphViz and Maude 2.7 to run. The easiest way to install these is</p>
+<pre><code>brew install tamarin-prover/tap/maude graphviz haskell-stack</code></pre>
+<p>Alternatively, you can install them yourself:</p>
 <ul>
-<li><code>brew uninstall tamarin-prover</code></li>
-<li><code>brew untap homebrew/science</code></li>
+<li><p><strong>Haskell Stack</strong> Follow the instructions given at <a href="https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md">Stack's install page</a>. If you are installing <code>stack</code> with your package manager (particularly on Ubuntu), you must run <code>stack upgrade</code> afterwards, as that version of stack is usually out-of-date.</p></li>
+<li><p><strong>Graphviz</strong> Graphviz should be available using your standard package manager, or directly from <a href="http://www.graphviz.org/" class="uri">http://www.graphviz.org/</a></p></li>
+<li><p><strong>Maude</strong> You can install Maude using your package manager. However, if your package manager installs Maude 2.6, then you must install version 2.7.1, <a href="http://maude.cs.illinois.edu/w/index.php?title=Maude_download_and_installation#Core_Maude_2.7.1">Core Maude 2.7.1</a>, directly from <a href="http://maude.cs.illinois.edu/" class="uri">http://maude.cs.illinois.edu/</a>. In this case, you should ensure that your <code>PATH</code> includes the install path, so that calling <code>maude</code> starts version 2.7.1. Note that even though the Maude executable is movable, the <code>prelude.maude</code> file must be in the same folder that you start Maude from.</p></li>
 </ul>
-<h4 id="installing-homebrew">Installing Homebrew</h4>
-<p>If you don't have <a href="http://brew.sh/">Homebrew</a> installed, follow the instructions on their website (this is a one-line copy paste install). Update everything with: <code>brew update</code>. Any issues, run <code>brew doctor</code> for more information.</p>
-<p>That's it! Homebrew will automatically update Tamarin when new versions are released, if you <code>brew update</code> and <code>brew upgrade</code> on a semi-regular basis.</p>
-<p>For reference, Homebrew will place a symlink to the binary in <code>/usr/local/bin/tamarin-prover</code>, but you should never need to touch this. To uninstall, just <code>brew remove tamarin-prover</code>, and if you want, also remove <code>maude</code>, <code>libbuddy</code> and <code>graphviz</code>, dependencies which are automatically installed with Tamarin.</p>
-<h3 id="installing-tamarin-from-sources">Installing Tamarin from sources</h3>
-<ol style="list-style-type: decimal">
-<li>To compile Tamarin, you need the Haskell tool <a href="https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md#manual-download-1">stack</a>. To run Tamarin you need <a href="http://maude.cs.illinois.edu/w/index.php?title=Maude_download_and_installation">Maude 2.7</a> and <a href="http://www.graphviz.org/Download.php">GraphViz</a>. You can download these tools from their respective sites. Alternatively, you can use either the <a href="https://www.macports.org">MacPorts</a> or <a href="http://brew.sh">Homebrew</a> package managers.</li>
-</ol>
-<ul>
-<li><p>For MacPorts:</p>
-<pre><code>  sudo port install maude graphviz</code></pre></li>
-</ul>
-<p>The Haskell tool <code>stack</code> is not in the MacPorts repository and must be installed by following the instructions at <a href="https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md" class="uri">https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md</a>.</p>
-<ul>
-<li><p>For Homebrew:</p>
-<pre><code>  brew install tamarin-prover/tap/maude graphviz haskell-stack</code></pre></li>
-</ul>
-<ol start="2" style="list-style-type: decimal">
-<li><p>Clone the <code>tamarin-prover</code> repository by typing</p>
-<pre><code>  git clone https://github.com/tamarin-prover/tamarin-prover.git</code></pre>
-<p>or download the source files from <a href="https://github.com/tamarin-prover/tamarin-prover/archive/develop.zip" class="uri">https://github.com/tamarin-prover/tamarin-prover/archive/develop.zip</a>.</p></li>
-<li><p>Build Tamarin by changing into the <code>tamarin-prover</code> directory and typing</p>
-<pre><code>  make default</code></pre></li>
-</ol>
-<p>The installation process informs you where the <code>tamarin-prover</code> executable will be installed, for example, in <code>~/.local/bin/</code>. Move the binary to a directory in your executables path or add <code>~/.local/bin/</code> to your path.</p>
-<p>Continue as described in Section <a href="#sec:running-tamarin">Running Tamarin</a> to run Tamarin for the first time.</p>
-<h2 id="sec:windows">Windows</h2>
-<p>Windows is not currently supported. To the best of our knowledge, there is not a current GraphViz version available for Windows and there is no Maude binary for Windows 10. Therefore only the command-line parts of the tool are functional for Windows systems prior to Windows 10.</p>
-<h2 id="sec:running-tamarin">Running Tamarin</h2>
-<p>Starting <code>tamarin-prover</code> without arguments will output its help message, including the paths to the installed example protocol models and all case studies from published papers. We recommend opening the <a href="https://raw.githubusercontent.com/tamarin-prover/tamarin-prover/develop/examples/Tutorial.spthy">Tutorial.spthy</a> example file in a text editor and start exploring from there, or to continue reading this document. Note that the <code>Tutorial.spthy</code> file can be found in the <code>examples</code> directory of the Tamarin source.</p>
-<p>Running <code>tamarin-prover test</code> will check the Maude and GraphViz versions and run some tests. Its output should be:</p>
-<pre><code>$ tamarin-prover test
-Self-testing the tamarin-prover installation.
-
-*** Testing the availability of the required tools ***
-maude tool: &#39;maude&#39;
- checking version: 2.7.1. OK.
- checking installation: OK.
-
-GraphViz tool: &#39;dot&#39;
- checking version: dot - graphviz version 2.39.20150613.2112
-                   (20150613.2112). OK.
-
-*** Testing the unification infrastructure ***
-Cases: 55  Tried: 55  Errors: 0  Failures: 0
-
-*** TEST SUMMARY ***
-All tests successful.
-The tamarin-prover should work as intended.
-
-           :-) happy proving (-:</code></pre>
-<p>You are now ready to use Tamarin to verify cryptographic protocols.</p>
+<h3 id="compile">Compile</h3>
+<p>Check out the source code with</p>
+<pre><code>git clone https://github.com/tamarin-prover/tamarin-prover.git</code></pre>
+<p>and you have the current development version ready for compilation. If you would prefer to use the master version, just run <code>git checkout master</code>.</p>
+<p>In either case, you can then run <code>make default</code> in the new directory, which will install an appropriate GHC (the Glasgow Haskell Compiler) for your system, including all dependencies. The <code>tamarin-prover</code> executable will be copied to <code>~/.local/bin/tamarin-prover</code>. Note that this process will take between 30 and 60 minutes, as all dependencies (roughly 120) are compiled from scratch. If you later pull a newer version of Tamarin (or switch to/from the <code>master</code> branch), then only the tool itself needs to be recompiled, which takes a few minutes, at most.</p>
 <h2 id="running-tamarin-on-a-remote-machine">Running Tamarin on a remote machine</h2>
 <p>If you have access to a faster desktop or server, but prefer using Tamarin on your laptop, you can do that. The cpu/memory intensive reasoning part of the tool will then run on the faster machine, while you just run the GUI locally, i.e., the web browser of your choice. To do this, you forward your port 3001 to the port 3001 of your server with the following command, replacing <code>SERVERNAME</code> appropriately.</p>
 <pre><code>ssh -L 3001:localhost:3001 SERVERNAME</code></pre>
 <p>If you do this, we recommend that you run your Tamarin instance on the server in a <a href="https://www.gnu.org/software/screen/manual/screen.html">screen</a> environment, which will continue running even if the network drops your connection as you can later reconnect to it. Otherwise, any network failure may require you to restart Tamarin and start over on the proof.</p>
 <h2 id="tamarin-code-editors">Tamarin Code Editors</h2>
-<p>Under the <a href="https://github.com/tamarin-prover/tamarin-prover/tree/develop/etc">etc</a> folder contained in the Tamarin Prover project, plug-ins are available for VIM, Sublime Text 3 and Notepad++. Below we details the steps required to install your preferred plug-in.</p>
-<h3 id="vim">VIM</h3>
+<p>Under the <a href="https://github.com/tamarin-prover/tamarin-prover/tree/develop/etc">etc</a> folder contained in the Tamarin Prover project, plug-ins are available for VIM, Sublime Text 3, Emacs and Notepad++. Below we details the steps required to install your preferred plug-in.</p>
+<h4 id="vim">VIM</h4>
 <ol style="list-style-type: decimal">
 <li>Create <code>~/.vim/</code> directory if not already existing, which is the typical location for <code>$VIMRUNTIME</code></li>
 <li>Change directory to <code>~/.vim/</code></li>
@@ -156,7 +90,7 @@ The tamarin-prover should work as intended.
 <li>Create another directory <code>syntax</code> within <code>~/.vim/</code> directory and change directory to it.</li>
 <li>Place the <a href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/spthy.vim">spthy.vim</a> and <a href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/sapic.vim">sapic.vim</a> files in <code>~/.vim/syntax</code></li>
 </ol>
-<h3 id="sublime-text-3">Sublime Text 3</h3>
+<h4 id="sublime-text-3">Sublime Text 3</h4>
 <p><a href="http://jwhitefield.co.uk/TamarinAssist/">TamarinAssist</a> is a plug-in developed for the Sublime Text 3 editor. The plug-in has the following functionality: - Basic Syntaxes - Run Tamarin within Sublime - Snippets for Theory, Rule, Axiom and Lemma</p>
 <p>TamarinAssist can be install in two ways:</p>
 <p>The first and preferred method is with <a href="https://packagecontrol.io/">PackageControl.io</a>. TamarinAssist can now be installed via the sublime package manager. See the <a href="https://packagecontrol.io/installation">install</a> and <a href="https://packagecontrol.io/docs/usage">usage</a> documentation, then search and install TamarinAssist.</p>
@@ -175,8 +109,25 @@ The tamarin-prover should work as intended.
 <li>Open Sublime and bottom right syntaxes 'Tamarin' should be in the list.</li>
 </ol>
 <p><em>Please be aware that TamarinAssist is still under active development and as such, several of the features are still implemented in a prototypical manner. If you experience any problems or have any questions on running any parts of the plug-in please <a href="https://github.com/lordqwerty/TamarinAssist/">visit the project GitHub page</a>.</em></p>
-<h3 id="notepad">Notepad++</h3>
+<h4 id="notepad">Notepad++</h4>
 <p>Follow steps from the <a href="http://docs.notepad-plus-plus.org/index.php/User_Defined_Language_Files#How_to_install_user_defined_language_files">Notepad++ Wiki</a> using the <a href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/notepad_plus_plus_spthy.xml">notepad_plus_plus_spthy.xml</a> file.</p>
+<h4 id="emacs">Emacs</h4>
+<p>The <a href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/spthy.el">spthy.el</a> implements a SPTHY major mode. You can load it with <code>M-x load-file</code>, or add it to your <code>.emacs</code> in your favourite way.</p>
+<h2 id="faq">FAQ</h2>
+<h4 id="why-is-windows-not-supported">Why is Windows not supported?</h4>
+<p>To the best of our knowledge, there is not a current GraphViz version available for Windows and there is no Maude binary for Windows 10. Therefore only the command-line parts of the tool are functional anyway for Windows systems prior to Windows 10. Moreover, few users actually run Tamarin on Windows.</p>
+<h4 id="how-do-i-uninstall-tamarin-using-homebrew">How do I uninstall Tamarin using Homebrew?</h4>
+<p>To uninstall (and &quot;untap&quot; the Tamarin homebrew tap):</p>
+<ul>
+<li><code>brew uninstall tamarin-prover</code></li>
+<li><code>brew untap tamarin-prover/tap</code></li>
+</ul>
+<h4 id="whats-with-this-homebrew-science-tap">What's with this <code>homebrew-science</code> tap?</h4>
+<p>Tamarin was previously distributed in the now-closed <code>homebrew-science</code> tap. If you have already installed it through Homebrew, you may have to uninstall and untap that version first:</p>
+<ul>
+<li><code>brew uninstall tamarin-prover</code></li>
+<li><code>brew untap homebrew/science</code></li>
+</ul>
     </div>
   </div>
 </body>
