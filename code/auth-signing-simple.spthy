@@ -5,43 +5,45 @@ builtins: asymmetric-encryption
 
 /* We formalize the following protocol:
 
-    1. A -> B: {A,na}sk(A)
+    1. A -> B: {A,na}pk(B)
 
 */
 
 // Public key infrastructure
 rule Register_pk:
-  [ Fr(~ltkA) ]
+  [ Fr(~ltkE) ]
   -->
-  [ !Ltk($A, ~ltkA)
-  , !Pk($A, pk(~ltkA))
-  , Out(pk(~ltkA)) 
+  [ !Ltk($E, ~ltkE)
+  , !Pk($E, pk(~ltkE))
+  , Out(pk(~ltkE)) 
   ] 
 
 // Role A sends first message
 rule A_1_send:
-  let m = <A, ~na>
+  let m = <$A, ~na>
   in 
   [ Fr(~na)
-  , !Ltk(A, ltkA)
-  , !Pk(B, pkB)
+  , !Ltk($A, ltkA)
+  , !Pk($B, pkB)
   ]
---[ Send(A, m) 
+--[ Send($A, m) 
   ]->
-  [ St_A_1(A, ltkA, pkB, B, ~na) 
-  , Out(aenc(m,ltkA))
+  [ St_A_1($A, ltkA, pkB, $B, ~na) 
+  , Out(aenc(m,pkB))
   ]
 
 // Role B receives first message
 rule B_1_receive:
-  [ !Ltk(B, ltkB)
-  , !Pk(A, pk(skA))
-  , In(aenc(m,skA))
+  let m = <$A, na>
+  in
+  [ !Ltk($B, ltkB)
+  , !Pk($B, pkB)
+  , In(aenc(m,pkB))
   ]
---[ Recv(B, m)
-  , Authentic(A,m), Honest(B), Honest(A)
+--[ Recv($B, m)
+  , Authentic($A,m), Honest($B), Honest($A)
   ]->
-  [ St_B_1(B, ltkB, pk(skA), A, m)
+  [ St_B_1($B, ltkB, $A, m)
   ]
 
 lemma executable:
