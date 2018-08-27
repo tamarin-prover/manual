@@ -139,10 +139,9 @@ rule A_1_send:
 // Role B receives first message
 rule B_1_receive:
   [ !Ltk($B, ltkB)
-  , !Pk($B, pkB)
-  , In(aenc(&lt;$A, na&gt;,pkB))
+  , In(aenc(&lt;$A, na&gt;,pk(ltkB)))
   ]
---[ Recv($B, aenc(&lt;$A, na&gt;, pkB)) 
+--[ Recv($B, aenc(&lt;$A, na&gt;, pk(ltkB)))
   , Secret(na), Honest($B), Honest($A), Role(&#39;B&#39;)
   ]-&gt;
   [ St_B_1($B, ltkB, $A, na)
