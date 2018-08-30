@@ -11,11 +11,11 @@ builtins: asymmetric-encryption
 
 // Public key infrastructure
 rule Register_pk:
-  [ Fr(~ltkA) ]
+  [ Fr(~ltkX) ]
   -->
-  [ !Ltk($A, ~ltkA)
-  , !Pk($A, pk(~ltkA))
-  , Out(pk(~ltkA)) 
+  [ !Ltk($X, ~ltkX)
+  , !Pk($X, pk(~ltkX))
+  , Out(pk(~ltkX)) 
   ] 
 
 // Role A sends first message
