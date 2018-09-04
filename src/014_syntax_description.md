@@ -95,7 +95,6 @@ quantifier.
     lemma_attrs      := '[' ('sources' | 'reuse' | 'use_induction' | 
                              'hide_lemma=' ident | 'heuristic=' ident) ']'
     trace_quantifier := 'all-traces' | 'exists-trace'
-    proof            := ... a proof as output by the Tamarin prover ..
 
 In observational equivalence mode, lemmas can be associated to one side.
 
@@ -117,7 +116,8 @@ It indicates the proof method used at each step, which may include multiple case
                     | '(' node_var ',' natural ')' '~~>' '(' node_var ',' natural ')'
                     | formula ("∥" formula)*
                     | 'splitEqs' '(' natural ')'
-    node_var       := ['#'] identifier ['.' natural] [':' 'node']
+    node_var       := ['#'] identifier ['.' natural]      // temporal sort prefix
+                    | identifier ['.' natural] ':' 'node' // temporal sort suffix
     natural_sub    := ('₀'|'₁'|'₂'|'₃'|'₄'|'₅'|'₆'|'₇'|'₈'|'₉')+
 
 Formal comments are used to make the input more readable. In contrast
@@ -160,9 +160,11 @@ the function definition.
     literal     := "'"  ident "'" // a fixed, public name
                  | "~'" ident "'" // a fixed, fresh name
                  | nonnode_var    // a non-temporal variable
-    nonnode_var := ['$'] identifier ['.' natural] [':' 'pub']   // 'pub' sort
-                 | ['~'] identifier ['.' natural] [':' 'fresh'] // 'fresh' sort
-                 | msg_var                                      // 'msg' sort
+    nonnode_var := ['$'] identifier ['.' natural]         // 'pub' sort prefix
+                 | identifier ['.' natural] ':' 'pub'     // 'pub' sort suffix
+                 | ['~'] identifier ['.' natural]         // 'fresh' sort prefix
+                 | identifier ['.' natural] ':' 'fresh'   // 'fresh' sort suffix
+                 | msg_var                                // 'msg' sort
 
 Facts do not have to be defined up-front. This will probably change once we
 implement user-defined sorts. Facts prefixed with `!` are persistent facts.
@@ -185,20 +187,21 @@ guards.
     disjunction := conjunction (('|' | '∨') conjunction)* // left-associative
     conjunction := negation (('&' | '∧') negation)*       // left-associative
     negation    := ['not' | '¬'] atom
-    atom        := ⊥ | 'F' | ⊤ | 'T'        // true or false
+    atom        := '⊥' | 'F' | '⊤' | 'T'        // true or false
                  | '(' formula ')'          // nested formula
                  | 'last' '(' node_var ')'  // 'last' temporal variable for induction
                  | fact '@' node_var        // action
                  | node_var '<' node_var    // ordering of temporal variables
                  | msetterm '=' msetterm    // equality of terms
                  | node_var '=' node_var    // equality of temporal variables
-                 | ('Ex' | '∃' | 'All' | ∀) 
-                    lvar (',' lvar)* '.' formula //quantified formula
+                 | ('Ex' | '∃' | 'All' | '∀') // quantified formula
+                    lvar+ '.' formula
+    lvar        := node_var | nonnode_var
 
 Identifiers always start with a letter or number, and may contain underscores
 after the first character. Moreover, they must not be one of the
 reserved keywords `let`, `in`, or `rule`. Although identifiers beginning with
-a number are valid, they are not allowed as the names of rules or facts which
-must begin with a letter.
+a number are valid, they are not allowed as the names of facts (which
+must begin with an upper-case letter).
     ident := alphaNum (alphaNum | '_')*
 
