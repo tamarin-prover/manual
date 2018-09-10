@@ -54,7 +54,7 @@ specified in the body of the theory.
     rule_attrs := '[' rule_attr (',' rule_attr)* ']'
     rule_attr  := ('color=' | 'colour=') hexcolor
     let_block  := 'let' (msg_var '=' msetterm)+ 'in'
-    msg_var    := identifier ['.' natural] [':' 'msg']
+    msg_var    := ident ['.' natural] [':' 'msg']
 
 Rule annotations do not influence the rule's semantics. A color is represented
 as a triplet of 8 bit hexadecimal values optionally
@@ -107,8 +107,8 @@ It indicates the proof method used at each step, which may include multiple case
 
     proof_skeleton :=  'SOLVED' | 'by' proof_method
                     | proof_method proof_skeleton
-                    | proof_method 'case' identifier proof_skeleton
-                        ('next 'case' identifier proof_skeleton)* 'qed'
+                    | proof_method 'case' ident proof_skeleton
+                        ('next 'case' ident proof_skeleton)* 'qed'
     proof_method   := 'sorry' | 'simplify' | 'solve '(' goal ')' |
                       'contradiction' | 'induction'
     goal           :=  fact "▶" natural_subscr node_var
@@ -116,8 +116,9 @@ It indicates the proof method used at each step, which may include multiple case
                     | '(' node_var ',' natural ')' '~~>' '(' node_var ',' natural ')'
                     | formula ("∥" formula)*
                     | 'splitEqs' '(' natural ')'
-    node_var       := ['#'] identifier ['.' natural]      // temporal sort prefix
-                    | identifier ['.' natural] ':' 'node' // temporal sort suffix
+    node_var       := ['#'] ident ['.' natural]      // temporal sort prefix
+                    | ident ['.' natural] ':' 'node' // temporal sort suffix
+    natural        := digit+
     natural_sub    := ('₀'|'₁'|'₂'|'₃'|'₄'|'₅'|'₆'|'₇'|'₈'|'₉')+
 
 Formal comments are used to make the input more readable. In contrast
@@ -160,10 +161,10 @@ the function definition.
     literal     := "'"  ident "'" // a fixed, public name
                  | "~'" ident "'" // a fixed, fresh name
                  | nonnode_var    // a non-temporal variable
-    nonnode_var := ['$'] identifier ['.' natural]         // 'pub' sort prefix
-                 | identifier ['.' natural] ':' 'pub'     // 'pub' sort suffix
-                 | ['~'] identifier ['.' natural]         // 'fresh' sort prefix
-                 | identifier ['.' natural] ':' 'fresh'   // 'fresh' sort suffix
+    nonnode_var := ['$'] ident ['.' natural]         // 'pub' sort prefix
+                 | ident ['.' natural] ':' 'pub'     // 'pub' sort suffix
+                 | ['~'] ident ['.' natural]         // 'fresh' sort prefix
+                 | ident ['.' natural] ':' 'fresh'   // 'fresh' sort suffix
                  | msg_var                                // 'msg' sort
 
 Facts do not have to be defined up-front. This will probably change once we
@@ -175,7 +176,7 @@ KU-facts have arity 2. Their first argument is used to track the
 exponentiation tags. See the `loops/Crypto_API_Simple.spthy` example for more
 information.
 
-    facts := fact list
+    facts := fact (',' fact)*
     fact := ['!'] ident '(' [msetterm (',' msetterm)*] ')'
 
 Formulas are trace formulas as described previously. Note that we are a bit
@@ -195,7 +196,8 @@ guards.
                  | msetterm '=' msetterm    // equality of terms
                  | node_var '=' node_var    // equality of temporal variables
                  | ('Ex' | '∃' | 'All' | '∀') // quantified formula
-                    lvar+ '.' formula
+                        lvar+ '.' formula
+
     lvar        := node_var | nonnode_var
 
 Identifiers always start with a letter or number, and may contain underscores
