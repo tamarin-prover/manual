@@ -122,8 +122,10 @@ literal := &quot;&#39;&quot;  ident &quot;&#39;&quot;      // a fixed, public na
          | &quot;#&quot;  ident          // a variable of sort &#39;temp&#39;
          | ident               // a variable of sort &#39;msg&#39;</code></pre>
 <p>Facts do not have to be defined up-front. This will probably change once we implement user-defined sorts. Facts prefixed with <code>!</code> are persistent facts. All other facts are linear. There are six reserved fact symbols: In, Out, KU, KD, and K. KU and KD facts are used for construction and deconstruction rules. KU-facts also log the messages deduced by construction rules. Note that KU-facts have arity 2. Their first argument is used to track the exponentiation tags. See the <code>loops/Crypto_API_Simple.spthy</code> example for more information.</p>
-<pre><code>facts := fact list
-fact := [&#39;!&#39;] ident &#39;(&#39; multterm list &#39;)&#39;</code></pre>
+<pre><code>facts      := fact list
+fact       := [&#39;!&#39;] ident &#39;(&#39; multterm list &#39;)&#39; [fact_attrs]
+fact_attrs := &#39;[&#39; fact_attr (&#39;,&#39; fact_attr)* &#39;]&#39;
+fact_attr  := &#39;+&#39; | &#39;-&#39; | &#39;no_precomp&#39;</code></pre>
 <p>Formulas are trace formulas as described previously. Note that we are a bit more liberal with respect to guardedness. We accept a conjunction of atoms as guards.</p>
 <pre><code>formula   := atom | &#39;(&#39; iff &#39;)&#39; | ( &#39;All&#39; | &#39;Ex&#39; ) ident+ &#39;.&#39; iff
 iff       := imp &#39;&lt;=&gt;&#39; imp
