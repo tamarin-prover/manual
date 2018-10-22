@@ -33,7 +33,7 @@ sets of function definitions and subterm convergent equations. They are
 expanded upon parsing and you can therefore inspect them by pretty printing
 the file using `tamarin-prover your_file.spthy`. The built-in `diffie-hellman`
 is special. It refers to the equations given in Section [Cryptographic
-Messages](004_cryptographic-messages.html#equational-theories). You need to 
+Messages](004_cryptographic-messages.html#sec:equational-theories). You need to
 enable it to parse terms containing exponentiations, e.g.,  g ^ x.
 
     built_in       := 'builtins' ':' built_ins (',' built_ins)*
@@ -92,8 +92,9 @@ quantifier.
              [trace_quantifier]
              '"' formula '"'
              proof_skeleton
-    lemma_attrs      := '[' ('sources' | 'reuse' | 'use_induction' | 
-                             'hide_lemma=' ident | 'heuristic=' ident) ']'
+    lemma_attrs      := '[' lemma_attr (',' lemma_attr)* ']'
+    lemma_attr       := 'sources' | 'reuse' | 'use_induction' |
+                             'hide_lemma=' ident | 'heuristic=' ident
     trace_quantifier := 'all-traces' | 'exists-trace'
 
 In observational equivalence mode, lemmas can be associated to one side.
@@ -177,7 +178,14 @@ exponentiation tags. See the `loops/Crypto_API_Simple.spthy` example for more
 information.
 
     facts := fact (',' fact)*
-    fact := ['!'] ident '(' [msetterm (',' msetterm)*] ')'
+    fact  := ['!'] ident '(' [msetterm (',' msetterm)*] ')' [fact_annotes]
+    fact_annotes := '[' fact_annote (',' fact_annote)* ']'
+    fact_annote  := '+' | '-' | 'no_precomp'
+
+Fact annotations can be used to adjust the priority of corresponding
+goals in the heuristics, or influence the precomputation step performed by
+Tamarin, as described in
+Section [Advanced Features](009_advanced-features.html#sec:fact-annotations).
 
 Formulas are trace formulas as described previously. Note that we are a bit
 more liberal with respect to guardedness. We accept a conjunction of atoms as
