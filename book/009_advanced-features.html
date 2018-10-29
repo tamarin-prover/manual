@@ -77,7 +77,7 @@
 </dd>
 </dl>
 <p>If several rankings are given for the heuristic flag, then they are employed in a round-robin fashion depending on the proof-depth. For example, a flag <code>--heuristic=ssC</code> always uses two times the smart ranking and then once the 'Consecutive' goal ranking. The idea is that you can mix goal rankings easily in this way.</p>
-<h3 id="fact-annotations">Fact Annotations</h3>
+<h2 id="sec:fact-annotations">Fact annotations</h2>
 <p>Facts can be annotated with <code>+</code> or <code>-</code> to influence their priority in heuristics. Annotating a fact with <code>+</code> causes the tool to solve instances of that fact earlier than normal, while annotating a fact with <code>-</code> will delay solving those instances. A fact can be annotated by suffixing it with the annotation in square brackets. For example, a fact <code>F(x)[+]</code> will be prioritized, while a fact <code>G(x)[-]</code> will be delayed.</p>
 <p>Fact annotations apply only to the instances that are annotated, and are not considered during unification. For example, a rule premise containing <code>A(x)[+]</code> can unify with a rule conclusion containing <code>A(x)</code>. This allows multiple instances of the same fact to be solved with different priorities by annotating them differently.</p>
 <p>The <code>+</code> and <code>-</code> annotations can also be used to prioritize actions. For example, A reusable lemma of the form</p>
