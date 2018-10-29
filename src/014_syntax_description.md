@@ -27,9 +27,9 @@ only parse function applications of defined functions.
     equations      := 'equations' ':' equation (',' equation)*
     equation       := (term '=' term)
 
-Note that the equations must be subterm-convergent, and do not allow the use
+Note that the equations must be convergent and have the Finite Variant Property (FVP), and do not allow the use
 of fixed public names in the terms. Tamarin provides built-in
-sets of function definitions and subterm convergent equations. They are
+sets of function definitions and equations. They are
 expanded upon parsing and you can therefore inspect them by pretty printing
 the file using `tamarin-prover your_file.spthy`. The built-in `diffie-hellman`
 is special. It refers to the equations given in Section [Cryptographic
