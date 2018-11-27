@@ -91,7 +91,7 @@ snd(pair(x,y)) = y</code></pre>
 <dd><p>This theory models a signature scheme. It defines the function symbols <code>sign/2</code>, <code>verify/3</code>, <code>pk/1</code>, and <code>true</code>, which are related by the equation <code>verify(sign(m,sk),m,pk(sk)) = true</code>.</p>
 </dd>
 <dt><code>revealing-signing</code>:</dt>
-<dd><p>This theory models a message-revealing signature scheme. It defines the function symbols <code>revealingSign/2</code>, <code>revealingVerify/3</code>, <code>getMessage/1</code>, <code>pk/1</code>, and <code>true</code>, which are related by the equations <code>revealingVerify(revealingSign(m,sk),m,pk(sk)) = true</code> and <code>getMessage(revealingSign(m,sk)) = m</code>.</p>
+<dd><p>This theory models a message-revealing signature scheme. It defines the function symbols <code>revealSign/2</code>, <code>revealVerify/3</code>, <code>getMessage/1</code>, <code>pk/1</code>, and <code>true</code>, which are related by the equations <code>revealVerify(revealSign(m,sk),m,pk(sk)) = true</code> and <code>getMessage(revealSign(m,sk)) = m</code>.</p>
 </dd>
 <dt><code>symmetric-encryption</code>:</dt>
 <dd><p>This theory models a symmetric encryption scheme. It defines the function symbols <code>senc/2</code> and <code>sdec/2</code>, which are related by the equation <code>sdec(senc(m,k),k) = m</code>.</p>
