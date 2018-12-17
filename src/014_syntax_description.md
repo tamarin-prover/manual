@@ -28,7 +28,8 @@ only parse function applications of defined functions.
     equations      := 'equations' ':' equation (',' equation)*
     equation       := (term '=' term)
 
-Note that the equations must be convergent and have the Finite Variant Property (FVP), and do not allow the use
+Note that the equations must be convergent and have the
+Finite Variant Property (FVP), and do not allow the use
 of fixed public names in the terms. Tamarin provides built-in
 sets of function definitions and equations. They are
 expanded upon parsing and you can therefore inspect them by pretty printing
@@ -48,8 +49,8 @@ A global heuristic sets the default heuristic that will be used when autoproving
 lemmas in the file. The specified heuristic can be any of those discussed in
 Section [Heuristics](009_advanced-features.html#sec:heuristics).
 
-    heuristic      := 'heuristic' ':' heur_string
-    heur_string    := alpha+
+    global_heuristic := 'heuristic' ':' heuristic
+    heuristic        := alpha+
 
 Multiset rewriting rules are specified as follows. The protocol corresponding
 to a security protocol theory is the set of all multiset rewriting rules
@@ -102,13 +103,13 @@ quantifier.
              proof_skeleton
     lemma_attrs      := '[' lemma_attr (',' lemma_attr)* ']'
     lemma_attr       := 'sources' | 'reuse' | 'use_induction' |
-                             'hide_lemma=' ident | 'heuristic=' ident
+                             'hide_lemma=' ident | 'heuristic=' heuristic
     trace_quantifier := 'all-traces' | 'exists-trace'
 
 In observational equivalence mode, lemmas can be associated to one side.
 
     lemma_attrs      := '[' ('sources' | 'reuse' | 'use_induction' | 
-                             'hide_lemma=' ident | 'heuristic=' heuristic_str |
+                             'hide_lemma=' ident | 'heuristic=' heuristic |
                              'left' | 'right') ']'
 
 A proof skeleton is a complete or partial proof as output by the Tamarin prover.
