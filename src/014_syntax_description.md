@@ -13,7 +13,8 @@ All security protocol theory are named and delimited by `begin` and `end`.
 We explain the non-terminals of the body in the following paragraphs.
 
     security_protocol_theory := 'theory' ident 'begin' body 'end'
-    body := (signature_spec | rule | restriction | lemma | formal_comment)*
+    body := (signature_spec | global_heuristic | rule |
+                restriction | lemma | formal_comment)*
 
 Here, we use the term signature more liberally to denote both the defined
 function symbols and the equalities describing their interaction.  Note that
@@ -42,6 +43,13 @@ enable it to parse terms containing exponentiations, e.g.,  g ^ x.
                     | 'asymmetric-encryption' | 'signing'
                     | 'bilinear-pairing' | 'xor'
                     | 'multiset' | 'revealing-signing'
+
+A global heuristic sets the default heuristic that will be used when autoproving
+lemmas in the file. The specified heuristic can be any of those discussed in
+Section [Heuristics](009_advanced-features.html#sec:heuristics).
+
+    heuristic      := 'heuristic' ':' heur_string
+    heur_string    := alpha+
 
 Multiset rewriting rules are specified as follows. The protocol corresponding
 to a security protocol theory is the set of all multiset rewriting rules
@@ -100,7 +108,7 @@ quantifier.
 In observational equivalence mode, lemmas can be associated to one side.
 
     lemma_attrs      := '[' ('sources' | 'reuse' | 'use_induction' | 
-                             'hide_lemma=' ident | 'heuristic=' ident |
+                             'hide_lemma=' ident | 'heuristic=' heuristic_str |
                              'left' | 'right') ']'
 
 A proof skeleton is a complete or partial proof as output by the Tamarin prover.
