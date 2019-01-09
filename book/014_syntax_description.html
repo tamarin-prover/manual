@@ -56,7 +56,8 @@
 // for a line-comment</code></pre>
 <p>All security protocol theory are named and delimited by <code>begin</code> and <code>end</code>. We explain the non-terminals of the body in the following paragraphs.</p>
 <pre><code>security_protocol_theory := &#39;theory&#39; ident &#39;begin&#39; body &#39;end&#39;
-body := (signature_spec | rule | restriction | lemma | formal_comment)*</code></pre>
+body := (signature_spec | global_heuristic | rule |
+            restriction | lemma | formal_comment)*</code></pre>
 <p>Here, we use the term signature more liberally to denote both the defined function symbols and the equalities describing their interaction. Note that our parser is stateful and remembers what functions have been defined. It will only parse function applications of defined functions.</p>
 <pre><code>signature_spec := functions | equations | built_in
 functions      := &#39;functions&#39; &#39;:&#39; function_sym (&#39;,&#39; function_sym)*
@@ -71,6 +72,9 @@ built_ins      := &#39;diffie-hellman&#39;
                 | &#39;asymmetric-encryption&#39; | &#39;signing&#39;
                 | &#39;bilinear-pairing&#39; | &#39;xor&#39;
                 | &#39;multiset&#39; | &#39;revealing-signing&#39;</code></pre>
+<p>A global heuristic sets the default heuristic that will be used when autoproving lemmas in the file. The specified heuristic can be any of those discussed in Section <a href="009_advanced-features.html#sec:heuristics">Heuristics</a>.</p>
+<pre><code>global_heuristic := &#39;heuristic&#39; &#39;:&#39; heuristic
+heuristic        := alpha+</code></pre>
 <p>Multiset rewriting rules are specified as follows. The protocol corresponding to a security protocol theory is the set of all multiset rewriting rules specified in the body of the theory.</p>
 <pre><code>rule := &#39;rule&#39; [modulo] ident [rule_attrs] &#39;:&#39;
         [let_block]
@@ -98,11 +102,11 @@ restriction_attrs      := &#39;[&#39; (&#39;left&#39; | &#39;right&#39;) &#39;]&
          proof_skeleton
 lemma_attrs      := &#39;[&#39; lemma_attr (&#39;,&#39; lemma_attr)* &#39;]&#39;
 lemma_attr       := &#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; |
-                         &#39;hide_lemma=&#39; ident | &#39;heuristic=&#39; ident
+                         &#39;hide_lemma=&#39; ident | &#39;heuristic=&#39; heuristic
 trace_quantifier := &#39;all-traces&#39; | &#39;exists-trace&#39;</code></pre>
 <p>In observational equivalence mode, lemmas can be associated to one side.</p>
 <pre><code>lemma_attrs      := &#39;[&#39; (&#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
-                         &#39;hide_lemma=&#39; ident | &#39;heuristic=&#39; ident |
+                         &#39;hide_lemma=&#39; ident | &#39;heuristic=&#39; heuristic |
                          &#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
 <p>A proof skeleton is a complete or partial proof as output by the Tamarin prover. It indicates the proof method used at each step, which may include multiple cases.</p>
 <pre><code>proof_skeleton :=  &#39;SOLVED&#39; | &#39;by&#39; proof_method
