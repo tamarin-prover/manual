@@ -90,7 +90,7 @@ rule MyRule2:
         var5 = pk(~x)
     in
     [ ... ] --[ ... ]-&gt; [ ... ]</code></pre>
-<p>Such let-binding expressions can be used to specify local term macros within the context of a rule. Each macro should occur on a separate line and defines a substitution: the left-hand side of the <code>=</code> sign must be a variable and the right-hand side is an arbitrary term. The rule will be interpreted after substituting all variables occurring in the let by their right-hand sides. As the above example indicates, macros may use the right-hand sides of earlier defined macros.</p>
+<p>Such let-binding expressions can be used to specify local term macros within the context of a rule. Each macro should occur on a separate line and defines a substitution: the left-hand side of the <code>=</code> sign must be a variable and the right-hand side is an arbitrary term. The rule will be interpreted after substituting all variables occurring in the let by their right-hand sides. As the above example indicates, macros may use the left-hand sides of earlier defined macros.</p>
 <h2 id="facts">Facts</h2>
 <p>Facts are of the form <code>F(t1,...,tn)</code> for a fact symbol <code>F</code> and terms <code>ti</code>. They have a fixed arity (in this case <code>n</code>). Note that if a Tamarin model uses the same fact with two different arities, Tamarin will report an error.</p>
 <p>There are three types of special facts built in to Tamarin. These are used to model interaction with the untrusted network and to model the generation of unique fresh (random) values.</p>

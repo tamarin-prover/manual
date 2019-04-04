@@ -386,7 +386,7 @@ end</code></pre>
 <pre><code>tamarin-prover Example.spthy --prove +RTS -N2 -RTS</code></pre>
 <p>to prove the lemmas in file <code>Example.spthy</code> using two cores.</p>
 <h2 id="reasoning-about-exclusivity-facts-symbols-with-injective-instances">Reasoning about Exclusivity: Facts Symbols with Injective Instances</h2>
-<p>We say that a fact symbol <code>f</code> has <em>injective instances</em> with respect to a multiset rewriting system <code>R</code>, if there is no reachable state of the multiset rewriting system <code>R</code> with more than one instance of an <code>f</code>-fact with the same term as a first argument. Injective facts typically arise from modeling databases using linear facts. An example of an fact with injective instances, is the <code>Store</code>-fact in the following multiset rewriting system.</p>
+<p>We say that a fact symbol <code>f</code> has <em>injective instances</em> with respect to a multiset rewriting system <code>R</code>, if there is no reachable state of the multiset rewriting system <code>R</code> with more than one instance of an <code>f</code>-fact with the same term as a first argument. Injective facts typically arise from modeling databases using linear facts. An example of a fact with injective instances is the <code>Store</code>-fact in the following multiset rewriting system.</p>
 <pre><code>  rule CreateKey: [ Fr(handle), Fr(key) ] --&gt; [ Store(handle, key) ]
 
   rule NextKey:   [ Store(handle, key) ] --&gt; [ Store(handle, h(key)) ]
@@ -398,7 +398,7 @@ end</code></pre>
 <p>and let there be an edge from <code>(i,u)</code> to <code>(k,w)</code> for some indices <code>u</code> and <code>v</code>. Then, we have a contradiction, if the premise <code>(k,w)</code> requires a fact <code>f(t,...)</code> and there is a premise <code>(j,v)</code> requiring a fact <code>f(t,...)</code>. These two premises must be merged because the edge <code>(i,u) &gt;-&gt; (k,w)</code> crosses <code>j</code> and the state at <code>j</code> therefore contains <code>f(t,...)</code>. This merging is not possible due to the ordering constraints <code>i &lt; j &lt; k</code>.</p>
 <p>Note that computing the set of fact symbols with injective instances is undecidable in general. We therefore compute an under-approximation to this set using the following simple heuristic. A fact tag is guaranteed to have injective instance, if</p>
 <ol style="list-style-type: decimal">
-<li>the fact-symbol is linear,</li>
+<li>the fact-symbol is linear, and</li>
 <li>every introduction of such a fact is protected by a <code>Fr</code>-fact of the first term, and</li>
 <li>every rule has at most one copy of this fact-tag in the conclusion and the first term arguments agree.</li>
 </ol>
