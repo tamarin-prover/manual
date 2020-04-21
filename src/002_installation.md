@@ -16,6 +16,12 @@ It's separately packaged for
 You can also [download binaries directly from GitHub](https://github.com/tamarin-prover/tamarin-prover/releases)
 and manually install dependencies yourself (see below).
   
+## Installation under Windows 10
+
+You can install tamarin (with GUI) under Windows 10 using the [Windows Subsystem for Linux (ubuntu)](https://docs.microsoft.com/windows/wsl/install-win10).
+In the subsystem, first ensure that both GraphViz and Maude 2.7 are on the path, e.g. via `sudo apt-get install graphviz maude`.
+Then, download the [download ubuntu binary directly from GitHub](https://github.com/tamarin-prover/tamarin-prover/releases) and run it.
+
 ## Compiling from source {#sec:LinuxSrcInstall}
 
 You don't need to compile Tamarin from source unless you are developing a new feature for it or you
@@ -138,13 +144,6 @@ your favourite way.
 
 FAQ
 ---
-
-#### Why is Windows not supported?
-
-To the best of our knowledge, there is not a current GraphViz version available for Windows and
-there is no Maude binary for Windows 10. Therefore only the command-line parts of the tool are
-functional anyway for Windows systems prior to Windows 10. Moreover, few users actually run Tamarin
-on Windows.
 
 #### How do I uninstall Tamarin using Homebrew?
 
