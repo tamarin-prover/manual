@@ -33,16 +33,17 @@
 <li><a href='002_installation.html'               ><b>2. </b> Installation</a></li>
 <li><a href='003_example.html'                    ><b>3. </b> First Example</a></li>
 <li><a href='004_cryptographic-messages.html'     ><b>4. </b> Cryptographic Messages</a></li>
-<li><a href='005_protocol-specification.html'     ><b>5. </b> Protocol Specification</a></li>
-<li><a href='006_property-specification.html'     ><b>6. </b> Property Specification</a></li>
-<li><a href='007_precomputation.html'             ><b>7. </b> Precomputation</a></li>
-<li><a href='008_modeling-issues.html'            ><b>8. </b> Modeling Issues</a></li>
-<li><a href='009_advanced-features.html'          ><b>9. </b> Advanced Features</a></li>
-<li><a href='010_case-studies.html'               ><b>10.</b> Case Studies</a></li>
-<li><a href='011_toolchains.html'                 ><b>11.</b> Toolchains</a></li>
-<li><a href='012_limitations.html'                ><b>12.</b> Limitations</a></li>
-<li><a href='013_contact-and-further-reading.html'><b>13.</b> Contact Information and Further Reading</a></li>
-<li><a href='014_syntax_description.html'         ><b>14.</b> Syntax Description</a></li>
+<li><a href='005_protocol-specification-rules.html'     ><b>5. </b> Protocol Specification using Rules</a></li>
+<li><a href='006_protocol-specification-processes.html'     ><b>6. </b> Protocol Specification using Processes</a></li>
+<li><a href='007_property-specification.html'     ><b>7. </b> Property Specification</a></li>
+<li><a href='008_precomputation.html'             ><b>8. </b> Precomputation</a></li>
+<li><a href='009_modeling-issues.html'            ><b>9. </b> Modeling Issues</a></li>
+<li><a href='010_advanced-features.html'          ><b>10. </b> Advanced Features</a></li>
+<li><a href='011_case-studies.html'               ><b>11.</b> Case Studies</a></li>
+<li><a href='012_toolchains.html'                 ><b>12.</b> Toolchains</a></li>
+<li><a href='013_limitations.html'                ><b>13.</b> Limitations</a></li>
+<li><a href='014_contact-and-further-reading.html'><b>14.</b> Contact Information and Further Reading</a></li>
+<li><a href='015_syntax_description.html'         ><b>15.</b> Syntax Description</a></li>
   </ul>
   </div>
   <div id='page-wrapper'>
@@ -50,37 +51,37 @@
 <p class="halfbreak">
 </p>
 <h1 id="sec:advanced-features">Advanced Features</h1>
-<p>We now turn to some of Tamarin's more advanced features. We cover custom heuristics, the GUI, channel models, induction, internal preprocessor, and how to measure the time needed for proofs. <!--manual proofs,encoding tricks,--></p>
+<p>We now turn to some of Tamarin’s more advanced features. We cover custom heuristics, the GUI, channel models, induction, internal preprocessor, and how to measure the time needed for proofs. <!--manual proofs,encoding tricks,--></p>
 <h2 id="sec:heuristics">Heuristics</h2>
 <p>The default heuristic for the automated proof methods can be set either through the inclusion of a heuristic choice in the protocol file, or by using a commandline option. A heuristic is specified as a word built from the alphabet <code>{s,S,c,C,i,I,o,O}</code>, with each letter describing a different way to rank the open goals of a constraint system. Specifying a default heuristic within a protocol file can be done by including <code>heuristic:</code> followed by the heuristic, or by using the <code>--heuristic</code> command line option with the heuristic as the argument.</p>
 <p>The goal rankings are as follows.</p>
 <dl>
 <dt><code>s</code>:</dt>
-<dd>the 'smart' ranking is the ranking described in the extended version of our CSF'12 paper. It is the default ranking and works very well in a wide range of situations. Roughly, this ranking prioritizes chain goals, disjunctions, facts, actions, and adversary knowledge of private and fresh terms in that order (e.g., every action will be solved before any knowledge goal). Goals marked 'Probably Constructable' and 'Currently Deducible' in the GUI are lower priority.
+<dd>the ‘smart’ ranking is the ranking described in the extended version of our CSF’12 paper. It is the default ranking and works very well in a wide range of situations. Roughly, this ranking prioritizes chain goals, disjunctions, facts, actions, and adversary knowledge of private and fresh terms in that order (e.g., every action will be solved before any knowledge goal). Goals marked ‘Probably Constructable’ and ‘Currently Deducible’ in the GUI are lower priority.
 </dd>
 <dt><code>S</code>:</dt>
-<dd>is like the 'smart' ranking, but does not delay the solving of premises marked as loop-breakers. What premises are loop breakers is determined from the protocol using a simple under-approximation to the vertex feedback set of the conclusion-may-unify-to-premise graph. We require these loop-breakers for example to guarantee the termination of the case distinction precomputation. You can inspect which premises are marked as loop breakers in the 'Multiset rewriting rules' page in the GUI.
+<dd>is like the ‘smart’ ranking, but does not delay the solving of premises marked as loop-breakers. What premises are loop breakers is determined from the protocol using a simple under-approximation to the vertex feedback set of the conclusion-may-unify-to-premise graph. We require these loop-breakers for example to guarantee the termination of the case distinction precomputation. You can inspect which premises are marked as loop breakers in the ‘Multiset rewriting rules’ page in the GUI.
 </dd>
 <dt><code>c</code>:</dt>
-<dd>is the 'consecutive' or 'conservative' ranking. It solves goals in the order they occur in the constraint system. This guarantees that no goal is delayed indefinitely, but often leads to large proofs because some of the early goals are not worth solving.
+<dd>is the ‘consecutive’ or ‘conservative’ ranking. It solves goals in the order they occur in the constraint system. This guarantees that no goal is delayed indefinitely, but often leads to large proofs because some of the early goals are not worth solving.
 </dd>
 <dt><code>C</code>:</dt>
-<dd>is like 'c' but without delaying loop breakers.
+<dd>is like ‘c’ but without delaying loop breakers.
 </dd>
 <dt><code>i</code>:</dt>
-<dd>is a ranking developed to be well-suited to injective stateful protocols. The priority of goals is similar to the 'S' ranking, but instead of a strict priority hierarchy, the fact, action, and knowledge goals are considered equal priority and solved by their age. This is useful for stateful protocols with an unbounded number of runs, in which for example solving a fact goal may create a new fact goal for the previous protocol run. This ranking will prioritize existing fact, action, and knowledge goals before following up on the fact goal of that previous run. In contrast the 'S' ranking would prioritize this new fact goal ahead of any existing action or knowledge goal, although solving the new goal may create yet another earlier fact goal and so on, preventing termination.
+<dd>is a ranking developed to be well-suited to injective stateful protocols. The priority of goals is similar to the ‘S’ ranking, but instead of a strict priority hierarchy, the fact, action, and knowledge goals are considered equal priority and solved by their age. This is useful for stateful protocols with an unbounded number of runs, in which for example solving a fact goal may create a new fact goal for the previous protocol run. This ranking will prioritize existing fact, action, and knowledge goals before following up on the fact goal of that previous run. In contrast the ‘S’ ranking would prioritize this new fact goal ahead of any existing action or knowledge goal, although solving the new goal may create yet another earlier fact goal and so on, preventing termination.
 </dd>
 <dt><code>I</code>:</dt>
-<dd>is like 'i' but without delaying loop breakers.
+<dd>is like ‘i’ but without delaying loop breakers.
 </dd>
 <dt><code>o</code>:</dt>
-<dd>is the oracle ranking. It allows the user to provide an arbitrary program that runs independently of Tamarin and ranks the proof goals. The program must be named <code>oracle</code>. Moreover, it must be executable from the current working directory, i.e., with <code>./oracle</code>. Alternatively, a different file name, say <code>FILE</code>, can be used when additionally passing the <code>--oraclename=FILE</code> flag as commandline option (default is <code>oracle</code>). The oracle's input is a numbered list of proof goals, given in the 'Consecutive' ranking (as generated by the heuristic <code>C</code>). Every line of the input is a new goal and starts with &quot;%i: &quot;, where %i is the index of the goal. The oracle's output is expected to be a line-separated list of indices, prioritizing the given proof goals. Note that it suffices to output the index of a single proof goal, as the first ranked goal will always be selected. Moreover, the oracle is also allowed to terminate without printing a valid index. In this case, the first goal of the 'Consecutive' ranking will be selected.
+<dd>is the oracle ranking. It allows the user to provide an arbitrary program that runs independently of Tamarin and ranks the proof goals. The program must be named <code>oracle</code>. Moreover, it must be executable from the current working directory, i.e., with <code>./oracle</code>. Alternatively, a different file name, say <code>FILE</code>, can be used when additionally passing the <code>--oraclename=FILE</code> flag as commandline option (default is <code>oracle</code>). The oracle’s input is a numbered list of proof goals, given in the ‘Consecutive’ ranking (as generated by the heuristic <code>C</code>). Every line of the input is a new goal and starts with “%i:”, where %i is the index of the goal. The oracle’s output is expected to be a line-separated list of indices, prioritizing the given proof goals. Note that it suffices to output the index of a single proof goal, as the first ranked goal will always be selected. Moreover, the oracle is also allowed to terminate without printing a valid index. In this case, the first goal of the ‘Consecutive’ ranking will be selected.
 </dd>
 <dt><code>O</code>:</dt>
-<dd>is the oracle ranking based on the 'smart' heuristic <code>s</code>. It works the same as <code>o</code> but uses 'smart' instead of 'Consecutive' ranking to start with. Again, for using an oracle at location <code>FILE</code> one must additionally pass the <code>--oraclename=FILE</code> flag as commandline option.
+<dd>is the oracle ranking based on the ‘smart’ heuristic <code>s</code>. It works the same as <code>o</code> but uses ‘smart’ instead of ‘Consecutive’ ranking to start with. Again, for using an oracle at location <code>FILE</code> one must additionally pass the <code>--oraclename=FILE</code> flag as commandline option.
 </dd>
 </dl>
-<p>If several rankings are given for the heuristic flag, then they are employed in a round-robin fashion depending on the proof-depth. For example, a flag <code>--heuristic=ssC</code> always uses two times the smart ranking and then once the 'Consecutive' goal ranking. The idea is that you can mix goal rankings easily in this way.</p>
+<p>If several rankings are given for the heuristic flag, then they are employed in a round-robin fashion depending on the proof-depth. For example, a flag <code>--heuristic=ssC</code> always uses two times the smart ranking and then once the ‘Consecutive’ goal ranking. The idea is that you can mix goal rankings easily in this way.</p>
 <p>Individual lemmas may also specify a heuristic to be used when solving them, instead of the default heuristic. This is done with the <code>heuristic=</code> lemma annotation followed by the heuristic.</p>
 <h2 id="sec:fact-annotations">Fact annotations</h2>
 <p>Facts can be annotated with <code>+</code> or <code>-</code> to influence their priority in heuristics. Annotating a fact with <code>+</code> causes the tool to solve instances of that fact earlier than normal, while annotating a fact with <code>-</code> will delay solving those instances. A fact can be annotated by suffixing it with the annotation in square brackets. For example, a fact <code>F(x)[+]</code> will be prioritized, while a fact <code>G(x)[-]</code> will be delayed.</p>
@@ -90,7 +91,7 @@
 <p>will cause the <code>B(x)[+]</code> actions created when applying this lemma to be solved with higher priority.</p>
 <p>Heuristic priority can also be influenced by starting a fact name with <code>F_</code> (for first) or <code>L_</code> (for last) corresponding to the <code>+</code> and <code>-</code> annotations respectively. Note however that these prefixes must apply to every instance of the fact, as a fact <code>F_A(x)</code> cannot unify with a fact <code>A(x)</code>.</p>
 <p>Facts in rule premises can also be annotated with <code>no_precomp</code> to prevent the tool from precomputing their sources. Use of the <code>no_precomp</code> annotation in key places can be very useful for reducing the precomputation time required to load large models, however it should be used sparingly. Preventing the precomputation of sources for a premise that is solved frequently will typically slow down the tool, as it must solve the premise each time instead of directly applying precomputed sources. Note also that using this annotation may cause partial deconstructions if the source of a premise was necessary to compute a full deconstruction.</p>
-<p>The <code>no_precomp</code> annotation can be used in combination with heuristic annotations by including both separated by commas---e.g., a premise <code>A(x)[-,no_precomp]</code> will be delayed and also will not have its sources precomputed.</p>
+<p>The <code>no_precomp</code> annotation can be used in combination with heuristic annotations by including both separated by commas—e.g., a premise <code>A(x)[-,no_precomp]</code> will be delayed and also will not have its sources precomputed.</p>
 <h3 id="using-an-oracle">Using an Oracle</h3>
 <p>We present a small example to demonstrate how an oracle can be used to generate efficient proofs.</p>
 <p>Assume we want to prove the uniqueness of a pair <code>&lt;xcomplicated,xsimple&gt;</code>, where <code>xcomplicated</code> is a term that is derived via a complicated and long way (not guaranteed to be unique) and <code>xsimple</code> is a unique term generated via a very simple way. The built-in heuristics cannot easily detect that the straightforward way to prove uniqueness is to solve for the term <code>xsimple</code>. By providing an oracle, we can generate a very short and efficient proof nevertheless.</p>
@@ -161,7 +162,7 @@ for i in ranked:
   print i</code></pre>
 <p>Having saved the Tamarin theory in the file <code>SourceOfUniqueness.spthy</code> and the oracle in the file <code>myoracle</code>, we can prove the lemma <code>uniqueness</code>, using the following command.</p>
 <pre><code>tamarin-prover --prove=uniqueness --heuristic=o --oraclename=myoracle SourceOfUniqueness.spthy</code></pre>
-<p>The generated proof consists of only 10 steps. (162 steps with 'consecutive' ranking, non-termination with 'smart' ranking).</p>
+<p>The generated proof consists of only 10 steps. (162 steps with ‘consecutive’ ranking, non-termination with ‘smart’ ranking).</p>
 <!--Advanced Encoding
 ----------------------------
 
@@ -170,17 +171,21 @@ to encoding using alternative more efficient descriptions-->
 <p>See Section <a href="003_example.html#sec:gui">Example</a> for a short demonstration of the main features of the GUI.</p>
 <!-- downloading proofs, keyboard commands (a vs A vs b vs B) etc. -->
 <h2 id="sec:channel-models">Different Channel Models</h2>
-<p>Tamarin's built-in adversary model is often referred to as the Dolev-Yao adversary. This models an active adversary that has complete control of the communication network. Hence this adversary can eavesdrop on, block, and modify messages sent over the network and can actively inject messages into the network. The injected messages though must be those that the adversary can construct from his knowledge, i.e., the messages he initially knew, the messages he has learned from observing network traffic, and the messages that he can construct from messages he knows.</p>
-<p>The adversary's control over the communication network is modeled with the following two built-in rules:</p>
-<ol style="list-style-type: decimal">
-<li><pre><code>rule irecv:
-   [ Out( x ) ] --&gt; [ !KD( x ) ]</code></pre></li>
-<li><pre><code>rule isend:
-   [ !KU( x ) ] --[ K( x ) ]-&gt; [ In( x ) ]</code></pre></li>
+<p>Tamarin’s built-in adversary model is often referred to as the Dolev-Yao adversary. This models an active adversary that has complete control of the communication network. Hence this adversary can eavesdrop on, block, and modify messages sent over the network and can actively inject messages into the network. The injected messages though must be those that the adversary can construct from his knowledge, i.e., the messages he initially knew, the messages he has learned from observing network traffic, and the messages that he can construct from messages he knows.</p>
+<p>The adversary’s control over the communication network is modeled with the following two built-in rules:</p>
+<ol type="1">
+<li></li>
 </ol>
-<p>The <code>irecv</code> rule states that any message sent by an agent using the <code>Out</code> fact is learned by the adversary. Such messages are then analyzed with the adversary's message deduction rules, which depend on the specified equational theory.</p>
+<pre><code>rule irecv:
+   [ Out( x ) ] --&gt; [ !KD( x ) ]</code></pre>
+<ol start="2" type="1">
+<li></li>
+</ol>
+<pre><code>rule isend:
+   [ !KU( x ) ] --[ K( x ) ]-&gt; [ In( x ) ]</code></pre>
+<p>The <code>irecv</code> rule states that any message sent by an agent using the <code>Out</code> fact is learned by the adversary. Such messages are then analyzed with the adversary’s message deduction rules, which depend on the specified equational theory.</p>
 <p>The <code>isend</code> rule states that any message received by an agent by means of the <code>In</code> fact has been constructed by the adversary.</p>
-<p>We can limit the adversary's control over the protocol agents' communication channels by specifying channel rules, which model channels with intrinsic security properties. In the following, we illustrate the modelling of confidential, authentic, and secure channels. Consider for this purpose the following protocol, where an initiator generates a fresh nonce and sends it to a receiver.</p>
+<p>We can limit the adversary’s control over the protocol agents’ communication channels by specifying channel rules, which model channels with intrinsic security properties. In the following, we illustrate the modelling of confidential, authentic, and secure channels. Consider for this purpose the following protocol, where an initiator generates a fresh nonce and sends it to a receiver.</p>
 <pre class="tamarin"><code>    I:  fresh(n)
     I -&gt; R: n </code></pre>
 <p>We can model this protocol as follows.</p>
@@ -299,7 +304,7 @@ rule R_1:
 <p>For the protocol sending the message over a secure channel, Tamarin proves all the considered lemmas. The nonce is secret from the perspective of both the initiator and the receiver because the adversary cannot read anything on a secure channel. Furthermore, as the adversary cannot send his own messages on the secure channel nor modify messages transmitted on the channel, the receiver can be sure that the nonce was sent by the agent who he believes to be in the initiator role.</p>
 <p>Similarly, one can define other channels with other properties. For example, we can model a secure channel with the additional property that it does not allow for replay. This could be done by changing the secure channel rules above by chaining <code>!Sec($A,$B,x)</code> to be a linear fact <code>Sec($A,$B,x)</code>. Consequently, this fact can only be consumed once and not be replayed by the adversary at a later point in time. In a similar manner, the other channel properties can be changed and additional properties can be imagined.</p>
 <h2 id="induction">Induction</h2>
-<p>Tamarin's constraint solving approach is similar to a backwards search, in the sense that it starts from later states and reasons backwards to derive information about possible earlier states. For some properties, it is more useful to reason forwards, by making assumptions about earlier states and deriving conclusions about later states. To support this, Tamarin offers a specialised inductive proof method.</p>
+<p>Tamarin’s constraint solving approach is similar to a backwards search, in the sense that it starts from later states and reasons backwards to derive information about possible earlier states. For some properties, it is more useful to reason forwards, by making assumptions about earlier states and deriving conclusions about later states. To support this, Tamarin offers a specialised inductive proof method.</p>
 <p>We start by motivating the need for an inductive proof method on a simple example with two rules and one lemma:</p>
 <pre class="tamarin"><code>theory InductionExample
 begin
@@ -322,7 +327,7 @@ end</code></pre>
 <p>The induction method works by distinguishing the last timepoint <code>#i</code> in the trace, as <code>last(#i)</code>, from all other timepoints. It assumes the property holds for all other timepoints than this one. As these other time points must occur earlier, this can be understood as a form of <em>wellfounded induction</em>. The induction hypothesis then becomes an additional constraint during the constraint solving phase and thereby allows more properties to be proven.</p>
 <p>This is particularly useful when reasoning about action facts that must always be preceded in traces by some other action facts. For example, induction can help to prove that some later protocol step is always preceded by the initialization step of the corresponding protocol role, with similar parameters.</p>
 <h2 id="sec:integrated-preprocessor">Integrated Preprocessor</h2>
-<p>Tamarin's integrated preprocessor can be used to include or exclude parts of your file. You can use this, for example, to restrict your focus to just some subset of lemmas. This is done by putting the relevant part of your file within an <code>#ifdef</code> block with a keyword <code>KEYWORD</code></p>
+<p>Tamarin’s integrated preprocessor can be used to include or exclude parts of your file. You can use this, for example, to restrict your focus to just some subset of lemmas. This is done by putting the relevant part of your file within an <code>#ifdef</code> block with a keyword <code>KEYWORD</code></p>
 <pre><code>#ifdef KEYWORD
 ...
 #endif</code></pre>
@@ -380,7 +385,7 @@ lemma otherlemma2:
 end</code></pre>
 <h2 id="configure-the-number-of-threads-used-by-tamarin">Configure the Number of Threads Used by Tamarin</h2>
 <p>Tamarin uses multi-threading to speed up the proof search. By default, Haskell automatically counts the number of cores available on the machine and uses the same number of threads.</p>
-<p>Using the options of Haskell's run-time system this number can be manually configured. To use x threads, add the parameters</p>
+<p>Using the options of Haskell’s run-time system this number can be manually configured. To use x threads, add the parameters</p>
 <pre><code>+RTS -Nx -RTS</code></pre>
 <p>to your Tamarin call, e.g.,</p>
 <pre><code>tamarin-prover Example.spthy --prove +RTS -N2 -RTS</code></pre>
@@ -397,7 +402,7 @@ end</code></pre>
 <pre><code>  i &lt; j &lt; k</code></pre>
 <p>and let there be an edge from <code>(i,u)</code> to <code>(k,w)</code> for some indices <code>u</code> and <code>v</code>. Then, we have a contradiction, if the premise <code>(k,w)</code> requires a fact <code>f(t,...)</code> and there is a premise <code>(j,v)</code> requiring a fact <code>f(t,...)</code>. These two premises must be merged because the edge <code>(i,u) &gt;-&gt; (k,w)</code> crosses <code>j</code> and the state at <code>j</code> therefore contains <code>f(t,...)</code>. This merging is not possible due to the ordering constraints <code>i &lt; j &lt; k</code>.</p>
 <p>Note that computing the set of fact symbols with injective instances is undecidable in general. We therefore compute an under-approximation to this set using the following simple heuristic. A fact tag is guaranteed to have injective instance, if</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>the fact-symbol is linear, and</li>
 <li>every introduction of such a fact is protected by a <code>Fr</code>-fact of the first term, and</li>
 <li>every rule has at most one copy of this fact-tag in the conclusion and the first term arguments agree.</li>

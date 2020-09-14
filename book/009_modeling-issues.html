@@ -33,16 +33,17 @@
 <li><a href='002_installation.html'               ><b>2. </b> Installation</a></li>
 <li><a href='003_example.html'                    ><b>3. </b> First Example</a></li>
 <li><a href='004_cryptographic-messages.html'     ><b>4. </b> Cryptographic Messages</a></li>
-<li><a href='005_protocol-specification.html'     ><b>5. </b> Protocol Specification</a></li>
-<li><a href='006_property-specification.html'     ><b>6. </b> Property Specification</a></li>
-<li><a href='007_precomputation.html'             ><b>7. </b> Precomputation</a></li>
-<li><a href='008_modeling-issues.html'            ><b>8. </b> Modeling Issues</a></li>
-<li><a href='009_advanced-features.html'          ><b>9. </b> Advanced Features</a></li>
-<li><a href='010_case-studies.html'               ><b>10.</b> Case Studies</a></li>
-<li><a href='011_toolchains.html'                 ><b>11.</b> Toolchains</a></li>
-<li><a href='012_limitations.html'                ><b>12.</b> Limitations</a></li>
-<li><a href='013_contact-and-further-reading.html'><b>13.</b> Contact Information and Further Reading</a></li>
-<li><a href='014_syntax_description.html'         ><b>14.</b> Syntax Description</a></li>
+<li><a href='005_protocol-specification-rules.html'     ><b>5. </b> Protocol Specification using Rules</a></li>
+<li><a href='006_protocol-specification-processes.html'     ><b>6. </b> Protocol Specification using Processes</a></li>
+<li><a href='007_property-specification.html'     ><b>7. </b> Property Specification</a></li>
+<li><a href='008_precomputation.html'             ><b>8. </b> Precomputation</a></li>
+<li><a href='009_modeling-issues.html'            ><b>9. </b> Modeling Issues</a></li>
+<li><a href='010_advanced-features.html'          ><b>10. </b> Advanced Features</a></li>
+<li><a href='011_case-studies.html'               ><b>11.</b> Case Studies</a></li>
+<li><a href='012_toolchains.html'                 ><b>12.</b> Toolchains</a></li>
+<li><a href='013_limitations.html'                ><b>13.</b> Limitations</a></li>
+<li><a href='014_contact-and-further-reading.html'><b>14.</b> Contact Information and Further Reading</a></li>
+<li><a href='015_syntax_description.html'         ><b>15.</b> Syntax Description</a></li>
   </ul>
   </div>
   <div id='page-wrapper'>
@@ -51,7 +52,7 @@
 </p>
 <h1 id="sec:modeling-issues">Modeling Issues</h1>
 <h2 id="first-time-users">First-time users</h2>
-<p>In this section we discuss some problems that a first-time user might face. This includes error messages and how one might fix them. We also discuss how certain 'sanity' lemmas can be proven to provide some confidence in the protocol specification.</p>
+<p>In this section we discuss some problems that a first-time user might face. This includes error messages and how one might fix them. We also discuss how certain ‘sanity’ lemmas can be proven to provide some confidence in the protocol specification.</p>
 <p>To illustrate these concepts, consider the following protocol, where an initiator <code>$I</code> and a receiver <code>$R</code> share a symmetric key <code>~k</code>. <code>$I</code> then sends the message <code>~m</code>, encrypted with their shared key <code>~k</code> to <code>$R</code>.</p>
 <pre class="tamarin"><code>builtins: symmetric-encryption
 
@@ -75,7 +76,7 @@ rule R_1:
 lemma nonce_secret: 
     &quot;All m #i #j. Secret(m) @i &amp; K(m) @j ==&gt; F&quot;
 </code></pre>
-<p>With the lemma <code>nonce_secret</code>, we examine if the message is secret from the receiver's perspective.</p>
+<p>With the lemma <code>nonce_secret</code>, we examine if the message is secret from the receiver’s perspective.</p>
 <h3 id="exist-trace-lemmas">Exist-Trace Lemmas</h3>
 <p>Imagine that in the setup rule you forgot the agent state fact for the receiver <code>AgSt($R,~k)</code> as follows:</p>
 <pre class="tamarin"><code>// WARNING: this rule illustrates a non-functional protocol
@@ -121,7 +122,7 @@ fact usage:
 4. rule `R_1&#39;, fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)
         AgSt( $R, ~k )
 */</code></pre>
-<p>The problem lists all the fact usages of fact <code>AgSt</code>. The statement <code>1. rule 'setup', fact &quot;agst&quot;:(&quot;AgSt&quot;,3,Linear)</code> means that in the rule <code>setup</code> the fact <code>AgSt</code> is used as a linear fact with 3 arguments. This is not consistent with its use in other rules. For example <code>2. rule 'setup', fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)</code> indicates that it is also used with 2 arguments in the <code>setup</code> rule. To solve this problem we must ensure that we only use the same fact with the same number of arguments.</p>
+<p>The problem lists all the fact usages of fact <code>AgSt</code>. The statement <code>1. rule 'setup', fact "agst":("AgSt",3,Linear)</code> means that in the rule <code>setup</code> the fact <code>AgSt</code> is used as a linear fact with 3 arguments. This is not consistent with its use in other rules. For example <code>2. rule 'setup', fact "agst": ("AgSt",2,Linear)</code> indicates that it is also used with 2 arguments in the <code>setup</code> rule. To solve this problem we must ensure that we only use the same fact with the same number of arguments.</p>
 <h3 id="unbound-variables">Unbound variables</h3>
 <p>If we change the rule <code>R_1</code> to</p>
 <pre class="tamarin"><code>// WARNING: this rule illustrates an error message      
@@ -202,16 +203,9 @@ sorts:
 <p>This indicates that the sorts of a message were inconsistently used. In the rule <code>setup</code>, this is the case because we used m once as a fresh value <code>~m</code> and another time without the <code>~</code>.</p>
 <h3 id="what-to-do-when-tamarin-does-not-terminate">What to do when Tamarin does not terminate</h3>
 <p>Tamarin may fail to terminate when it automatically constructs proofs. One reason for this is that there are open chains. For advice on how to find and remove open chains, see <a href="007_precomputation.html#sec:openchains">open chains</a>.</p>
-<!-- 
-### functions ###
-function-> where does it go? doesn have support:
-local to rule with "let"
--->
-<!-- Using rewrite rules to 'share'
-  ------------------------------
-
-  TODO: Katriel?
--->
+<p>&lt;!– ### functions ### function-&gt; where does it go? doesn have support: local to rule with “let” –!&gt;</p>
+<p>&lt;!– Using rewrite rules to ‘share’ ——————————</p>
+<p>TODO: Katriel? –!&gt;</p>
     </div>
   </div>
 </body>

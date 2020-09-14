@@ -33,16 +33,17 @@
 <li><a href='002_installation.html'               ><b>2. </b> Installation</a></li>
 <li><a href='003_example.html'                    ><b>3. </b> First Example</a></li>
 <li><a href='004_cryptographic-messages.html'     ><b>4. </b> Cryptographic Messages</a></li>
-<li><a href='005_protocol-specification.html'     ><b>5. </b> Protocol Specification</a></li>
-<li><a href='006_property-specification.html'     ><b>6. </b> Property Specification</a></li>
-<li><a href='007_precomputation.html'             ><b>7. </b> Precomputation</a></li>
-<li><a href='008_modeling-issues.html'            ><b>8. </b> Modeling Issues</a></li>
-<li><a href='009_advanced-features.html'          ><b>9. </b> Advanced Features</a></li>
-<li><a href='010_case-studies.html'               ><b>10.</b> Case Studies</a></li>
-<li><a href='011_toolchains.html'                 ><b>11.</b> Toolchains</a></li>
-<li><a href='012_limitations.html'                ><b>12.</b> Limitations</a></li>
-<li><a href='013_contact-and-further-reading.html'><b>13.</b> Contact Information and Further Reading</a></li>
-<li><a href='014_syntax_description.html'         ><b>14.</b> Syntax Description</a></li>
+<li><a href='005_protocol-specification-rules.html'     ><b>5. </b> Protocol Specification using Rules</a></li>
+<li><a href='006_protocol-specification-processes.html'     ><b>6. </b> Protocol Specification using Processes</a></li>
+<li><a href='007_property-specification.html'     ><b>7. </b> Property Specification</a></li>
+<li><a href='008_precomputation.html'             ><b>8. </b> Precomputation</a></li>
+<li><a href='009_modeling-issues.html'            ><b>9. </b> Modeling Issues</a></li>
+<li><a href='010_advanced-features.html'          ><b>10. </b> Advanced Features</a></li>
+<li><a href='011_case-studies.html'               ><b>11.</b> Case Studies</a></li>
+<li><a href='012_toolchains.html'                 ><b>12.</b> Toolchains</a></li>
+<li><a href='013_limitations.html'                ><b>13.</b> Limitations</a></li>
+<li><a href='014_contact-and-further-reading.html'><b>14.</b> Contact Information and Further Reading</a></li>
+<li><a href='015_syntax_description.html'         ><b>15.</b> Syntax Description</a></li>
   </ul>
   </div>
   <div id='page-wrapper'>
@@ -84,7 +85,7 @@ rule_attrs := &#39;[&#39; rule_attr (&#39;,&#39; rule_attr)* &#39;]&#39;
 rule_attr  := (&#39;color=&#39; | &#39;colour=&#39;) hexcolor
 let_block  := &#39;let&#39; (msg_var &#39;=&#39; msetterm)+ &#39;in&#39;
 msg_var    := ident [&#39;.&#39; natural] [&#39;:&#39; &#39;msg&#39;]</code></pre>
-<p>Rule annotations do not influence the rule's semantics. A color is represented as a triplet of 8 bit hexadecimal values optionally preceded by '#', and is used as the background color of the rule when it is rendered in graphs.</p>
+<p>Rule annotations do not influence the rule’s semantics. A color is represented as a triplet of 8 bit hexadecimal values optionally preceded by ‘#’, and is used as the background color of the rule when it is rendered in graphs.</p>
 <p>The let-block allows more succinct specifications. The equations are applied in a bottom-up fashion. For example,</p>
 <pre><code>let x = y
     y = &lt;z,x&gt;
@@ -95,7 +96,7 @@ in [] --&gt; [ A(y)]    is desugared to    [] --&gt; [ A(&lt;z,y&gt;) ]</code></
 <p>In observational equivalence mode, restrictions can be associated to one side.</p>
 <pre><code>restriction := &#39;restriction&#39; ident [restriction_attrs] &#39;:&#39; &#39;&quot;&#39; formula &#39;&quot;&#39;
 restriction_attrs      := &#39;[&#39; (&#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
-<p>Lemmas specify security properties. By default, the given formula is interpreted as a property that must hold for all traces of the protocol of the security protocol theory. You can change this using the 'exists-trace' trace quantifier.</p>
+<p>Lemmas specify security properties. By default, the given formula is interpreted as a property that must hold for all traces of the protocol of the security protocol theory. You can change this using the ‘exists-trace’ trace quantifier.</p>
 <pre><code>lemma := &#39;lemma&#39; [modulo] ident [lemma_attrs] &#39;:&#39;
          [trace_quantifier]
          &#39;&quot;&#39; formula &#39;&quot;&#39;
@@ -176,7 +177,7 @@ atom        := &#39;⊥&#39; | &#39;F&#39; | &#39;⊤&#39; | &#39;T&#39;        
                     lvar+ &#39;.&#39; formula
 
 lvar        := node_var | nonnode_var</code></pre>
-<p>Identifiers always start with a letter or number, and may contain underscores after the first character. Moreover, they must not be one of the reserved keywords <code>let</code>, <code>in</code>, or <code>rule</code>. Although identifiers beginning with a number are valid, they are not allowed as the names of facts (which must begin with an upper-case letter). ident := alphaNum (alphaNum | '_')*</p>
+<p>Identifiers always start with a letter or number, and may contain underscores after the first character. Moreover, they must not be one of the reserved keywords <code>let</code>, <code>in</code>, or <code>rule</code>. Although identifiers beginning with a number are valid, they are not allowed as the names of facts (which must begin with an upper-case letter). ident := alphaNum (alphaNum | ’_’)*</p>
     </div>
   </div>
 </body>
