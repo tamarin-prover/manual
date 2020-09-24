@@ -119,22 +119,22 @@ rule MyRule2:
 <p>This can be done by hand, namely by specifying a restriction that refers to an <code>action fact</code> unique to this rule, or by using embedded restrictions like this:</p>
 <pre><code>rule B:
     [In(x), In(y)] --[ _restrict( formula )]-&gt; []</code></pre>
-<p>where <code>formula</code> is a restriction.</p>
+<p>where <code>formula</code> is a restriction. Note that embedded restrictions currently are only available in trace mode.</p>
 <h2 id="modeling-protocols">Modeling protocols</h2>
 <p>There are several ways in which the execution of security protocols can be defined, e.g., as in <span class="citation" data-cites="opsem2012">(Cremers and Mauw 2012)</span>. In Tamarin, there is no pre-defined protocol concept and the user is free to model them as she or he chooses. Below we give an example of how protocols can be modeled and discuss alternatives afterwards.</p>
 <h3 id="public-key-infrastructure">Public-key infrastructure</h3>
 <p>In the Tamarin model, there is no pre-defined notion of public key infrastructure (PKI). A pre-distributed PKI with asymmetric keys for each party can be modeled by a single rule that generates a key for a party. The party’s identity and public/private keys are then stored as facts in the state, enabling protocol rules to retrieve them. For the public key, we commonly use the <code>Pk</code> fact, and for the corresponding long-term private key we use the <code>Ltk</code> fact. Since these facts will only be used by other rules to retrieve the keys, but never updated, we model them as persistent facts. We use the abstract function <code>pk(x)</code> to denote the public key corresponding to the private key <code>x</code>, leading to the following rule. Note that we also directly give all public keys to the attacker, modeled by the <code>Out</code> on the right-hand side.</p>
 <pre><code>rule Generate_key_pair:
-  [ Fr(~x) ] 
-  --&gt; 
+  [ Fr(~x) ]
+  --&gt;
   [ !Pk($A,pk(~x))
   , Out(pk(~x))
   , !Ltk($A,~x)
   ]</code></pre>
 <p>Some protocols, such as Naxos, rely on the algebraic properties of the key pairs. In many DH-based protocols, the public key is <span class="math inline">\(g^x\)</span> for the private key <span class="math inline">\(x\)</span>, which enables exploiting the commutativity of the exponents to establish keys. In this case, we specify the following rule instead.</p>
 <pre><code>rule Generate_DH_key_pair:
-  [ Fr(~x) ] 
-  --&gt; 
+  [ Fr(~x) ]
+  --&gt;
   [ !Pk($A,&#39;g&#39;^~x)
   , Out(&#39;g&#39;^~x)
   , !Ltk($A,~x)
@@ -165,18 +165,18 @@ functions: h2/1</code></pre>
             ]</code></pre>
 <p>However, the responder also computes a session key <code>kR</code>. Since the session key does not affect the sent or received messages, we can omit it from the left-hand side and the right-hand side of the rule. However, later we will want to make a statement about the session key in the security property. We therefore add the computed key to the actions:</p>
 <pre><code>    rule NaxosR_attempt2:
-            [ 
-              In(X), 
+            [
+              In(X),
               Fr(~eskR),
               !Ltk($R, lkR)
-            ] 
+            ]
             --[ SessionKey($R, kR ) ]-&gt;
-            [ 
-              Out( &#39;g&#39;^h1(&lt; ~eskR, lkR &gt;) ) 
+            [
+              Out( &#39;g&#39;^h1(&lt; ~eskR, lkR &gt;) )
             ]</code></pre>
 <p>The computation of <code>kR</code> is not yet specified in the above. We could replace <code>kR</code> in the above rule by its full unfolding, but this would decrease readability. Instead, we use let binding to avoid duplication and reduce possible mismatches. Additionally, for the key computation we need the public key of the communication partner <code>$I</code>, which we bind to a unique thread identifier <code>~tid</code>; we use the resulting action fact to specify security properties, as we will see in the next section. This leads to:</p>
 <pre><code>    rule NaxosR_attempt3:
-      let 
+      let
           exR = h1(&lt; ~eskR, lkR &gt;)
           hkr = &#39;g&#39;^exR
           kR  = h2(&lt; pkI^exR, X^lkR, X^exR, $I, $R &gt;)
