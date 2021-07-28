@@ -469,7 +469,7 @@ lemma unequal:
 <li>The lemma will be verified using the <code>Raw sources</code>.</li>
 <li>The lemma will be used to generate the <code>Refined sources</code>, which are used for verification of all non-<code>sources</code> lemmas.</li>
 </ul>
-<p>Source lemmas are necessary whenever the analysis reports <code>partial deconstructions left</code> in the <code>Raw sources</code>. See section on <a href="007_precomputation.html#sec:openchains">Open chains</a> for details on this.</p>
+<p>Source lemmas are necessary whenever the analysis reports <code>partial deconstructions left</code> in the <code>Raw sources</code>. See section on <a href="008_precomputation.html#sec:openchains">Open chains</a> for details on this.</p>
 <p>All <code>sources</code> lemmas are used only for the case distinctions and do not benefit from other lemmas being marked as <code>reuse</code>.</p>
 <h3 id="use_induction"><code>use_induction</code></h3>
 <p>As you have seen before, the first choice in any proof is whether to use simplification (the default) or induction. If you know that a lemma will require induction, you just annotate it with <code>use_induction</code>, which will make it use induction instead of simplification.</p>
