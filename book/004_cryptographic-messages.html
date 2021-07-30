@@ -129,7 +129,7 @@ x ⊕ x       = zero</code></pre>
 <dt><code>multiset</code>:</dt>
 <dd><p>This theory introduces the associative-commutative operator <code>+</code> which is usually used to model multisets.</p>
 </dd>
-<dt>`<code>reliable-channel</code>:</dt>
+<dt><code>reliable-channel</code>:</dt>
 <dd><p>This theory introduces support for reliable channel in the <a href="006_protocol-specification-processes.md">process calculus</a>. Messages on the channel (i.e., public name) <code>'r'</code> are guaranteed to arrive eventually. There is only one other channel, the public and unreliable channel <code>'c'</code>. Note that multiple reliable channels can be modelled using pattern matchting:</p>
 <pre><code>  out(&#39;r&#39;,&lt;&#39;channelA&#39;,&#39;Hello&#39;)              
 | out(&#39;r&#39;,&lt;&#39;channelB&#39;,&#39;Bonjour&#39;)
