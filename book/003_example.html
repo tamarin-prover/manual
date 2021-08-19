@@ -80,7 +80,7 @@ begin</code></pre>
     [ Fr(~ltk) ]
   --&gt;
     [ !Ltk($A, ~ltk), !Pk($A, pk(~ltk)) ]</code></pre>
-<p>Here the only premise is an instance of the <code>Fr</code> fact. The <code>Fr</code> fact is a built-in fact that denotes a freshly generated name. This mechanism is used to model random numbers such as nonces or keys (see <a href="005_protocol-specification.html#sec:model-specification">Model Specification</a> for details).</p>
+<p>Here the only premise is an instance of the <code>Fr</code> fact. The <code>Fr</code> fact is a built-in fact that denotes a freshly generated name. This mechanism is used to model random numbers such as nonces or keys (see <a href="005_protocol-specification-rules.html#sec:model-specification">Model Specification</a> for details).</p>
 <p>In Tamarin, the sort of a variable is expressed using prefixes:</p>
 <ul>
 <li><code>~x</code> denotes <code>x:fresh</code></li>
@@ -90,7 +90,7 @@ begin</code></pre>
 </ul>
 <p>Moreover, a string constant <code>'c'</code> denotes a public name in <code>pub</code>, which is a fixed, global constant. We have a top sort <code>msg</code> and two incomparable subsorts <code>fresh</code> and <code>pub</code> of that top sort. Timepoint variables of sort <code>temporal</code> are unconnected.</p>
 <p>The above rule can therefore be read as follows. First, generate a fresh name <code>~ltk</code> (of sort fresh), which is the new private key, and non-deterministically choose a public name <code>A</code>, for the agent for whom we are generating the key-pair. Afterward, generate the fact <code>!Ltk($A, ~ltk)</code> (the exclamation mark <code>!</code> denotes that the fact is persistent, i.e., it can be consumed arbitrarily often), which denotes the association between agent <code>A</code> and its private key <code>~ltk</code>, and generate the fact <code>!Pk($A, pk(~ltk))</code>, which associates agent <code>A</code> and its public key <code>pk(~ltk)</code>.</p>
-<p>In the example, we allow the adversary to retrieve any public key using the following rule. Essentially, it reads a public-key database entry and sends the public key to the network using the built-in fact <code>Out</code>, which denotes sending a message to the network (see the section on <a href="005_protocol-specification.html#sec:model-specification">Model Specification</a> for more information).</p>
+<p>In the example, we allow the adversary to retrieve any public key using the following rule. Essentially, it reads a public-key database entry and sends the public key to the network using the built-in fact <code>Out</code>, which denotes sending a message to the network (see the section on <a href="005_protocol-specification-rules.html#sec:model-specification">Model Specification</a> for more information).</p>
 <pre class="tamarin"><code>rule Get_pk:
     [ !Pk(A, pubkey) ]
   --&gt;
@@ -204,7 +204,7 @@ Finished loading theories ... server ready at
     http://127.0.0.1:3001
 
 21/Jun/2016:09:16:01 +0200 [Info#yesod-core] Application launched @(yesod_83PxojfItaB8w9Rj9nFdZm:Yesod.Core.Dispatch ./Yesod/Core/Dispatch.hs:157:11)</code></pre>
-<p>At this point, if there were any syntax or wellformedness errors (for example if the same fact is used with different arities an error would be displayed) they would be displayed. See the part on <a href="008_modeling-issues.html#sec:modeling-issues">Modeling Issues</a> for details on how to deal with such errors.</p>
+<p>At this point, if there were any syntax or wellformedness errors (for example if the same fact is used with different arities an error would be displayed) they would be displayed. See the part on <a href="009_modeling-issues.html#sec:modeling-issues">Modeling Issues</a> for details on how to deal with such errors.</p>
 <p>However, there are no such errors in our example, and thus the above command will start a web-server that loads all security protocol theories in the same directory as FirstExample.spthy. Point your browser to</p>
 <p><a href="http://localhost:3001" class="uri">http://localhost:3001</a></p>
 <p>and you will see the following welcome screen:</p>
@@ -402,7 +402,7 @@ end</code></pre>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>When using the default Tamarin setup, there is only one public channel modeling the network controlled by the adversary, i.e., the adversary receives all messages from the <code>Out( )</code> facts, and generates the protocol’s inputs in the <code>In( )</code> facts. Private channels can be added if required, see <a href="009_advanced-features.html#sec:channel-models">Channel Models</a> for details.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>When using the default Tamarin setup, there is only one public channel modeling the network controlled by the adversary, i.e., the adversary receives all messages from the <code>Out( )</code> facts, and generates the protocol’s inputs in the <code>In( )</code> facts. Private channels can be added if required, see <a href="010_advanced-features.html#sec:channel-models">Channel Models</a> for details.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p>The ‘i’ historically stems from “intruder”, but here we use “adversary”.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>

@@ -73,7 +73,7 @@ built_ins      := &#39;diffie-hellman&#39;
                 | &#39;asymmetric-encryption&#39; | &#39;signing&#39;
                 | &#39;bilinear-pairing&#39; | &#39;xor&#39;
                 | &#39;multiset&#39; | &#39;revealing-signing&#39;</code></pre>
-<p>A global heuristic sets the default heuristic that will be used when autoproving lemmas in the file. The specified heuristic can be any of those discussed in Section <a href="009_advanced-features.html#sec:heuristics">Heuristics</a>.</p>
+<p>A global heuristic sets the default heuristic that will be used when autoproving lemmas in the file. The specified heuristic can be any of those discussed in Section <a href="010_advanced-features.html#sec:heuristics">Heuristics</a>.</p>
 <pre><code>global_heuristic := &#39;heuristic&#39; &#39;:&#39; heuristic
 heuristic        := alpha+</code></pre>
 <p>Multiset rewriting rules are specified as follows. The protocol corresponding to a security protocol theory is the set of all multiset rewriting rules specified in the body of the theory.</p>
@@ -159,7 +159,7 @@ nonnode_var := [&#39;$&#39;] ident [&#39;.&#39; natural]         // &#39;pub&#39
 fact  := [&#39;!&#39;] ident &#39;(&#39; [msetterm (&#39;,&#39; msetterm)*] &#39;)&#39; [fact_annotes]
 fact_annotes := &#39;[&#39; fact_annote (&#39;,&#39; fact_annote)* &#39;]&#39;
 fact_annote  := &#39;+&#39; | &#39;-&#39; | &#39;no_precomp&#39;</code></pre>
-<p>Fact annotations can be used to adjust the priority of corresponding goals in the heuristics, or influence the precomputation step performed by Tamarin, as described in Section <a href="009_advanced-features.html#sec:fact-annotations">Advanced Features</a>.</p>
+<p>Fact annotations can be used to adjust the priority of corresponding goals in the heuristics, or influence the precomputation step performed by Tamarin, as described in Section <a href="010_advanced-features.html#sec:fact-annotations">Advanced Features</a>.</p>
 <p>Formulas are trace formulas as described previously. Note that we are a bit more liberal with respect to guardedness. We accept a conjunction of atoms as guards.</p>
 <pre><code>formula     := imp [(&#39;&lt;=&gt;&#39; | &#39;⇔&#39;) imp]
 imp         := disjunction [(&#39;==&gt;&#39; | &#39;⇒&#39;) imp]

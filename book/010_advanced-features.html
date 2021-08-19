@@ -211,7 +211,7 @@ lemma nonce_secret_receiver:
 
 lemma message_authentication: 
     &quot;All I n #j. Authentic(I,n) @j ==&gt; Ex #i. Send(I,n) @i &amp;i&lt;j&quot;</code></pre>
-<p>We state the nonce secrecy property for the initiator and responder with the <code>nonce_secret_initiator</code> and the <code>nonce_secret_receiver</code> lemma, respectively. The lemma <code>message_authentication</code> specifies a <a href="006_property-specification.html#sec:message-authentication">message authentication</a> property for the responder role.</p>
+<p>We state the nonce secrecy property for the initiator and responder with the <code>nonce_secret_initiator</code> and the <code>nonce_secret_receiver</code> lemma, respectively. The lemma <code>message_authentication</code> specifies a <a href="007_property-specification.html#sec:message-authentication">message authentication</a> property for the responder role.</p>
 <p>If we analyze the protocol with insecure channels, none of the properties hold because the adversary can learn the nonce sent by the initiator and send his own one to the receiver.</p>
 <h4 id="confidential-channel-rules">Confidential Channel Rules</h4>
 <p>Let us now modify the protocol such that the same message is sent over a confidential channel. By confidential we mean that only the intended receiver can read the message but everyone, including the adversary, can send a message on this channel.</p>

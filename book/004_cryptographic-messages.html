@@ -86,7 +86,7 @@ snd(pair(x,y)) = y</code></pre>
 <dd><p>This theory models a hash function. It defines the function symbol <code>h/1</code> and no equations.</p>
 </dd>
 <dt><code>asymmetric-encryption</code>:</dt>
-<dd><p>This theory models a public key encryption scheme. It defines the function symbols <code>aenc/2</code>, <code>adec/2</code>, and <code>pk/1</code>, which are related by the equation <code>adec(aenc(m, pk(sk)), sk) = m</code>. Note that as described in <a href="014_syntax_description.html">Syntax Description</a>, <code>aenc{x,y}pkB</code> is syntactic sugar for <code>aenc(&lt;x,y&gt;, pkB)</code>. <!-- This is otherwise not mentioned until Ch14: Syntax Description --></p>
+<dd><p>This theory models a public key encryption scheme. It defines the function symbols <code>aenc/2</code>, <code>adec/2</code>, and <code>pk/1</code>, which are related by the equation <code>adec(aenc(m, pk(sk)), sk) = m</code>. Note that as described in <a href="015_syntax_description.html">Syntax Description</a>, <code>aenc{x,y}pkB</code> is syntactic sugar for <code>aenc(&lt;x,y&gt;, pkB)</code>. <!-- This is otherwise not mentioned until Ch14: Syntax Description --></p>
 </dd>
 <dt><code>signing</code>:</dt>
 <dd><p>This theory models a signature scheme. It defines the function symbols <code>sign/2</code>, <code>verify/3</code>, <code>pk/1</code>, and <code>true</code>, which are related by the equation <code>verify(sign(m,sk),m,pk(sk)) = true</code>.</p>
@@ -130,7 +130,7 @@ x ⊕ x       = zero</code></pre>
 <dd><p>This theory introduces the associative-commutative operator <code>+</code> which is usually used to model multisets.</p>
 </dd>
 <dt><code>reliable-channel</code>:</dt>
-<dd><p>This theory introduces support for reliable channel in the <a href="006_protocol-specification-processes.md">process calculus</a>. Messages on the channel (i.e., public name) <code>'r'</code> are guaranteed to arrive eventually. There is only one other channel, the public and unreliable channel <code>'c'</code>. Note that multiple reliable channels can be modelled using pattern matchting:</p>
+<dd><p>This theory introduces support for reliable channel in the <a href="006_protocol-specification-processes.html">process calculus</a>. Messages on the channel (i.e., public name) <code>'r'</code> are guaranteed to arrive eventually. There is only one other channel, the public and unreliable channel <code>'c'</code>. Note that multiple reliable channels can be modelled using pattern matchting:</p>
 <pre><code>  out(&#39;r&#39;,&lt;&#39;channelA&#39;,&#39;Hello&#39;)              
 | out(&#39;r&#39;,&lt;&#39;channelB&#39;,&#39;Bonjour&#39;)
 | in(&#39;r&#39;,&lt;&#39;channelA&#39;,x); event PrepareTea()
