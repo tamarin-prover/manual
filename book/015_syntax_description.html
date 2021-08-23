@@ -78,15 +78,18 @@ built_ins      := &#39;diffie-hellman&#39;
 goal_ranking          := standard_goal_ranking | oracle_goal_ganking
 standard_goal_ranking := &#39;C&#39; | &#39;I&#39; | &#39;P&#39; | &#39;S&#39; | &#39;c&#39; | &#39;i&#39; | &#39;p&#39; | &#39;s&#39;
 oracle_goal_ranking   := &#39;o&#39; &#39;&quot;&#39; [^&#39;&quot;&#39;]* &#39;&quot;&#39; | &#39;O&#39; &#39;&quot;&#39; [^&#39;&quot;&#39;]* &#39;&quot;&#39;</code></pre>
-<p>Multiset rewriting rules are specified as follows. The protocol corresponding to a security protocol theory is the set of all multiset rewriting rules specified in the body of the theory.</p>
-<pre><code>rule := &#39;rule&#39; [modulo] ident [rule_attrs] &#39;:&#39;
+<p>Multiset rewriting rules are specified as follows. The protocol corresponding to a security protocol theory is the set of all multiset rewriting rules specified in the body of the theory. Rule variants can be explicitly given, as well as the left and right instances of a rule in diff-mode. (When called with <code>--diff</code>, Tamarin will parse <code>diff_rule</code> instead of <code>rule</code>).</p>
+<pre><code>rule        := simple_rule [variants]
+diff_rule   := simple_rule [&#39;left&#39; rule &#39;right&#39; rule]
+simple_rule := &#39;rule&#39; [modulo] ident [rule_attrs] &#39;:&#39;
         [let_block]
         &#39;[&#39; facts &#39;]&#39; ( &#39;--&gt;&#39; | &#39;--[&#39; facts &#39;]-&gt;&#39;) &#39;[&#39; facts &#39;]&#39;
-modulo     := &#39;(&#39; &#39;modulo&#39; (&#39;E&#39; | &#39;AC&#39;) &#39;)&#39;
-rule_attrs := &#39;[&#39; rule_attr (&#39;,&#39; rule_attr)* &#39;]&#39;
-rule_attr  := (&#39;color=&#39; | &#39;colour=&#39;) hexcolor
-let_block  := &#39;let&#39; (msg_var &#39;=&#39; msetterm)+ &#39;in&#39;
-msg_var    := ident [&#39;.&#39; natural] [&#39;:&#39; &#39;msg&#39;]</code></pre>
+variants    := &#39;variants&#39; simple_rule (&#39;,&#39; simple_rule)*
+modulo      := &#39;(&#39; &#39;modulo&#39; (&#39;E&#39; | &#39;AC&#39;) &#39;)&#39;
+rule_attrs  := &#39;[&#39; rule_attr (&#39;,&#39; rule_attr)* &#39;]&#39;
+rule_attr   := (&#39;color=&#39; | &#39;colour=&#39;) hexcolor
+let_block   := &#39;let&#39; (msg_var &#39;=&#39; msetterm)+ &#39;in&#39;
+msg_var     := ident [&#39;.&#39; natural] [&#39;:&#39; &#39;msg&#39;]</code></pre>
 <p>Rule annotations do not influence the rule’s semantics. A color is represented as a triplet of 8 bit hexadecimal values optionally preceded by ‘#’, and is used as the background color of the rule when it is rendered in graphs.</p>
 <p>The let-block allows more succinct specifications. The equations are applied in a bottom-up fashion. For example,</p>
 <pre><code>let x = y
@@ -108,7 +111,7 @@ lemma_attr       := &#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39
                          &#39;hide_lemma=&#39; ident | &#39;heuristic=&#39; goalRanking+
 trace_quantifier := &#39;all-traces&#39; | &#39;exists-trace&#39;</code></pre>
 <p>In observational equivalence mode, lemmas can be associated to one side.</p>
-<pre><code>lemma_attrs      := &#39;[&#39; (&#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
+<pre><code>lemma_attrs      := &#39;[&#39; (&#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; |
                          &#39;hide_lemma=&#39; ident | &#39;heuristic=&#39; goalRanking+ |
                          &#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
 <p>A proof skeleton is a complete or partial proof as output by the Tamarin prover. It indicates the proof method used at each step, which may include multiple cases.</p>

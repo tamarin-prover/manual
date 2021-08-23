@@ -186,11 +186,7 @@ this?**-->
 <p>To be able to add the sources lemma, Tamarin needs to modify the protocol rules of the loaded theory in two ways:</p>
 <ol type="1">
 <li>By adding the necessary annotations which will be used in the lemma to the protocol rules. All added annotations start with <code>AUTO_IN_</code> or <code>AUTO_OUT_</code>, and can be seen, e.g., by clicking on <code>Multiset rewriting rules</code> in interactive mode.</li>
-<li>By splitting protocol rules into their variants w.r.t. the equational theory, if these variants exists. This is necessary to be able to place the annotations. Unfortunately, at the moment, this prevents exporting and re-importing such a theory as Tamarin’s parser does not (yet) handle explicit rule variants. <!-- Will soon be :
-  When exporting such a theory from Tamarin using, e.g., the
-   ``Download`` button in the interactive mode, Tamarin will export the rule(s)
-    together with their (annotated) variants.
---></li>
+<li>By splitting protocol rules into their variants w.r.t. the equational theory, if these variants exists. This is necessary to be able to place the annotations. When exporting such a theory from Tamarin using, e.g., the <code>Download</code> button in the interactive mode, Tamarin will export the rule(s) together with their (annotated) variants, which can be re-imported as usual.</li>
 </ol>
 <div id="refs" class="references hanging-indent" role="doc-bibliography">
 <div id="ref-esorics2020">
