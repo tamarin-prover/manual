@@ -50,64 +50,193 @@
     <div id='page'>
 <p class="halfbreak">
 </p>
-<h1 id="sec:model-specification-proc">Model Specification using Processes</h1>
-<p>In this section, we provide an informal description of the process calculus now integrated in tamarin. It is called SAPIC, which stands for “Stateful Applied PI-Calculus”. The full details of this model can be found in <span class="citation" data-cites="KK-jcs16">(Kremer and Künnemann 2016)</span> and <span class="citation" data-cites="BaDrKr-2016-liveness">(Backes et al. 2017)</span>.</p>
-<p>A Protocol can be modelled in terms of rules or as a (single) process. The process is translated into a set of rules that adhere to the semantics of the process calculus. It is even possible to mix a process declaration and a set of rules, although this is not recommended, as the interactions between the rules and the process depend on how precisely this translation is defined.</p>
+<h1 id="sec:model-specification-proc">Model Specification using
+Processes</h1>
+<p>In this section, we provide an informal description of the process
+calculus now integrated in tamarin. It is called SAPIC, which stands for
+“Stateful Applied PI-Calculus”. The full details of this model can be
+found in <span class="citation" data-cites="KK-jcs16">(Kremer and
+Künnemann 2016)</span> and <span class="citation"
+data-cites="BaDrKr-2016-liveness">(Backes et al. 2017)</span>.</p>
+<p>A Protocol can be modelled in terms of rules or as a (single)
+process. The process is translated into a set of rules that adhere to
+the semantics of the process calculus. It is even possible to mix a
+process declaration and a set of rules, although this is not
+recommended, as the interactions between the rules and the process
+depend on how precisely this translation is defined.</p>
 <h2 id="sec:proc">Processes</h2>
-<p><img src="../images/sapic-overview.png" alt="Syntax of SAPIC, where a is a fresh name, x a variable, m and n terms, F a fact and P a predicate." /><br />
+<p><img src="../images/sapic-overview.png"
+alt="Syntax of SAPIC, where a is a fresh name, x a variable, m and n terms, F a fact and P a predicate." /><br />
 </p>
-<p>The SAPIC calculus is a dialect of the applied-pi calculus with additional features for storing, retrieving and modifying global state.</p>
+<p>The SAPIC calculus is a dialect of the applied-pi calculus with
+additional features for storing, retrieving and modifying global
+state.</p>
 <h3 id="standard-applied-pi-features">Standard applied-pi features</h3>
-<p>The main ingredients for modelling protocols are network communication and parallelism. We start with the network communication and other constructs that model local operation.</p>
-<p>The processes <code>out(m,n); P</code> and <code>in(m,n); P</code> represent the output, respectively input, of message <code>n</code> on channel <code>m</code>. As opposed to the applied pi calculus <span class="citation" data-cites="AF-popl01">(Abadi and Fournet 2001)</span>, SAPiC’s input construct performs pattern matching instead of variable binding.</p>
+<p>The main ingredients for modelling protocols are network
+communication and parallelism. We start with the network communication
+and other constructs that model local operation.</p>
+<p>The processes <code>out(m,n); P</code> and <code>in(m,n); P</code>
+represent the output, respectively input, of message <code>n</code> on
+channel <code>m</code>. As opposed to the applied pi calculus <span
+class="citation" data-cites="AF-popl01">(Abadi and Fournet 2001)</span>,
+SAPiC’s input construct performs pattern matching instead of variable
+binding.</p>
 <!--
 TODO example here
 -->
-<p>If the channel is left out, the public channel <code>'c'</code> is assumed, which is the case in the majority of our examples. This is exactly what the facts <code>In(m)</code> and <code>Out(m)</code> represent. Processes can also branch: <code>if Pred then P else Q</code> will execute either <code>P</code> or <code>Q</code>, depending on whether <code>Pred</code> holds. As of now, only the equality check is implemented, hence Pred always has the form <code>t = t'</code> for terms <code>t</code> and <code>t'</code>.</p>
-<p>The construct <code>new a;P</code> binds the fresh name <code>a</code> in <code>P</code>. Similar to the fact <code>Fr(a)</code>, it models the generation of a fresh, random value.</p>
-<p>The <code>event</code> construct is similar to actions in rules. In fact, it will be translated to actions. Like in rules, events annotate parts of the processes and are useful for stating security properties. Each of these constructs can be thought of as “local” computations. They are separated with a semicolon <code>;</code> and are terminated with <code>0</code>, the terminal process or null process. This is a process that does nothing. It is allowed to omit trailing <code>0</code> processes and <code>else</code>-branches that consist of a <code>0</code> process.</p>
-<p>We can now come to the operations modelling parallelism. <code>P | Q</code> is the parallel execution of processes P and Q. This is used, e.g., to model two participants in a protocol.</p>
-<p><code>!P</code> is the replication of P, which allows an unbounded number of sessions in protocol executions. It can be thought of to be an infinite number of processes <code>P | .. | P</code> running in parallel. If <code>P</code> describes a webserver answering a single query, then <code>!P</code> is the webserver answering queries indefinitely. <code>P+Q</code> denotes external non-deterministic choice, which can be used to model alternatives. In that sense, it is closer to a condition rather than two processes running in parallel: <code>P+Q</code> reduces to <em>either</em> <code>P'</code> or <code>Q'</code>, the follow-up processes or <code>P</code> or <code>Q</code> respectively.</p>
+<p>If the channel is left out, the public channel <code>'c'</code> is
+assumed, which is the case in the majority of our examples. This is
+exactly what the facts <code>In(m)</code> and <code>Out(m)</code>
+represent. Processes can also branch: <code>if Pred then P else Q</code>
+will execute either <code>P</code> or <code>Q</code>, depending on
+whether <code>Pred</code> holds. As of now, only the equality check is
+implemented, hence Pred always has the form <code>t = t'</code> for
+terms <code>t</code> and <code>t'</code>.</p>
+<p>The construct <code>new a;P</code> binds the fresh name
+<code>a</code> in <code>P</code>. Similar to the fact
+<code>Fr(a)</code>, it models the generation of a fresh, random
+value.</p>
+<p>The <code>event</code> construct is similar to actions in rules. In
+fact, it will be translated to actions. Like in rules, events annotate
+parts of the processes and are useful for stating security properties.
+Each of these constructs can be thought of as “local” computations. They
+are separated with a semicolon <code>;</code> and are terminated with
+<code>0</code>, the terminal process or null process. This is a process
+that does nothing. It is allowed to omit trailing <code>0</code>
+processes and <code>else</code>-branches that consist of a
+<code>0</code> process.</p>
+<p>We can now come to the operations modelling parallelism.
+<code>P | Q</code> is the parallel execution of processes P and Q. This
+is used, e.g., to model two participants in a protocol.</p>
+<p><code>!P</code> is the replication of P, which allows an unbounded
+number of sessions in protocol executions. It can be thought of to be an
+infinite number of processes <code>P | .. | P</code> running in
+parallel. If <code>P</code> describes a webserver answering a single
+query, then <code>!P</code> is the webserver answering queries
+indefinitely. <code>P+Q</code> denotes external non-deterministic
+choice, which can be used to model alternatives. In that sense, it is
+closer to a condition rather than two processes running in parallel:
+<code>P+Q</code> reduces to <em>either</em> <code>P'</code> or
+<code>Q'</code>, the follow-up processes or <code>P</code> or
+<code>Q</code> respectively.</p>
 <h3 id="manipulation-of-global-state">Manipulation of global state</h3>
 <p>The remaining constructs are used to manipulate global state.</p>
 <ul>
-<li>The construct <code>insert m,n; P</code> binds the value <code>n</code> to the key <code>m</code>. Successive inserts overwrite this binding. The store is global, but as <code>m</code> is a term, it can be used to define name spaces. E.g., if a webserver is identified by a name <code>w_id</code>, then it could prefix it’s store as follows: <code>insert &lt;'webservers',w_id,'store'&gt;, data; P</code>.</li>
+<li>The construct <code>insert m,n; P</code> binds the value
+<code>n</code> to the key <code>m</code>. Successive inserts overwrite
+this binding. The store is global, but as <code>m</code> is a term, it
+can be used to define name spaces. E.g., if a webserver is identified by
+a name <code>w_id</code>, then it could prefix it’s store as follows:
+<code>insert &lt;'webservers',w_id,'store'&gt;, data; P</code>.</li>
 <li>The construct <code>delete m; P</code> ‘undefines’ the binding.</li>
-<li>The construct <code>lookup m as x in P else Q</code> allows for retrieving the value associated to <code>m</code> and binds it to the variable <code>x</code> if entering <code>P</code>. If the mapping is undefined for <code>m</code>, the process behaves as <code>Q</code>.</li>
-<li>The <code>lock</code> and <code>unlock</code> constructs are used to gain or waive exclusive access to a resource <code>m</code>, in the style of Dijkstra’s binary semaphores: if a term <code>m</code> has been locked, any subsequent attempt to lock <code>m</code> will be blocked until <code>m</code> has been unlocked. This is essential for writing protocols where parallel processes may read and update a common memory.</li>
+<li>The construct <code>lookup m as x in P else Q</code> allows for
+retrieving the value associated to <code>m</code> and binds it to the
+variable <code>x</code> if entering <code>P</code>. If the mapping is
+undefined for <code>m</code>, the process behaves as
+<code>Q</code>.</li>
+<li>The <code>lock</code> and <code>unlock</code> constructs are used to
+gain or waive exclusive access to a resource <code>m</code>, in the
+style of Dijkstra’s binary semaphores: if a term <code>m</code> has been
+locked, any subsequent attempt to lock <code>m</code> will be blocked
+until <code>m</code> has been unlocked. This is essential for writing
+protocols where parallel processes may read and update a common
+memory.</li>
 </ul>
-<p>There is a hidden feature for experts: inline multiset-rewrite rules: <code>[l] --[a]-&gt; r; P</code> is a valid process. Embedded rules apply if their preconditions apply (i.e., the facts on the left-hand-side are present) <strong>and</strong> the process is reduced up to this rule. If the rule applies in the current state, the process reduces to <code>P</code>. We advice to avoid these rules whenever possible, as they run counter to the aim of SAPIC: to provide clear, provably correct high-level abstractions for the modelling of protocols. Note also that the state-manipulation constructs <code>lookup x as v</code>, <code>insert x,y</code> and <code>delete x</code> manage state by emitting actions <code>IsIn(x,y')</code>, <code>Insert(x,y)</code> and <code>Delete(x)</code> and enforcing their proper semantics via restrictions. For example: an action <code>IsIn(x,y)</code>, which expresses a succesful lookup, requires that an action <code>Insert(x,y)</code> has occurred previously, and in between, no other <code>Insert(x,y')</code> or <code>Delete(x)</code> action has changed the global store at the position <code>x</code>. Hence, the global store is distinct from the set of facts in the current state.</p>
-<h3 id="enforcing-local-progress-optional">Enforcing local progress (optional)</h3>
-<p>The translation from processes can be modified so it enforces a different semantics. In this semantics, the set of traces consists of only those where a process has been reduced <strong>as far as possible</strong>. A process can reduce unless it is waiting for some input, it is under replication, or unless it is already reduced up to the 0-process.</p>
+<p>There is a hidden feature for experts: inline multiset-rewrite rules:
+<code>[l] --[a]-&gt; r; P</code> is a valid process. Embedded rules
+apply if their preconditions apply (i.e., the facts on the
+left-hand-side are present) <strong>and</strong> the process is reduced
+up to this rule. If the rule applies in the current state, the process
+reduces to <code>P</code>. We advice to avoid these rules whenever
+possible, as they run counter to the aim of SAPIC: to provide clear,
+provably correct high-level abstractions for the modelling of protocols.
+Note also that the state-manipulation constructs
+<code>lookup x as v</code>, <code>insert x,y</code> and
+<code>delete x</code> manage state by emitting actions
+<code>IsIn(x,y')</code>, <code>Insert(x,y)</code> and
+<code>Delete(x)</code> and enforcing their proper semantics via
+restrictions. For example: an action <code>IsIn(x,y)</code>, which
+expresses a succesful lookup, requires that an action
+<code>Insert(x,y)</code> has occurred previously, and in between, no
+other <code>Insert(x,y')</code> or <code>Delete(x)</code> action has
+changed the global store at the position <code>x</code>. Hence, the
+global store is distinct from the set of facts in the current state.</p>
+<h3 id="enforcing-local-progress-optional">Enforcing local progress
+(optional)</h3>
+<p>The translation from processes can be modified so it enforces a
+different semantics. In this semantics, the set of traces consists of
+only those where a process has been reduced <strong>as far as
+possible</strong>. A process can reduce unless it is waiting for some
+input, it is under replication, or unless it is already reduced up to
+the 0-process.</p>
 <pre><code>options: translation-progress</code></pre>
-<p>This can be used to model time-outs. The following process must reduce to either <code>P</code> or <code>out('help');0</code>:</p>
+<p>This can be used to model time-outs. The following process must
+reduce to either <code>P</code> or <code>out('help');0</code>:</p>
 <pre><code>( in(x); P) + (out(&#39;help&#39;);0)</code></pre>
-<p>If the input message received, it will produce regulary, in this example: with <code>P</code>. If the input is not received, there is no other way to progress except for the right-hand side. But progress it must, so the right-hand side can model a recovery protocol.</p>
-<p>In the translated rules, events <code>ProgressFrom_p</code> and <code>ProgressTo_p</code> are added. Here <code>p</code> marks a position that, one reached, requires the corresponding <code>ProgressTo</code> event to appear. This is enforced by restrictions. Note that a process may need to process to more than one position, e.g.,</p>
+<p>If the input message received, it will produce regulary, in this
+example: with <code>P</code>. If the input is not received, there is no
+other way to progress except for the right-hand side. But progress it
+must, so the right-hand side can model a recovery protocol.</p>
+<p>In the translated rules, events <code>ProgressFrom_p</code> and
+<code>ProgressTo_p</code> are added. Here <code>p</code> marks a
+position that, one reached, requires the corresponding
+<code>ProgressTo</code> event to appear. This is enforced by
+restrictions. Note that a process may need to process to more than one
+position, e.g.,</p>
 <pre><code>new a; (new b; 0 | new c; 0)</code></pre>
 <p>progresses to both trailing 0-processes.</p>
 <p>It may also process to one out of many positions, e.g., here</p>
 <pre><code>in(x); if x=&#39;a&#39; then 0 else 0</code></pre>
-<p>More details can be found in the corrsponding paper <span class="citation" data-cites="BaDrKr-2016-liveness">(Backes et al. 2017)</span>. Note that local progress by itself does not guarantee that messages arrive. Recovery protocols often rely on a trusted third party, which is possibly offline most of time, but can be reached using <a href="004_cryptographic-messages.html#sec:builtin-theories">the builtin theory for reliable channels</a>.</p>
-<h3 id="modeling-isolated-execution-environments">Modeling Isolated Execution Environments</h3>
-<p>IEEs, or enclaves, allow to run code inside a secure environment and to provide a certificate of the current state (including the executed program) of the enclave. A localized version of the applied pi-calculus, defined in <span class="citation" data-cites="JKS-eurosp17">(<span class="citeproc-not-found" data-reference-id="JKS-eurosp17"><strong>???</strong></span>)</span> and included in SAPIC, allows to model such environments.</p>
-<p>Processes can be given a unique identifier, which we call location:</p>
+<p>More details can be found in the corrsponding paper <span
+class="citation" data-cites="BaDrKr-2016-liveness">(Backes et al.
+2017)</span>. Note that local progress by itself does not guarantee that
+messages arrive. Recovery protocols often rely on a trusted third party,
+which is possibly offline most of time, but can be reached using <a
+href="004_cryptographic-messages.html#sec:builtin-theories">the builtin
+theory for reliable channels</a>.</p>
+<h3 id="modeling-isolated-execution-environments">Modeling Isolated
+Execution Environments</h3>
+<p>IEEs, or enclaves, allow to run code inside a secure environment and
+to provide a certificate of the current state (including the executed
+program) of the enclave. A localized version of the applied pi-calculus,
+defined in <span class="citation"
+data-cites="JKS-eurosp17">(<strong>JKS-eurosp17?</strong>)</span> and
+included in SAPIC, allows to model such environments.</p>
+<p>Processes can be given a unique identifier, which we call
+location:</p>
 <pre><code>let A = (...)@loc</code></pre>
-<p>Locations can be any term (which may depend on previous inputs). A location is an identifier which allows to talk about its process. Inside a location, a report over some value can be produced:</p>
+<p>Locations can be any term (which may depend on previous inputs). A
+location is an identifier which allows to talk about its process. Inside
+a location, a report over some value can be produced:</p>
 <pre><code>(...
 let x=report(m) in
    ...)@loc</code></pre>
-<p>Some external user can then verify that some value has been produced at a specific location, i.e produced by a specific process or program, by using the <code>check_rep</code> function:</p>
+<p>Some external user can then verify that some value has been produced
+at a specific location, i.e produced by a specific process or program,
+by using the <code>check_rep</code> function:</p>
 <pre><code>if input=check_rep(rep,loc) then</code></pre>
-<p>This will be valid only if <code>rep</code> has been produced by the previous instruction, with <code>m=input</code>.</p>
-<p>An important point about enclaves is that any user, e.g an attacker, can use enclaves, and thus produce reports for its own processes or locations. But if the attacker can produce a report for any location, he can break all security properties associated to it. To this end, the user can define a set of untrusted locations, which amounts to defining a set of processes that he does not trust, by defining a builtin <code>Report</code> predicate:</p>
+<p>This will be valid only if <code>rep</code> has been produced by the
+previous instruction, with <code>m=input</code>.</p>
+<p>An important point about enclaves is that any user, e.g an attacker,
+can use enclaves, and thus produce reports for its own processes or
+locations. But if the attacker can produce a report for any location, he
+can break all security properties associated to it. To this end, the
+user can define a set of untrusted locations, which amounts to defining
+a set of processes that he does not trust, by defining a builtin
+<code>Report</code> predicate:</p>
 <pre><code>predicates:
 Report(x,y) &lt;=&gt; phi(x,y)</code></pre>
-<p>The attacker can then produce any <code>report(m)@loc</code> if <code>phi(m,loc)</code> is true.</p>
-<p>More details can be found in the corresponding paper <span class="citation" data-cites="JKS-eurosp17">(<span class="citeproc-not-found" data-reference-id="JKS-eurosp17"><strong>???</strong></span>)</span>, and the examples.</p>
+<p>The attacker can then produce any <code>report(m)@loc</code> if
+<code>phi(m,loc)</code> is true.</p>
+<p>More details can be found in the corresponding paper <span
+class="citation"
+data-cites="JKS-eurosp17">(<strong>JKS-eurosp17?</strong>)</span>, and
+the examples.</p>
 <h2 id="syntactic-sugar">Syntactic sugar</h2>
-<h3 id="process-declarations-using-let">Process declarations using <code>let</code></h3>
-<p>It is advisable to structure processes around the protocol roles they represent. These can be declared using the let construct:</p>
+<h3 id="process-declarations-using-let">Process declarations using
+<code>let</code></h3>
+<p>It is advisable to structure processes around the protocol roles they
+represent. These can be declared using the let construct:</p>
 <pre><code>let Webserver = in(&lt;&#39;Get&#39;,identity..&gt;); ..
 
 let Webbrowser = ..
@@ -117,28 +246,46 @@ let Webbrowser = ..
 <pre><code>let A = ..
 let B = A | A
 !B</code></pre>
-<p>Other process calculi, e.g., ProVerif’s dialect of the applied-pi calculus, only allow variables in inputs. While it is sometimes clearer to write a pattern in a letblock, it may confuse users that expect the <code>in</code> construct to bind a variable:</p>
+<p>Other process calculi, e.g., ProVerif’s dialect of the applied-pi
+calculus, only allow variables in inputs. While it is sometimes clearer
+to write a pattern in a letblock, it may confuse users that expect the
+<code>in</code> construct to bind a variable:</p>
 <pre><code>let pat_m1 = &lt;x,y&gt; in
 in(pat_m1)</code></pre>
-<p>To avoid unexpected behaviour, we allow a let-expression to apply to a single-variable term in an <code>in</code> only if the variable is prefixed with <code>pat_</code>, as in the above example.</p>
-<h3 id="using-let-binding-in-processes">Using ‘let’ binding in processes</h3>
-<p>Similar to rules, <code>let</code>-bindings are allowed to faciliate writing processes where a term occur several times (possibly as a subterm) within the process rule. The bindings can even be nested:</p>
+<p>To avoid unexpected behaviour, we allow a let-expression to apply to
+a single-variable term in an <code>in</code> only if the variable is
+prefixed with <code>pat_</code>, as in the above example.</p>
+<h3 id="using-let-binding-in-processes">Using ‘let’ binding in
+processes</h3>
+<p>Similar to rules, <code>let</code>-bindings are allowed to faciliate
+writing processes where a term occur several times (possibly as a
+subterm) within the process rule. The bindings can even be nested:</p>
 <pre><code>let foo1 = h(bar)
     foo2 = &lt;&#39;bars&#39;, foo1&gt;
     ...
     var5 = pk(~x)
         in
         in(&lt;&#39;test&#39;,y&gt;); let response = &lt;foo2,y&gt; in out(response)</code></pre>
-<p>Let-bindings in processes adhere to the same rules as <a href="#sec:let-rules">let-bindings in rules</a>.</p>
-<div id="refs" class="references hanging-indent" role="doc-bibliography">
-<div id="ref-AF-popl01">
-<p>Abadi, Martín, and Cédric Fournet. 2001. “Mobile Values, New Names, and Secure Communication.” In <em>POPL</em>, 104–15. ACM.</p>
+<p>Let-bindings in processes adhere to the same rules as <a
+href="#sec:let-rules">let-bindings in rules</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent"
+role="doc-bibliography">
+<div id="ref-AF-popl01" class="csl-entry" role="doc-biblioentry">
+Abadi, Martín, and Cédric Fournet. 2001. <span>“Mobile Values, New
+Names, and Secure Communication.”</span> In <em>POPL</em>, 104–15. ACM.
 </div>
-<div id="ref-BaDrKr-2016-liveness">
-<p>Backes, Michael, Jannik Dreier, Steve Kremer, and Robert Künnemann. 2017. “A Novel Approach for Reasoning About Liveness in Cryptographic Protocols and Its Application to Fair Exchange.” In <em>EuroS&amp;P</em>. IEEE Computer Society.</p>
+<div id="ref-BaDrKr-2016-liveness" class="csl-entry"
+role="doc-biblioentry">
+Backes, Michael, Jannik Dreier, Steve Kremer, and Robert Künnemann.
+2017. <span>“A Novel Approach for Reasoning about Liveness in
+Cryptographic Protocols and Its Application to Fair Exchange.”</span> In
+<em>EuroS&amp;p</em>. IEEE Computer Society.
 </div>
-<div id="ref-KK-jcs16">
-<p>Kremer, Steve, and Robert Künnemann. 2016. “Automated Analysis of Security Protocols with Global State.” <em>Journal of Computer Security</em> 24 (5): 583–616. <a href="https://doi.org/10.3233/JCS-160556">https://doi.org/10.3233/JCS-160556</a>.</p>
+<div id="ref-KK-jcs16" class="csl-entry" role="doc-biblioentry">
+Kremer, Steve, and Robert Künnemann. 2016. <span>“Automated Analysis of
+Security Protocols with Global State.”</span> <em>Journal of Computer
+Security</em> 24 (5): 583–616. <a
+href="https://doi.org/10.3233/JCS-160556">https://doi.org/10.3233/JCS-160556</a>.
 </div>
 </div>
     </div>
