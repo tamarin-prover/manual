@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tamarin Prover Manual</title>
+  <link rel="stylesheet" type="text/css" href="book.css">
+  <script src="book.js"></script>
+  <link rel="stylesheet" href="styles/github.css">
+  <!--    <script src="highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+-->
+  </head>
+
+<body class="tamarindoc">
+  <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+  <div id="nav">
+    <button id="toggle-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </div>
+  <div id='toc' class='mobile-hidden'>
+    <ul class='chapter'>
+      <!-- <li><a href='000_prelims.html'><b>0. </b>Preliminaries</a></li> -->
+      <li><a href='001_introduction.html'><b>1. </b> Introduction</a></li>
+      <li><a href='002_installation.html'><b>2. </b> Installation</a></li>
+      <li><a href='003_example.html'><b>3. </b> First Example</a></li>
+      <li><a href='004_cryptographic-messages.html'><b>4. </b> Cryptographic Messages</a></li>
+      <li><a href='005_protocol-specification-rules.html'><b>5. </b> Protocol Specification using Rules</a></li>
+      <li><a href='006_protocol-specification-processes.html'><b>6. </b> Protocol Specification using Processes</a></li>
+      <li><a href='007_property-specification.html'><b>7. </b> Property Specification</a></li>
+      <li><a href='008_accountability.html'><b>8. </b> Accountability</a></li>
+      <li><a href='009_precomputation.html'><b>9. </b> Precomputation</a></li>
+      <li><a href='010_modeling-issues.html'><b>10. </b> Modeling Issues</a></li>
+      <li><a href='011_advanced-features.html'><b>11. </b> Advanced Features</a></li>
+      <li><a href='012_case-studies.html'><b>12.</b> Case Studies</a></li>
+      <li><a href='013_toolchains.html'><b>13.</b> Toolchains</a></li>
+      <li><a href='014_limitations.html'><b>14.</b> Limitations</a></li>
+      <li><a href='015_contact-and-further-reading.html'><b>15.</b> Contact Information and Further Reading</a></li>
+      <li><a href='016_syntax_description.html'><b>16.</b> Syntax Description</a></li>
+    </ul>
+  </div>
+  <div id='page-wrapper'>
+    <div id='page'>
+      <p class="halfbreak">
+      </p>
+      <h1 id="sec:precomputation">Precomputation: refining sources</h1>
+      <p>In this section, we will explain some of the aspects of the
+      precomputation performed by Tamarin. This is relevant for users
+      that model complex protocols since they may at some point run into
+      so-called remaining <a href="#sec:openchains">partial
+      deconstructions</a>, which can be problematic for
+      verification.</p>
+      <p>To illustrate the concepts, consider the example of the
+      Needham-Schroeder-Lowe Public Key Protocol, given here in
+      Alice&amp;Bob notation:</p>
+      <pre class="tamarin"><code>  protocol NSLPK3 {
+    1. I -&gt; R: {&#39;1&#39;,ni,I}pk(R)
+    2. I &lt;- R: {&#39;2&#39;,ni,nr,R}pk(I)
+    3. I -&gt; R: {&#39;3&#39;,nr}pk(R)
+
+  }</code></pre>
+      <p>It is specified in Tamarin by the following rules:</p>
+      <pre class="tamarin"><code>rule Register_pk:
+  [ Fr(~ltkA) ]
+  --&gt;
+  [ !Ltk($A, ~ltkA), !Pk($A, pk(~ltkA)), Out(pk(~ltkA)) ]
+
+rule Reveal_ltk:
+  [ !Ltk(A, ltkA) ] --[ RevLtk(A)    ]-&gt; [ Out(ltkA) ]
+
+rule I_1:
+  let m1 = aenc{&#39;1&#39;, ~ni, $I}pkR
+  in
+    [ Fr(~ni), !Pk($R, pkR) ]
+  --[ OUT_I_1(m1)]-&gt;
+    [ Out( m1 ), St_I_1($I, $R, ~ni)]
+
+rule R_1:
+  let m1 = aenc{&#39;1&#39;, ni, I}pk(ltkR)
+      m2 = aenc{&#39;2&#39;, ni, ~nr, $R}pkI
+  in
+    [ !Ltk($R, ltkR), In( m1 ), !Pk(I, pkI), Fr(~nr)]
+  --[ IN_R_1_ni( ni, m1 ), OUT_R_1( m2 ), Running(I, $R, &lt;&#39;init&#39;,ni,~nr&gt;)]-&gt;
+    [ Out( m2 ), St_R_1($R, I, ni, ~nr) ]
+
+rule I_2:
+  let m2 = aenc{&#39;2&#39;, ni, nr, R}pk(ltkI)
+      m3 = aenc{&#39;3&#39;, nr}pkR
+  in
+    [ St_I_1(I, R, ni), !Ltk(I, ltkI), In( m2 ), !Pk(R, pkR) ]
+  --[ IN_I_2_nr( nr, m2), Commit(I, R, &lt;&#39;init&#39;,ni,nr&gt;), Running(R, I, &lt;&#39;resp&#39;,ni,nr&gt;) ]-&gt;
+    [ Out( m3 ), Secret(I,R,nr), Secret(I,R,ni) ]
+
+rule R_2:
+    [ St_R_1(R, I, ni, nr), !Ltk(R, ltkR), In( aenc{&#39;3&#39;, nr}pk(ltkR) ) ]
+  --[ Commit(R, I, &lt;&#39;resp&#39;,ni,nr&gt;)]-&gt;
+    [ Secret(R,I,nr), Secret(R,I,ni)    ]
+
+rule Secrecy_claim:
+  [ Secret(A, B, m) ] --[ Secret(A, B, m) ]-&gt; []
+
+</code></pre>
+      <p>We now want to prove the following lemma:</p>
+      <pre class="tamarin"><code>
+lemma nonce_secrecy:
+  &quot; /* It cannot be that */
+    not(
+        Ex A B s #i.
+          /* somebody claims to have setup a shared secret, */
+          Secret(A, B, s) @ i
+          /* but the adversary knows it */
+        &amp; (Ex #j. K(s) @ j)
+          /* without having performed a long-term key reveal. */
+        &amp; not (Ex #r. RevLtk(A) @ r)
+        &amp; not (Ex #r. RevLtk(B) @ r)
+       )&quot;
+</code></pre>
+      <p>This proof attempt will not terminate due to there being
+      <code>12 partial deconstructions left</code> when looking at this
+      example in the GUI as described in detail below.</p>
+      <h2 id="sec:openchains">Partial deconstructions left</h2>
+      <p>In the precomputation phase, Tamarin goes through all rules and
+      inspects their premises. For each of these facts, Tamarin will
+      precompute a set of possible <em>sources</em>. Each such source
+      represents combinations of rules from which the fact could be
+      obtained. For each fact, this leads to a set of possible sources
+      and we refer to these sets as the <em>raw sources</em>,
+      respectively <em>refined sources</em>.</p>
+      <p>However, for some rules Tamarin cannot resolve where a fact
+      must have come from. We say that a partial deconstruction is left
+      in the raw sources, and we will explain them in more detail
+      below.</p>
+      <p>The existence of such partial deconstructions complicates
+      automated proof generation and often (but not always) means that
+      no proof will be found automatically. For this reason, it is
+      useful for users to be able to find these and examine if it is
+      possible to remove them.</p>
+      <p>In the interactive mode you can find such partial
+      deconstructions as follows. On the top left, under “Raw sources”,
+      one can find the precomputed sources by Tamarin.</p>
+      <p><img src="../images/FindOpenChains1.png" title="Raw sources"
+      style="width:80.0%" alt="Tamarin GUI" /><br />
+      </p>
+      <p>Cases with partial deconstructions will be listed with the text
+      <code>(partial deconstructions)</code> after the case name. The
+      partial deconstructions can be identified by light green arrows in
+      the graph, as in the following example:</p>
+      <p><img src="../images/FindOpenChains2.png"
+      title="Partial deconstructions visible" style="width:100.0%"
+      alt="Partial deconstruction visible in green" /><br />
+      </p>
+      <p>The green arrow indicates that Tamarin cannot exclude the
+      possibility that the adversary can derive any fresh term
+      <code>~t.1</code> with this rule <code>I_2</code>. As we are using
+      an untyped protocol model, the tool cannot determine that
+      <code>nr.7</code> should be a fresh nonce, but that it could be
+      any message. For this reason Tamarin concludes that it can derive
+      any message with this rule.</p>
+      <!--**FIX Cas: In the above, we mention untyped protocol model. Did we explain
+      this?**-->
+      <h3 id="why-partial-deconstructions-complicate-proofs">Why partial
+      deconstructions complicate proofs</h3>
+      <p>To get a better understanding of the problem, consider what
+      happens if we try to prove the lemma <code>nonce_secrecy</code>.
+      If we manually always choose the first case for the proof, we can
+      see that Tamarin derives the secret key to decrypt the output of
+      rule <code>I_2</code> by repeatedly using this rule
+      <code>I_2</code>. More specifically, in <code>a)</code> the output
+      of rule <code>I_2</code> is decrypted by the adversary. To get the
+      relevant key for this, in part <code>b)</code> again the output
+      from rule <code>I_2</code> is decrypted by the adversary. This is
+      done with a key coming from part <code>c)</code> where the same
+      will happen repeatedly.</p>
+      <p><img src="../images/FindOpenChains3_RepetitionHilighted.jpg"
+      title="`I_2` repeatedly" style="width:90.0%"
+      alt="Secret derived by using I_2" /><br />
+      </p>
+      <p>As Tamarin is unable to conclude that the secret key could not
+      have come from the rule <code>I_2</code>, the algorithm derives
+      the secret key that is needed. The proof uses the same strategy
+      recursively but will not terminate.</p>
+      <h2
+      id="using-sources-lemmas-to-mitigate-partial-deconstructions">Using
+      Sources Lemmas to Mitigate Partial Deconstructions</h2>
+      <p>Once we identified the rules and cases in which partial
+      deconstructions occur, we can try to avoid them. A good mechanism
+      to get rid of partial deconstructions is the use of so-called
+      <em>sources lemmas</em>.</p>
+      <p>Sources lemmas are a special case of lemmas, and are applied
+      during Tamarin’s pre-computation. Roughly, verification in Tamarin
+      involves the following steps:</p>
+      <ol type="1">
+      <li><p>Tamarin first determines the possible sources of all
+      premises. We call these the raw sources.</p></li>
+      <li><p>Next, automatic proof mode is used to discharge any sources
+      lemmas using induction.</p></li>
+      <li><p>The sources lemmas are applied to the raw sources, yielding
+      a new set of sources, which we call the refined sources.</p></li>
+      <li><p>Depending on the mode, the other (non-sources) lemmas are
+      now considered manually or automatically using the refined
+      sources.</p></li>
+      </ol>
+      <p>For full technical details, we refer the reader to <span
+      class="citation" data-cites="meierthesis">(Meier 2012)</span>,
+      where these are called type assertions.</p>
+      <p>In our example, we can add the following lemma:</p>
+      <pre class="tamarin"><code>lemma types [sources]:
+  &quot; (All ni m1 #i.
+       IN_R_1_ni( ni, m1) @ i
+       ==&gt;
+       ( (Ex #j. KU(ni) @ j &amp; j &lt; i)
+       | (Ex #j. OUT_I_1( m1 ) @ j)
+       )
+    )
+  &amp; (All nr m2 #i.
+       IN_I_2_nr( nr, m2) @ i
+       ==&gt;
+       ( (Ex #j. KU(nr) @ j &amp; j &lt; i)
+       | (Ex #j. OUT_R_1( m2 ) @ j)
+       )
+    )
+  &quot;
+</code></pre>
+      <p>This sources lemma is applied to the raw sources to compute the
+      refined sources. All non-sources lemmas are proven with the
+      resulting refined sources, while sources lemmas must be proved
+      with the raw sources.</p>
+      <p>This lemma relates the point of instantiation to the point of
+      sending by either the adversary or the communicating partner. In
+      other words, it says that whenever the responder receives the
+      first nonce, either the nonce was known to the adversary or the
+      initiator sent the first message prior to that moment. Similarly,
+      the second part states that whenever the initiator receives the
+      second message, either the adversary knew the corresponding nonce
+      or the responder has sent the second message before. Generally, in
+      a protocol with partial deconstructions left it is advisable to
+      try if the problem can be solved by a sources lemma that considers
+      where a term could be coming from. As in the above example, one
+      idea to do so is by stating that a used term must either have
+      occurred in one of a list of rules before, or it must have come
+      from the adversary.</p>
+      <p>The above sources lemma can be automatically proven by Tamarin.
+      With the sources lemma, Tamarin can then automatically prove the
+      lemma <code>nonce_secrecy</code>.</p>
+      <p>Another possibility is that the partial deconstructions only
+      occur in an undesired application of a rule that we do not wish to
+      consider in our model. In such a case, we can explicitly exclude
+      this application of the rule with a restriction. But, we should
+      ensure that the resulting model is the one we want; so use this
+      with care.</p>
+      <h2
+      id="modelling-tricks-to-mitigate-partial-deconstructions">Modelling
+      tricks to Mitigate Partial Deconstructions</h2>
+      <p>Sometimes partial deconstructions can be removed by applying
+      some modelling tricks:</p>
+      <ol type="1">
+      <li><p>If the deconstruction reveals a term <code>t</code> that,
+      intuitively, can be made public anyway, you can add
+      <code>In(t)</code> to the lhs of the rule. If you are not sure if
+      this transformation is sound, you may write a lemma to ensure that
+      the rule can still fire.</p>
+      <p>Example: Counter values are public knowledge, so adding
+      <code>In(c)</code> to the second rule helps here:</p>
+      <pre><code>[] --&gt; [Counter(&#39;1&#39;)]
+
+[Counter(c)] --&gt; [Counter(c+&#39;1&#39;), Out(c+&#39;1&#39;)]
+</code></pre></li>
+      <li><p>Give fresh or public type if you know some values are
+      atomic, but you see that pre-computation tries to deduce
+      non-atomic terms from them. This works only under the assumption
+      that the implementation can enforce the correct assignment, e.g.,
+      by appropriate tagging.</p></li>
+      <li><p>Using pattern matching instead of destructor functions can
+      help distill the main argument of a proof in the design phase or
+      in first stages of modelling. It is valid, and often successful
+      strategy to start with a simplistic modelling and formulate
+      provable lemmas first, and then proceed to refine the model step
+      by step.</p></li>
+      </ol>
+      <h2 id="sec:autosources">Auto-Sources</h2>
+      <p>Tamarin can also try to automatically generate sources lemmas
+      <span class="citation" data-cites="esorics2020">(Cortier, Delaune,
+      and Dreier 2020)</span>. To enable this feature, Tamarin needs to
+      be started using the command line parameter
+      <code>--auto-sources</code>.</p>
+      <p>When Tamarin is called using <code>--auto-sources</code>, it
+      will check, for each theory it loads, whether the theory contains
+      partial deconstructions, and whether there is a sources lemma. If
+      there are partial deconstructions and there is no sources lemma,
+      it will try to automatically generate a suitable lemma, called
+      <code>AUTO_typing</code>, and added to the theory’s list of
+      lemmas.</p>
+      <p>This works in many cases, note however that there is no
+      guarantee that the generated lemma is (i) sufficient to remove all
+      partial deconstructions and (ii) correct - so you still need to
+      check whether all partial deconstructions are resolved, and to
+      prove the lemma’s correctness in Tamarin, as usual.</p>
+      <p>Cases where Tamarin may fail to generate a sufficient or
+      correct sources lemma include in particular theories using non
+      subterm convergent equations or AC symbols, or cases where partial
+      deconstruction stem from state facts rather than inputs and
+      outputs.</p>
+      <p>To be able to add the sources lemma, Tamarin needs to modify
+      the protocol rules of the loaded theory in two ways:</p>
+      <ol type="1">
+      <li>By adding the necessary annotations which will be used in the
+      lemma to the protocol rules. All added annotations start with
+      <code>AUTO_IN_</code> or <code>AUTO_OUT_</code>, and can be seen,
+      e.g., by clicking on <code>Multiset rewriting rules</code> in
+      interactive mode.</li>
+      <li>By splitting protocol rules into their variants w.r.t. the
+      equational theory, if these variants exists. This is necessary to
+      be able to place the annotations. When exporting such a theory
+      from Tamarin using, e.g., the <code>Download</code> button in the
+      interactive mode, Tamarin will export the rule(s) together with
+      their (annotated) variants, which can be re-imported as
+      usual.</li>
+      </ol>
+      <div id="refs" class="references csl-bib-body hanging-indent"
+      role="doc-bibliography">
+      <div id="ref-esorics2020" class="csl-entry"
+      role="doc-biblioentry">
+      Cortier, Véronique, Stéphanie Delaune, and Jannik Dreier. 2020.
+      <span>“<span class="nocase">Automatic generation of sources lemmas
+      in Tamarin: towards automatic proofs of security
+      protocols</span>.”</span> In <em><span class="nocase">ESORICS 2020
+      - 25th European Symposium on Research in Computer
+      Security</span></em>. Guilford, United Kingdom. <a
+      href="https://hal.archives-ouvertes.fr/hal-02903620">https://hal.archives-ouvertes.fr/hal-02903620</a>.
+      </div>
+      <div id="ref-meierthesis" class="csl-entry"
+      role="doc-biblioentry">
+      Meier, Simon. 2012. <span>“Advancing Automated Security Protocol
+      Verification.”</span> {PhD} dissertation, ETH Zurich. <a
+      href="http://dx.doi.org/10.3929/ethz-a-009790675">http://dx.doi.org/10.3929/ethz-a-009790675</a>.
+      </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

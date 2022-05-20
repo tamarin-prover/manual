@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamarin Prover Manual</title>
-    <link rel="stylesheet" type="text/css" href="book.css">
-    <script src="book.js"></script>
-    <link rel="stylesheet" href="styles/github.css">
-<!--    <script src="highlight.pack.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tamarin Prover Manual</title>
+  <link rel="stylesheet" type="text/css" href="book.css">
+  <script src="book.js"></script>
+  <link rel="stylesheet" href="styles/github.css">
+  <!--    <script src="highlight.pack.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 -->
-    </head>
+  </head>
+
 <body class="tamarindoc">
-    <!--[if lte IE 8]>
+  <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
         things.
@@ -20,246 +22,258 @@
     <![endif]-->
   <div id="nav">
     <button id="toggle-nav">
-    <span class="sr-only">Toggle navigation</span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
+      <span class="sr-only">Toggle navigation</span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
     </button>
   </div>
   <div id='toc' class='mobile-hidden'>
-  <ul class='chapter'>
-<!-- <li><a href='000_prelims.html'                    ><b>0. </b>Preliminaries</a></li> -->
-<li><a href='001_introduction.html'               ><b>1. </b> Introduction</a></li>
-<li><a href='002_installation.html'               ><b>2. </b> Installation</a></li>
-<li><a href='003_example.html'                    ><b>3. </b> First Example</a></li>
-<li><a href='004_cryptographic-messages.html'     ><b>4. </b> Cryptographic Messages</a></li>
-<li><a href='005_protocol-specification-rules.html'     ><b>5. </b> Protocol Specification using Rules</a></li>
-<li><a href='006_protocol-specification-processes.html'     ><b>6. </b> Protocol Specification using Processes</a></li>
-<li><a href='007_property-specification.html'     ><b>7. </b> Property Specification</a></li>
-<li><a href='008_precomputation.html'             ><b>8. </b> Precomputation</a></li>
-<li><a href='009_modeling-issues.html'            ><b>9. </b> Modeling Issues</a></li>
-<li><a href='010_advanced-features.html'          ><b>10. </b> Advanced Features</a></li>
-<li><a href='011_case-studies.html'               ><b>11.</b> Case Studies</a></li>
-<li><a href='012_toolchains.html'                 ><b>12.</b> Toolchains</a></li>
-<li><a href='013_limitations.html'                ><b>13.</b> Limitations</a></li>
-<li><a href='014_contact-and-further-reading.html'><b>14.</b> Contact Information and Further Reading</a></li>
-<li><a href='015_syntax_description.html'         ><b>15.</b> Syntax Description</a></li>
-  </ul>
+    <ul class='chapter'>
+      <!-- <li><a href='000_prelims.html'><b>0. </b>Preliminaries</a></li> -->
+      <li><a href='001_introduction.html'><b>1. </b> Introduction</a></li>
+      <li><a href='002_installation.html'><b>2. </b> Installation</a></li>
+      <li><a href='003_example.html'><b>3. </b> First Example</a></li>
+      <li><a href='004_cryptographic-messages.html'><b>4. </b> Cryptographic Messages</a></li>
+      <li><a href='005_protocol-specification-rules.html'><b>5. </b> Protocol Specification using Rules</a></li>
+      <li><a href='006_protocol-specification-processes.html'><b>6. </b> Protocol Specification using Processes</a></li>
+      <li><a href='007_property-specification.html'><b>7. </b> Property Specification</a></li>
+      <li><a href='008_accountability.html'><b>8. </b> Accountability</a></li>
+      <li><a href='009_precomputation.html'><b>9. </b> Precomputation</a></li>
+      <li><a href='010_modeling-issues.html'><b>10. </b> Modeling Issues</a></li>
+      <li><a href='011_advanced-features.html'><b>11. </b> Advanced Features</a></li>
+      <li><a href='012_case-studies.html'><b>12.</b> Case Studies</a></li>
+      <li><a href='013_toolchains.html'><b>13.</b> Toolchains</a></li>
+      <li><a href='014_limitations.html'><b>14.</b> Limitations</a></li>
+      <li><a href='015_contact-and-further-reading.html'><b>15.</b> Contact Information and Further Reading</a></li>
+      <li><a href='016_syntax_description.html'><b>16.</b> Syntax Description</a></li>
+    </ul>
   </div>
   <div id='page-wrapper'>
     <div id='page'>
-<p class="halfbreak">
-</p>
-<h1 id="sec:installation">Installation</h1>
-<h2 id="sec:maclinux">Installation on macOS or Linux</h2>
-<p>The easiest way to install Tamarin on macOS or Linux is to use <a
-href="http://brew.sh/">Homebrew</a>:</p>
-<ul>
-<li><code>brew install tamarin-prover/tap/tamarin-prover</code></li>
-</ul>
-<p>It’s separately packaged for</p>
-<ul>
-<li>Arch Linux: <code>pacman -S tamarin-prover</code></li>
-<li>Nixpkgs: <code>nix-env -i tamarin-prover</code></li>
-<li>NixOS: add <code>tamarin-prover</code> to your
-<code>environment.systemPackages</code>.</li>
-</ul>
-<p>You can also <a
-href="https://github.com/tamarin-prover/tamarin-prover/releases">download
-binaries directly from GitHub</a> and <a
-href="#sec:dependencies">manually install dependencies yourself</a>, or
-<a href="#sec:LinuxSrcInstall">compile from source</a>.</p>
-<h2 id="sec:windows">Installation on Windows 10</h2>
-<p>You can install Tamarin (with GUI) under Windows 10 using the <a
-href="https://docs.microsoft.com/windows/wsl/install-win10">Windows
-Subsystem for Linux (WSL)</a>. For performance and compatibility
-reasons, we recommend using WSL2 with Ubuntu. Once you have WSL and
-Ubuntu installed, start the Ubuntu app and install Tamarin following the
-<a href="#sec:maclinux">installation instructions for Linux</a> above.
-You can then run Tamarin inside the the Ubuntu app using the usual
-command. To use the interactive mode, start Tamarin inside the app and
-connect your usual Windows-run browser to <a
-href="http://127.0.0.1:3001">http://127.0.0.1:3001</a>. Your Windows
-files are accessible inside the Ubuntu app via, e.g.,
-<code>/mnt/c</code> for files on drive <code>C:</code>.</p>
-<h2 id="sec:LinuxSrcInstall">Compiling from source</h2>
-<p>You don’t need to compile Tamarin from source unless you are
-developing a new feature for it or you want to use an unreleased
-feature. However, if you do want to install it from source:</p>
-<h3 id="sec:dependencies">Manually install dependencies</h3>
-<p>Tamarin requires Haskell Stack to build and GraphViz and Maude 2.7.1
-(or newer) to run. The easiest way to install these is</p>
-<pre><code>brew install tamarin-prover/tap/maude graphviz haskell-stack</code></pre>
-<p>Alternatively, you can install them yourself:</p>
-<ul>
-<li><p><strong>Haskell Stack</strong> Follow the instructions given at
-<a
-href="https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md">Stack’s
-install page</a>. If you are installing <code>stack</code> with your
-package manager (particularly on Ubuntu), you must run
-<code>stack     upgrade</code> afterwards, as that version of stack is
-usually out-of-date.</p></li>
-<li><p><strong>Graphviz</strong> Graphviz should be available using your
-standard package manager, or directly from <a
-href="http://www.graphviz.org/"
-class="uri">http://www.graphviz.org/</a></p></li>
-<li><p><strong>Maude</strong> You can install Maude using your package
-manager. However, if your package manager installs Maude 2.6, then you
-must install version 2.7.1, <a
-href="http://maude.cs.illinois.edu/w/index.php?title=Maude_download_and_installation#Core_Maude_2.7.1">Core
-Maude 2.7.1</a>, directly from <a href="http://maude.cs.illinois.edu/"
-class="uri">http://maude.cs.illinois.edu/</a>. In this case, you should
-ensure that your <code>PATH</code> includes the install path, so that
-calling <code>maude</code> starts version 2.7.1. Note that even though
-the Maude executable is movable, the <code>prelude.maude</code> file
-must be in the same folder that you start Maude from.</p></li>
-</ul>
-<h3 id="compile">Compile</h3>
-<p>Check out the source code with</p>
-<pre><code>git clone https://github.com/tamarin-prover/tamarin-prover.git</code></pre>
-<p>and you have the current development version ready for compilation.
-If you would prefer to use the master version, just run
-<code>git checkout master</code>.</p>
-<p>In either case, you can then run <code>make default</code> in the new
-directory, which will install an appropriate GHC (the Glasgow Haskell
-Compiler) for your system, including all dependencies. The
-<code>tamarin-prover</code> executable will be copied to
-<code>~/.local/bin/tamarin-prover</code>. Note that this process will
-take between 30 and 60 minutes, as all dependencies (roughly 120) are
-compiled from scratch. If you later pull a newer version of Tamarin (or
-switch to/from the <code>master</code> branch), then only the tool
-itself needs to be recompiled, which takes a few minutes, at most.</p>
-<h2 id="running-tamarin-on-a-remote-machine">Running Tamarin on a remote
-machine</h2>
-<p>If you have access to a faster desktop or server, but prefer using
-Tamarin on your laptop, you can do that. The cpu/memory intensive
-reasoning part of the tool will then run on the faster machine, while
-you just run the GUI locally, i.e., the web browser of your choice. To
-do this, you forward your port 3001 to the port 3001 of your server with
-the following command, replacing <code>SERVERNAME</code>
-appropriately.</p>
-<pre><code>ssh -L 3001:localhost:3001 SERVERNAME</code></pre>
-<p>If you do this, we recommend that you run your Tamarin instance on
-the server in a <a
-href="https://www.gnu.org/software/screen/manual/screen.html">screen</a>
-environment, which will continue running even if the network drops your
-connection as you can later reconnect to it. Otherwise, any network
-failure may require you to restart Tamarin and start over on the
-proof.</p>
-<h2 id="tamarin-code-editors">Tamarin Code Editors</h2>
-<p>Under the <a
-href="https://github.com/tamarin-prover/tamarin-prover/tree/develop/etc">etc</a>
-folder contained in the Tamarin Prover project, plug-ins are available
-for VIM, Sublime Text 3, Emacs and Notepad++. Below we details the steps
-required to install your preferred plug-in.</p>
-<h4 id="vim">VIM</h4>
-<h5 id="using-vim-plugin-managers">Using Vim plugin managers</h5>
-<p>This example will use <a
-href="https://github.com/VundleVim/Vundle.vim">Vundle</a> to install the
-plugin directly from this repository. The instructions below should be
-translatable to other plugin managers.</p>
-<ol type="1">
-<li>Make sure you installed Vundle (or your favorite plugin
-manager)</li>
-<li>Put the below, or equivalent instructions, into your
-<code>.vimrc</code>:</li>
-</ol>
-<pre class="vimrc"><code>Plugin &#39;tamarin-prover/editors&#39;</code></pre>
-<ol start="3" type="1">
-<li>Restart Vim or reload the configuration</li>
-<li>Run the Vim command <code>:PluginInstall</code> (or equivalent)</li>
-</ol>
-<p>You can install updates through <code>:PluginUpdate</code>.</p>
-<h5 id="manual-installation-not-recommended">Manual installation (not
-recommended)</h5>
-<p>If you install the Vim support files using this method, you will need
-to keep the files up-to-date yourself.</p>
-<ol type="1">
-<li>Create <code>~/.vim/</code> directory if not already existing, which
-is the typical location for <code>$VIMRUNTIME</code></li>
-<li>Copy the contents of <code>etc/vim</code> to <code>~/.vim/</code>,
-including the folders.</li>
-</ol>
-<h4 id="sublime-text-3">Sublime Text 3</h4>
-<p><a
-href="https://github.com/tamarin-prover/editor-sublime">editor-sublime</a>
-is a plug-in developed for the Sublime Text 3 editor. The plug-in has
-the following functionality: - Basic Syntaxes - Snippets for Theories,
-Rules, Restrictions and Lemmas</p>
-<p>editor-sublime can be install in two ways:</p>
-<p>The first and preferred method is with <a
-href="https://packagecontrol.io/">PackageControl.io</a>. editor-sublime
-can now be installed via the sublime package manager. See the <a
-href="https://packagecontrol.io/installation">install</a> and <a
-href="https://packagecontrol.io/docs/usage">usage</a> documentation,
-then search and install Tamarin​Prover.</p>
-<p>Alternatively it can be installed from source. For Linux / macOS this
-process can be followed. We assume you have the <code>git</code> tool
-installed.</p>
-<ol type="1">
-<li>Change Directory to Sublime Text packages directory:
-<ul>
-<li>macOS:
-<code>cd ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/</code></li>
-<li>Linux: <code>cd ~/.config/sublime-text-3/Packages/</code></li>
-</ul></li>
-<li>Clone the directory into the Packages folder.
-<ul>
-<li>SSH:
-<code>git clone git@github.com:tamarin-prover/editor-sublime.git</code></li>
-<li>HTTPS:
-<code>git clone https://github.com/tamarin-prover/editor-sublime.git</code></li>
-</ul></li>
-<li>Close and re-open Sublime, and in the bottom right list of syntaxes
-‘Tamarin’ should now be in the list.</li>
-</ol>
-<p><em>Please be aware that this plugin is under active development and
-as such, several of the features are still implemented in a prototypical
-manner. If you experience any problems or have any questions on running
-any parts of the plug-in please <a
-href="https://github.com/tamarin-prover/editor-sublime">visit the
-project GitHub page</a>.</em></p>
-<h4 id="notepad">Notepad++</h4>
-<p>Follow steps from the <a
-href="http://docs.notepad-plus-plus.org/index.php/User_Defined_Language_Files#How_to_install_user_defined_language_files">Notepad++
-Wiki</a> using the <a
-href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/notepad_plus_plus_spthy.xml">notepad_plus_plus_spthy.xml</a>
-file.</p>
-<h4 id="emacs">Emacs</h4>
-<p>The <a
-href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/spthy-mode.el">spthy.el</a>
-implements a SPTHY major mode. You can load it with
-<code>M-x load-file</code>, or add it to your <code>.emacs</code> in
-your favourite way.</p>
-<h4 id="atom">Atom</h4>
-<p>The <a
-href="https://atom.io/packages/language-tamarin">language-tamarin</a>
-package provides Tamarin syntax highlighting for Atom. To install it,
-run <code>apm install language-tamarin</code>.</p>
-<h2 id="faq">FAQ</h2>
-<h4 id="how-do-i-uninstall-tamarin-using-homebrew">How do I uninstall
-Tamarin using Homebrew?</h4>
-<p>To uninstall (and “untap” the Tamarin homebrew tap):</p>
-<ul>
-<li><code>brew uninstall tamarin-prover</code></li>
-<li><code>brew untap tamarin-prover/tap</code></li>
-</ul>
-<h4 id="whats-with-this-homebrew-science-tap">What’s with this
-<code>homebrew-science</code> tap?</h4>
-<p>Tamarin was previously distributed in the now-closed
-<code>homebrew-science</code> tap. If you have already installed it
-through Homebrew, you may have to uninstall and untap that version
-first:</p>
-<ul>
-<li><code>brew uninstall tamarin-prover</code></li>
-<li><code>brew untap homebrew/science</code></li>
-</ul>
-<h4
-id="after-an-updatepullrelease-tamarin-does-not-compile-any-more.">After
-an update/pull/release Tamarin does not compile any more.</h4>
-<p>Try running <code>stack upgrade</code> and <code>stack update</code>.
-An out-of-date stack version can cause spurious compilation errors.</p>
+      <p class="halfbreak">
+      </p>
+      <h1 id="sec:installation">Installation</h1>
+      <h2 id="sec:maclinux">Installation on macOS or Linux</h2>
+      <p>The easiest way to install Tamarin on macOS or Linux is to use
+      <a href="http://brew.sh/">Homebrew</a>:</p>
+      <ul>
+      <li><code>brew install tamarin-prover/tap/tamarin-prover</code></li>
+      </ul>
+      <p>It’s separately packaged for</p>
+      <ul>
+      <li>Arch Linux: <code>pacman -S tamarin-prover</code></li>
+      <li>Nixpkgs: <code>nix-env -i tamarin-prover</code></li>
+      <li>NixOS: add <code>tamarin-prover</code> to your
+      <code>environment.systemPackages</code>.</li>
+      </ul>
+      <p>You can also <a
+      href="https://github.com/tamarin-prover/tamarin-prover/releases">download
+      binaries directly from GitHub</a> and <a
+      href="#sec:dependencies">manually install dependencies
+      yourself</a>, or <a href="#sec:LinuxSrcInstall">compile from
+      source</a>.</p>
+      <h2 id="sec:windows">Installation on Windows 10</h2>
+      <p>You can install Tamarin (with GUI) under Windows 10 using the
+      <a
+      href="https://docs.microsoft.com/windows/wsl/install-win10">Windows
+      Subsystem for Linux (WSL)</a>. For performance and compatibility
+      reasons, we recommend using WSL2 with Ubuntu. Once you have WSL
+      and Ubuntu installed, start the Ubuntu app and install Tamarin
+      following the <a href="#sec:maclinux">installation instructions
+      for Linux</a> above. You can then run Tamarin inside the the
+      Ubuntu app using the usual command. To use the interactive mode,
+      start Tamarin inside the app and connect your usual Windows-run
+      browser to <a
+      href="http://127.0.0.1:3001">http://127.0.0.1:3001</a>. Your
+      Windows files are accessible inside the Ubuntu app via, e.g.,
+      <code>/mnt/c</code> for files on drive <code>C:</code>.</p>
+      <h2 id="sec:LinuxSrcInstall">Compiling from source</h2>
+      <p>You don’t need to compile Tamarin from source unless you are
+      developing a new feature for it or you want to use an unreleased
+      feature. However, if you do want to install it from source:</p>
+      <h3 id="sec:dependencies">Manually install dependencies</h3>
+      <p>Tamarin requires Haskell Stack to build and GraphViz and Maude
+      2.7.1 (or newer) to run. The easiest way to install these is</p>
+      <pre><code>brew install tamarin-prover/tap/maude graphviz haskell-stack</code></pre>
+      <p>Alternatively, you can install them yourself:</p>
+      <ul>
+      <li><p><strong>Haskell Stack</strong> Follow the instructions
+      given at <a
+      href="https://github.com/commercialhaskell/stack/blob/master/doc/install_and_upgrade.md">Stack’s
+      install page</a>. If you are installing <code>stack</code> with
+      your package manager (particularly on Ubuntu), you must run
+      <code>stack     upgrade</code> afterwards, as that version of
+      stack is usually out-of-date.</p></li>
+      <li><p><strong>Graphviz</strong> Graphviz should be available
+      using your standard package manager, or directly from <a
+      href="http://www.graphviz.org/"
+      class="uri">http://www.graphviz.org/</a></p></li>
+      <li><p><strong>Maude</strong> You can install Maude using your
+      package manager. However, if your package manager installs Maude
+      2.6, then you must install version 2.7.1, <a
+      href="http://maude.cs.illinois.edu/w/index.php?title=Maude_download_and_installation#Core_Maude_2.7.1">Core
+      Maude 2.7.1</a>, directly from <a
+      href="http://maude.cs.illinois.edu/"
+      class="uri">http://maude.cs.illinois.edu/</a>. In this case, you
+      should ensure that your <code>PATH</code> includes the install
+      path, so that calling <code>maude</code> starts version 2.7.1.
+      Note that even though the Maude executable is movable, the
+      <code>prelude.maude</code> file must be in the same folder that
+      you start Maude from.</p></li>
+      </ul>
+      <h3 id="compile">Compile</h3>
+      <p>Check out the source code with</p>
+      <pre><code>git clone https://github.com/tamarin-prover/tamarin-prover.git</code></pre>
+      <p>and you have the current development version ready for
+      compilation. If you would prefer to use the master version, just
+      run <code>git checkout master</code>.</p>
+      <p>In either case, you can then run <code>make default</code> in
+      the new directory, which will install an appropriate GHC (the
+      Glasgow Haskell Compiler) for your system, including all
+      dependencies. The <code>tamarin-prover</code> executable will be
+      copied to <code>~/.local/bin/tamarin-prover</code>. Note that this
+      process will take between 30 and 60 minutes, as all dependencies
+      (roughly 120) are compiled from scratch. If you later pull a newer
+      version of Tamarin (or switch to/from the <code>master</code>
+      branch), then only the tool itself needs to be recompiled, which
+      takes a few minutes, at most.</p>
+      <h2 id="running-tamarin-on-a-remote-machine">Running Tamarin on a
+      remote machine</h2>
+      <p>If you have access to a faster desktop or server, but prefer
+      using Tamarin on your laptop, you can do that. The cpu/memory
+      intensive reasoning part of the tool will then run on the faster
+      machine, while you just run the GUI locally, i.e., the web browser
+      of your choice. To do this, you forward your port 3001 to the port
+      3001 of your server with the following command, replacing
+      <code>SERVERNAME</code> appropriately.</p>
+      <pre><code>ssh -L 3001:localhost:3001 SERVERNAME</code></pre>
+      <p>If you do this, we recommend that you run your Tamarin instance
+      on the server in a <a
+      href="https://www.gnu.org/software/screen/manual/screen.html">screen</a>
+      environment, which will continue running even if the network drops
+      your connection as you can later reconnect to it. Otherwise, any
+      network failure may require you to restart Tamarin and start over
+      on the proof.</p>
+      <h2 id="tamarin-code-editors">Tamarin Code Editors</h2>
+      <p>Under the <a
+      href="https://github.com/tamarin-prover/tamarin-prover/tree/develop/etc">etc</a>
+      folder contained in the Tamarin Prover project, plug-ins are
+      available for VIM, Sublime Text 3, Emacs and Notepad++. Below we
+      details the steps required to install your preferred plug-in.</p>
+      <h4 id="vim">VIM</h4>
+      <h5 id="using-vim-plugin-managers">Using Vim plugin managers</h5>
+      <p>This example will use <a
+      href="https://github.com/VundleVim/Vundle.vim">Vundle</a> to
+      install the plugin directly from this repository. The instructions
+      below should be translatable to other plugin managers.</p>
+      <ol type="1">
+      <li>Make sure you installed Vundle (or your favorite plugin
+      manager)</li>
+      <li>Put the below, or equivalent instructions, into your
+      <code>.vimrc</code>:</li>
+      </ol>
+      <pre class="vimrc"><code>Plugin &#39;tamarin-prover/editors&#39;</code></pre>
+      <ol start="3" type="1">
+      <li>Restart Vim or reload the configuration</li>
+      <li>Run the Vim command <code>:PluginInstall</code> (or
+      equivalent)</li>
+      </ol>
+      <p>You can install updates through <code>:PluginUpdate</code>.</p>
+      <h5 id="manual-installation-not-recommended">Manual installation
+      (not recommended)</h5>
+      <p>If you install the Vim support files using this method, you
+      will need to keep the files up-to-date yourself.</p>
+      <ol type="1">
+      <li>Create <code>~/.vim/</code> directory if not already existing,
+      which is the typical location for <code>$VIMRUNTIME</code></li>
+      <li>Copy the contents of <code>etc/vim</code> to
+      <code>~/.vim/</code>, including the folders.</li>
+      </ol>
+      <h4 id="sublime-text-3">Sublime Text 3</h4>
+      <p><a
+      href="https://github.com/tamarin-prover/editor-sublime">editor-sublime</a>
+      is a plug-in developed for the Sublime Text 3 editor. The plug-in
+      has the following functionality: - Basic Syntaxes - Snippets for
+      Theories, Rules, Restrictions and Lemmas</p>
+      <p>editor-sublime can be install in two ways:</p>
+      <p>The first and preferred method is with <a
+      href="https://packagecontrol.io/">PackageControl.io</a>.
+      editor-sublime can now be installed via the sublime package
+      manager. See the <a
+      href="https://packagecontrol.io/installation">install</a> and <a
+      href="https://packagecontrol.io/docs/usage">usage</a>
+      documentation, then search and install Tamarin​Prover.</p>
+      <p>Alternatively it can be installed from source. For Linux /
+      macOS this process can be followed. We assume you have the
+      <code>git</code> tool installed.</p>
+      <ol type="1">
+      <li>Change Directory to Sublime Text packages directory:
+      <ul>
+      <li>macOS:
+      <code>cd ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/</code></li>
+      <li>Linux: <code>cd ~/.config/sublime-text-3/Packages/</code></li>
+      </ul></li>
+      <li>Clone the directory into the Packages folder.
+      <ul>
+      <li>SSH:
+      <code>git clone git@github.com:tamarin-prover/editor-sublime.git</code></li>
+      <li>HTTPS:
+      <code>git clone https://github.com/tamarin-prover/editor-sublime.git</code></li>
+      </ul></li>
+      <li>Close and re-open Sublime, and in the bottom right list of
+      syntaxes ‘Tamarin’ should now be in the list.</li>
+      </ol>
+      <p><em>Please be aware that this plugin is under active
+      development and as such, several of the features are still
+      implemented in a prototypical manner. If you experience any
+      problems or have any questions on running any parts of the plug-in
+      please <a
+      href="https://github.com/tamarin-prover/editor-sublime">visit the
+      project GitHub page</a>.</em></p>
+      <h4 id="notepad">Notepad++</h4>
+      <p>Follow steps from the <a
+      href="http://docs.notepad-plus-plus.org/index.php/User_Defined_Language_Files#How_to_install_user_defined_language_files">Notepad++
+      Wiki</a> using the <a
+      href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/notepad_plus_plus_spthy.xml">notepad_plus_plus_spthy.xml</a>
+      file.</p>
+      <h4 id="emacs">Emacs</h4>
+      <p>The <a
+      href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/spthy-mode.el">spthy.el</a>
+      implements a SPTHY major mode. You can load it with
+      <code>M-x load-file</code>, or add it to your <code>.emacs</code>
+      in your favourite way.</p>
+      <h4 id="atom">Atom</h4>
+      <p>The <a
+      href="https://atom.io/packages/language-tamarin">language-tamarin</a>
+      package provides Tamarin syntax highlighting for Atom. To install
+      it, run <code>apm install language-tamarin</code>.</p>
+      <h2 id="faq">FAQ</h2>
+      <h4 id="how-do-i-uninstall-tamarin-using-homebrew">How do I
+      uninstall Tamarin using Homebrew?</h4>
+      <p>To uninstall (and “untap” the Tamarin homebrew tap):</p>
+      <ul>
+      <li><code>brew uninstall tamarin-prover</code></li>
+      <li><code>brew untap tamarin-prover/tap</code></li>
+      </ul>
+      <h4 id="whats-with-this-homebrew-science-tap">What’s with this
+      <code>homebrew-science</code> tap?</h4>
+      <p>Tamarin was previously distributed in the now-closed
+      <code>homebrew-science</code> tap. If you have already installed
+      it through Homebrew, you may have to uninstall and untap that
+      version first:</p>
+      <ul>
+      <li><code>brew uninstall tamarin-prover</code></li>
+      <li><code>brew untap homebrew/science</code></li>
+      </ul>
+      <h4
+      id="after-an-updatepullrelease-tamarin-does-not-compile-any-more.">After
+      an update/pull/release Tamarin does not compile any more.</h4>
+      <p>Try running <code>stack upgrade</code> and
+      <code>stack update</code>. An out-of-date stack version can cause
+      spurious compilation errors.</p>
     </div>
   </div>
 </body>
+
 </html>

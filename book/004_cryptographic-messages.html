@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamarin Prover Manual</title>
-    <link rel="stylesheet" type="text/css" href="book.css">
-    <script src="book.js"></script>
-    <link rel="stylesheet" href="styles/github.css">
-<!--    <script src="highlight.pack.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tamarin Prover Manual</title>
+  <link rel="stylesheet" type="text/css" href="book.css">
+  <script src="book.js"></script>
+  <link rel="stylesheet" href="styles/github.css">
+  <!--    <script src="highlight.pack.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 -->
-    </head>
+  </head>
+
 <body class="tamarindoc">
-    <!--[if lte IE 8]>
+  <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
         things.
@@ -20,256 +22,271 @@
     <![endif]-->
   <div id="nav">
     <button id="toggle-nav">
-    <span class="sr-only">Toggle navigation</span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
+      <span class="sr-only">Toggle navigation</span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
     </button>
   </div>
   <div id='toc' class='mobile-hidden'>
-  <ul class='chapter'>
-<!-- <li><a href='000_prelims.html'                    ><b>0. </b>Preliminaries</a></li> -->
-<li><a href='001_introduction.html'               ><b>1. </b> Introduction</a></li>
-<li><a href='002_installation.html'               ><b>2. </b> Installation</a></li>
-<li><a href='003_example.html'                    ><b>3. </b> First Example</a></li>
-<li><a href='004_cryptographic-messages.html'     ><b>4. </b> Cryptographic Messages</a></li>
-<li><a href='005_protocol-specification-rules.html'     ><b>5. </b> Protocol Specification using Rules</a></li>
-<li><a href='006_protocol-specification-processes.html'     ><b>6. </b> Protocol Specification using Processes</a></li>
-<li><a href='007_property-specification.html'     ><b>7. </b> Property Specification</a></li>
-<li><a href='008_precomputation.html'             ><b>8. </b> Precomputation</a></li>
-<li><a href='009_modeling-issues.html'            ><b>9. </b> Modeling Issues</a></li>
-<li><a href='010_advanced-features.html'          ><b>10. </b> Advanced Features</a></li>
-<li><a href='011_case-studies.html'               ><b>11.</b> Case Studies</a></li>
-<li><a href='012_toolchains.html'                 ><b>12.</b> Toolchains</a></li>
-<li><a href='013_limitations.html'                ><b>13.</b> Limitations</a></li>
-<li><a href='014_contact-and-further-reading.html'><b>14.</b> Contact Information and Further Reading</a></li>
-<li><a href='015_syntax_description.html'         ><b>15.</b> Syntax Description</a></li>
-  </ul>
+    <ul class='chapter'>
+      <!-- <li><a href='000_prelims.html'><b>0. </b>Preliminaries</a></li> -->
+      <li><a href='001_introduction.html'><b>1. </b> Introduction</a></li>
+      <li><a href='002_installation.html'><b>2. </b> Installation</a></li>
+      <li><a href='003_example.html'><b>3. </b> First Example</a></li>
+      <li><a href='004_cryptographic-messages.html'><b>4. </b> Cryptographic Messages</a></li>
+      <li><a href='005_protocol-specification-rules.html'><b>5. </b> Protocol Specification using Rules</a></li>
+      <li><a href='006_protocol-specification-processes.html'><b>6. </b> Protocol Specification using Processes</a></li>
+      <li><a href='007_property-specification.html'><b>7. </b> Property Specification</a></li>
+      <li><a href='008_accountability.html'><b>8. </b> Accountability</a></li>
+      <li><a href='009_precomputation.html'><b>9. </b> Precomputation</a></li>
+      <li><a href='010_modeling-issues.html'><b>10. </b> Modeling Issues</a></li>
+      <li><a href='011_advanced-features.html'><b>11. </b> Advanced Features</a></li>
+      <li><a href='012_case-studies.html'><b>12.</b> Case Studies</a></li>
+      <li><a href='013_toolchains.html'><b>13.</b> Toolchains</a></li>
+      <li><a href='014_limitations.html'><b>14.</b> Limitations</a></li>
+      <li><a href='015_contact-and-further-reading.html'><b>15.</b> Contact Information and Further Reading</a></li>
+      <li><a href='016_syntax_description.html'><b>16.</b> Syntax Description</a></li>
+    </ul>
   </div>
   <div id='page-wrapper'>
     <div id='page'>
-<p class="halfbreak">
-</p>
-<h1 id="sec:cryptographic-messages">Cryptographic Messages</h1>
-<p>Tamarin analyzes protocols with respect to a symbolic model of
-cryptography. This means cryptographic messages are modeled as terms
-rather than bit strings.</p>
-<!--  
-[^1]: FIXME: Should we write more about terms and equations.
--->
-<p>The properties of the employed cryptographic algorithms are modeled
-by equations. More concretely, a cryptographic message is either a
-constant <code>c</code> or a message <code>f(m1,...,mn)</code>
-corresponding to the application of the <code>n</code>-ary function
-symbol <code>f</code> to <code>n</code> cryptographic messages
-<code>m1</code>, …, <code>mn</code>. When specifying equations, we also
-allow for variables in addition to constants.</p>
-<h2 id="constants">Constants</h2>
-<p>We distinguish between two types of constants:</p>
-<ul>
-<li><em>Public constants</em> model publicly known atomic messages such
-as agent identities and labels. We use the notation <code>'ident'</code>
-to denote public constants in Tamarin.</li>
-<li><em>Fresh constants</em> model random values such as secret keys or
-random nonces. We use the notation <code>~'ident'</code> to denote fresh
-constants in Tamarin. Note that fresh <em>constants</em> are rarely used
-in protocol specifications. A fresh <em>variable</em> is almost always
-the right choice.</li>
-</ul>
-<h2 id="function-symbols">Function Symbols</h2>
-<p>Tamarin supports a fixed set of built-in function symbols and
-additional user-defined function symbols. The only function symbols
-available in every Tamarin file are for pairing and projection. The
-binary function symbol <code>pair</code> models the pair of two messages
-and the function symbols <code>fst</code> and <code>snd</code> model the
-projections of the first and second argument. The properties of
-projection are captured by the following equations:</p>
-<pre><code>fst(pair(x,y)) = x
+      <p class="halfbreak">
+      </p>
+      <h1 id="sec:cryptographic-messages">Cryptographic Messages</h1>
+      <p>Tamarin analyzes protocols with respect to a symbolic model of
+      cryptography. This means cryptographic messages are modeled as
+      terms rather than bit strings.</p>
+      <!--  
+      [^1]: FIXME: Should we write more about terms and equations.
+      -->
+      <p>The properties of the employed cryptographic algorithms are
+      modeled by equations. More concretely, a cryptographic message is
+      either a constant <code>c</code> or a message
+      <code>f(m1,...,mn)</code> corresponding to the application of the
+      <code>n</code>-ary function symbol <code>f</code> to
+      <code>n</code> cryptographic messages <code>m1</code>, …,
+      <code>mn</code>. When specifying equations, we also allow for
+      variables in addition to constants.</p>
+      <h2 id="constants">Constants</h2>
+      <p>We distinguish between two types of constants:</p>
+      <ul>
+      <li><em>Public constants</em> model publicly known atomic messages
+      such as agent identities and labels. We use the notation
+      <code>'ident'</code> to denote public constants in Tamarin.</li>
+      <li><em>Fresh constants</em> model random values such as secret
+      keys or random nonces. We use the notation <code>~'ident'</code>
+      to denote fresh constants in Tamarin. Note that fresh
+      <em>constants</em> are rarely used in protocol specifications. A
+      fresh <em>variable</em> is almost always the right choice.</li>
+      </ul>
+      <h2 id="function-symbols">Function Symbols</h2>
+      <p>Tamarin supports a fixed set of built-in function symbols and
+      additional user-defined function symbols. The only function
+      symbols available in every Tamarin file are for pairing and
+      projection. The binary function symbol <code>pair</code> models
+      the pair of two messages and the function symbols <code>fst</code>
+      and <code>snd</code> model the projections of the first and second
+      argument. The properties of projection are captured by the
+      following equations:</p>
+      <pre><code>fst(pair(x,y)) = x
 snd(pair(x,y)) = y</code></pre>
-<p>Tamarin also supports <code>&lt;x,y&gt;</code> as syntactic sugar for
-<code>pair(x,y)</code> and <code>&lt;x1,x2,...,xn-1,xn&gt;</code> as
-syntactic sugar for
-<code>&lt;x1,&lt;x2,..,&lt;xn-1,xn&gt;...&gt;</code>.</p>
-<p>Additional built-in function symbols can be activated by including
-one of the following message theories: <code>hashing</code>,
-<code>asymmetric-encryption</code>, <code>signing</code>,
-<code>revealing-signing</code>, <code>symmetric-encryption</code>,
-<code>diffie-hellman</code>, <code>bilinear-pairing</code>,
-<code>xor</code>, and <code>multiset</code>.</p>
-<p>To activate message theories <code>t1</code>, …, <code>tn</code>,
-include the line <code>builtins: t1, ..., tn</code> in your file. The
-definitions of the built-in message theories are given in Section <a
-href="#sec:builtin-theories">Built-in message theories</a>.</p>
-<p>To define function symbols <code>f1</code>, …, <code>fn</code> with
-arity <code>a1</code>,…,<code>an</code> include the following line in
-your file:</p>
-<pre><code>functions: f1/a1, ..., fn/an</code></pre>
-<p>Tamarin also supports <em>private function symbols</em>. In contrast
-to regular function symbols, Tamarin assumes that private function
-symbols cannot be applied by the adversary. Private functions can be
-used to model functions that implicitly use some secret that is shared
-between all (honest) users. To make a function private, simply add the
-attribute <code>[private]</code> after the function declaration. For
-example, the line</p>
-<pre><code>functions: f/3, g/2 [private], h/1</code></pre>
-<p>defines the private function <code>g</code> and the public functions
-<code>f</code> and <code>h</code>. We will describe in the next section
-how you can define equations that formalize properties of functions.</p>
-<h2 id="sec:equational-theories">Equational theories</h2>
-<p>Equational theories can be used to model properties of functions,
-e.g., that symmetric decryption is the inverse of symmetric encryption
-whenever both use the same key. The syntax for adding equations to the
-context is:</p>
-<pre><code>equations: lhs1 = rhs1, ..., lhsn = rhsn</code></pre>
-<p>Both <code>lhs</code> and <code>rhs</code> can contain variables, but
-no public constants, and all variables on the right hand side must also
-appear on the left hand side. The symbolic proof search used by Tamarin
-supports a certain class of user-defined equations, namely
-<em>convergent</em> equational theories that have the <em>finite variant
-property</em> <span class="citation"
-data-cites="Comon-LundhD05">(Comon-Lundh and Delaune 2005)</span>. Note
-that Tamarin does <em>not</em> check whether the given equations belong
-to this class, so writing equations outside this class can cause
-non-termination or incorrect results <em>without any warning</em>.</p>
-<p>Also note that Tamarin’s reasoning is particularly efficient when
-considering only subterm-convergent equations, i.e., if the
-right-hand-side is either a ground term (i.e., it does not contain any
-variables) or a proper subterm of the left-hand-side. These equations
-are thus preferred if they are sufficient to model the required
-properties. However, for example the equations modeled by the built-in
-message theories <code>diffie-hellman</code>,
-<code>bilinear-pairing</code>, <code>xor</code>, and
-<code>multiset</code> do not belong to this restricted class since they
-include for example associativity and commutativity. All other built-in
-message theories can be equivalently defined by using
-<code>functions: ...</code> and <code>equations: ...</code> and we will
-see some examples of allowed equations in the next section.</p>
-<h2 id="sec:builtin-theories">Built-in message theories and other
-built-in features</h2>
-<p>In the following, we write <code>f/n</code> to denote that the
-function symbol <code>f</code> is <code>n</code>-ary.</p>
-<dl>
-<dt><code>hashing</code>:</dt>
-<dd>
-<p>This theory models a hash function. It defines the function symbol
-<code>h/1</code> and no equations.</p>
-</dd>
-<dt><code>asymmetric-encryption</code>:</dt>
-<dd>
-<p>This theory models a public key encryption scheme. It defines the
-function symbols <code>aenc/2</code>, <code>adec/2</code>, and
-<code>pk/1</code>, which are related by the equation
-<code>adec(aenc(m, pk(sk)), sk) = m</code>. Note that as described in <a
-href="015_syntax_description.html">Syntax Description</a>,
-<code>aenc{x,y}pkB</code> is syntactic sugar for
-<code>aenc(&lt;x,y&gt;, pkB)</code>.
-<!-- This is otherwise not mentioned until Ch14: Syntax Description --></p>
-</dd>
-<dt><code>signing</code>:</dt>
-<dd>
-<p>This theory models a signature scheme. It defines the function
-symbols <code>sign/2</code>, <code>verify/3</code>, <code>pk/1</code>,
-and <code>true</code>, which are related by the equation
-<code>verify(sign(m,sk),m,pk(sk)) = true</code>.</p>
-</dd>
-<dt><code>revealing-signing</code>:</dt>
-<dd>
-<p>This theory models a message-revealing signature scheme. It defines
-the function symbols <code>revealSign/2</code>,
-<code>revealVerify/3</code>, <code>getMessage/1</code>,
-<code>pk/1</code>, and <code>true</code>, which are related by the
-equations <code>revealVerify(revealSign(m,sk),m,pk(sk)) = true</code>
-and <code>getMessage(revealSign(m,sk)) = m</code>.</p>
-</dd>
-<dt><code>symmetric-encryption</code>:</dt>
-<dd>
-<p>This theory models a symmetric encryption scheme. It defines the
-function symbols <code>senc/2</code> and <code>sdec/2</code>, which are
-related by the equation <code>sdec(senc(m,k),k) = m</code>.</p>
-</dd>
-<dt><code>diffie-hellman</code>:</dt>
-<dd>
-<p>This theory models Diffie-Hellman groups. It defines the function
-symbols <code>inv/1</code>, <code>1/0</code>, and the symbols
-<code>^</code> and <code>*</code>. We use <code>g ^ a</code> to denote
-exponentiation in the group and <code>*</code>, <code>inv</code> and
-<code>1</code> to model the (multiplicative) abelian group of exponents
-(the integers modulo the group order). The set of defined equations
-is:</p>
-</dd>
-</dl>
-<pre><code>(x^y)^z  = x^(y*z)
+      <p>Tamarin also supports <code>&lt;x,y&gt;</code> as syntactic
+      sugar for <code>pair(x,y)</code> and
+      <code>&lt;x1,x2,...,xn-1,xn&gt;</code> as syntactic sugar for
+      <code>&lt;x1,&lt;x2,..,&lt;xn-1,xn&gt;...&gt;</code>.</p>
+      <p>Additional built-in function symbols can be activated by
+      including one of the following message theories:
+      <code>hashing</code>, <code>asymmetric-encryption</code>,
+      <code>signing</code>, <code>revealing-signing</code>,
+      <code>symmetric-encryption</code>, <code>diffie-hellman</code>,
+      <code>bilinear-pairing</code>, <code>xor</code>, and
+      <code>multiset</code>.</p>
+      <p>To activate message theories <code>t1</code>, …,
+      <code>tn</code>, include the line
+      <code>builtins: t1, ..., tn</code> in your file. The definitions
+      of the built-in message theories are given in Section <a
+      href="#sec:builtin-theories">Built-in message theories</a>.</p>
+      <p>To define function symbols <code>f1</code>, …, <code>fn</code>
+      with arity <code>a1</code>,…,<code>an</code> include the following
+      line in your file:</p>
+      <pre><code>functions: f1/a1, ..., fn/an</code></pre>
+      <p>Tamarin also supports <em>private function symbols</em>. In
+      contrast to regular function symbols, Tamarin assumes that private
+      function symbols cannot be applied by the adversary. Private
+      functions can be used to model functions that implicitly use some
+      secret that is shared between all (honest) users. To make a
+      function private, simply add the attribute <code>[private]</code>
+      after the function declaration. For example, the line</p>
+      <pre><code>functions: f/3, g/2 [private], h/1</code></pre>
+      <p>defines the private function <code>g</code> and the public
+      functions <code>f</code> and <code>h</code>. We will describe in
+      the next section how you can define equations that formalize
+      properties of functions.</p>
+      <h2 id="sec:equational-theories">Equational theories</h2>
+      <p>Equational theories can be used to model properties of
+      functions, e.g., that symmetric decryption is the inverse of
+      symmetric encryption whenever both use the same key. The syntax
+      for adding equations to the context is:</p>
+      <pre><code>equations: lhs1 = rhs1, ..., lhsn = rhsn</code></pre>
+      <p>Both <code>lhs</code> and <code>rhs</code> can contain
+      variables, but no public constants, and all variables on the right
+      hand side must also appear on the left hand side. The symbolic
+      proof search used by Tamarin supports a certain class of
+      user-defined equations, namely <em>convergent</em> equational
+      theories that have the <em>finite variant property</em> <span
+      class="citation" data-cites="Comon-LundhD05">(Comon-Lundh and
+      Delaune 2005)</span>. Note that Tamarin does <em>not</em> check
+      whether the given equations belong to this class, so writing
+      equations outside this class can cause non-termination or
+      incorrect results <em>without any warning</em>.</p>
+      <p>Also note that Tamarin’s reasoning is particularly efficient
+      when considering only subterm-convergent equations, i.e., if the
+      right-hand-side is either a ground term (i.e., it does not contain
+      any variables) or a proper subterm of the left-hand-side. These
+      equations are thus preferred if they are sufficient to model the
+      required properties. However, for example the equations modeled by
+      the built-in message theories <code>diffie-hellman</code>,
+      <code>bilinear-pairing</code>, <code>xor</code>, and
+      <code>multiset</code> do not belong to this restricted class since
+      they include for example associativity and commutativity. All
+      other built-in message theories can be equivalently defined by
+      using <code>functions: ...</code> and <code>equations: ...</code>
+      and we will see some examples of allowed equations in the next
+      section.</p>
+      <h2 id="sec:builtin-theories">Built-in message theories and other
+      built-in features</h2>
+      <p>In the following, we write <code>f/n</code> to denote that the
+      function symbol <code>f</code> is <code>n</code>-ary.</p>
+      <dl>
+      <dt><code>hashing</code>:</dt>
+      <dd>
+      <p>This theory models a hash function. It defines the function
+      symbol <code>h/1</code> and no equations.</p>
+      </dd>
+      <dt><code>asymmetric-encryption</code>:</dt>
+      <dd>
+      <p>This theory models a public key encryption scheme. It defines
+      the function symbols <code>aenc/2</code>, <code>adec/2</code>, and
+      <code>pk/1</code>, which are related by the equation
+      <code>adec(aenc(m, pk(sk)), sk) = m</code>. Note that as described
+      in <a href="015_syntax_description.html">Syntax Description</a>,
+      <code>aenc{x,y}pkB</code> is syntactic sugar for
+      <code>aenc(&lt;x,y&gt;, pkB)</code>.
+      <!-- This is otherwise not mentioned until Ch14: Syntax Description --></p>
+      </dd>
+      <dt><code>signing</code>:</dt>
+      <dd>
+      <p>This theory models a signature scheme. It defines the function
+      symbols <code>sign/2</code>, <code>verify/3</code>,
+      <code>pk/1</code>, and <code>true</code>, which are related by the
+      equation <code>verify(sign(m,sk),m,pk(sk)) = true</code>.</p>
+      </dd>
+      <dt><code>revealing-signing</code>:</dt>
+      <dd>
+      <p>This theory models a message-revealing signature scheme. It
+      defines the function symbols <code>revealSign/2</code>,
+      <code>revealVerify/3</code>, <code>getMessage/1</code>,
+      <code>pk/1</code>, and <code>true</code>, which are related by the
+      equations
+      <code>revealVerify(revealSign(m,sk),m,pk(sk)) = true</code> and
+      <code>getMessage(revealSign(m,sk)) = m</code>.</p>
+      </dd>
+      <dt><code>symmetric-encryption</code>:</dt>
+      <dd>
+      <p>This theory models a symmetric encryption scheme. It defines
+      the function symbols <code>senc/2</code> and <code>sdec/2</code>,
+      which are related by the equation
+      <code>sdec(senc(m,k),k) = m</code>.</p>
+      </dd>
+      <dt><code>diffie-hellman</code>:</dt>
+      <dd>
+      <p>This theory models Diffie-Hellman groups. It defines the
+      function symbols <code>inv/1</code>, <code>1/0</code>, and the
+      symbols <code>^</code> and <code>*</code>. We use
+      <code>g ^ a</code> to denote exponentiation in the group and
+      <code>*</code>, <code>inv</code> and <code>1</code> to model the
+      (multiplicative) abelian group of exponents (the integers modulo
+      the group order). The set of defined equations is:</p>
+      </dd>
+      </dl>
+      <pre><code>(x^y)^z  = x^(y*z)
 x^1      = x
 x*y      = y*x
 (x*y)*z  = x*(y*z)
 x*1      = x
 x*inv(x) = 1</code></pre>
-<dl>
-<dt><code>bilinear-pairing</code>:</dt>
-<dd>
-<p>This theory models bilinear groups. It extends the
-<code>diffie-hellman</code> theory with the function symbols
-<code>pmult/2</code> and <code>em/2</code>. Here,
-<code>pmult(x,p)</code> denotes the multiplication of the point
-<code>p</code> by the scalar <code>x</code> and <code>em(p,q)</code>
-denotes the application of the bilinear map to the points <code>p</code>
-and <code>q</code>. The additional equations are:</p>
-</dd>
-</dl>
-<pre><code>pmult(x,(pmult(y,p)) = pmult(x*y,p)
+      <dl>
+      <dt><code>bilinear-pairing</code>:</dt>
+      <dd>
+      <p>This theory models bilinear groups. It extends the
+      <code>diffie-hellman</code> theory with the function symbols
+      <code>pmult/2</code> and <code>em/2</code>. Here,
+      <code>pmult(x,p)</code> denotes the multiplication of the point
+      <code>p</code> by the scalar <code>x</code> and
+      <code>em(p,q)</code> denotes the application of the bilinear map
+      to the points <code>p</code> and <code>q</code>. The additional
+      equations are:</p>
+      </dd>
+      </dl>
+      <pre><code>pmult(x,(pmult(y,p)) = pmult(x*y,p)
 pmult(1,p)           = p
 em(p,q)              = em(q,p)
 em(pmult(x,p),q)     = pmult(x,em(q,p))</code></pre>
-<dl>
-<dt><code>xor</code>:</dt>
-<dd>
-<p>This theory models the exclusive-or operation. It adds the function
-symbols <code>⊕/2</code> (also written as <code>XOR/2</code>) and
-<code>zero/0</code>. <code>⊕</code> is associative and commutative and
-satisfies the cancellation equations:</p>
-</dd>
-</dl>
-<pre><code>x ⊕ y       = y ⊕ x
+      <dl>
+      <dt><code>xor</code>:</dt>
+      <dd>
+      <p>This theory models the exclusive-or operation. It adds the
+      function symbols <code>⊕/2</code> (also written as
+      <code>XOR/2</code>) and <code>zero/0</code>. <code>⊕</code> is
+      associative and commutative and satisfies the cancellation
+      equations:</p>
+      </dd>
+      </dl>
+      <pre><code>x ⊕ y       = y ⊕ x
 (x ⊕ y) ⊕ z = x ⊕ (y ⊕ z)
 x ⊕ zero    = x
 x ⊕ x       = zero</code></pre>
-<dl>
-<dt><code>multiset</code>:</dt>
-<dd>
-<p>This theory introduces the associative-commutative operator
-<code>+</code> which is usually used to model multisets.</p>
-</dd>
-<dt><code>reliable-channel</code>:</dt>
-<dd>
-<p>This theory introduces support for reliable channel in the <a
-href="006_protocol-specification-processes.html">process calculus</a>.
-Messages on the channel (i.e., public name) <code>'r'</code> are
-guaranteed to arrive eventually. There is only one other channel, the
-public and unreliable channel <code>'c'</code>. Note that multiple
-reliable channels can be modelled using pattern matchting:</p>
-<pre><code>  out(&#39;r&#39;,&lt;&#39;channelA&#39;,&#39;Hello&#39;)              
+      <dl>
+      <dt><code>multiset</code>:</dt>
+      <dd>
+      <p>This theory introduces the associative-commutative operator
+      <code>+</code> which is usually used to model multisets.</p>
+      </dd>
+      <dt><code>reliable-channel</code>:</dt>
+      <dd>
+      <p>This theory introduces support for reliable channel in the <a
+      href="006_protocol-specification-processes.html">process
+      calculus</a>. Messages on the channel (i.e., public name)
+      <code>'r'</code> are guaranteed to arrive eventually. There is
+      only one other channel, the public and unreliable channel
+      <code>'c'</code>. Note that multiple reliable channels can be
+      modelled using pattern matchting:</p>
+      <pre><code>  out(&#39;r&#39;,&lt;&#39;channelA&#39;,&#39;Hello&#39;)              
 | out(&#39;r&#39;,&lt;&#39;channelB&#39;,&#39;Bonjour&#39;)
 | in(&#39;r&#39;,&lt;&#39;channelA&#39;,x); event PrepareTea()
 | in(&#39;r&#39;,&lt;&#39;channelB&#39;,x); event PrepareCoffee()</code></pre>
-</dd>
-</dl>
-<h2 id="sec:reserved-names">Reserved function symbol names</h2>
-<p>Due to their use in built-in message theories, the following function
-names cannot be user-defined: <code>mun</code>, <code>one</code>,
-<code>exp</code>, <code>mult</code>, <code>inv</code>,
-<code>pmult</code>, <code>em</code>.</p>
-<p>If a theory contains any of these as user-defined function symbol the
-parser will reject the file, stating which reserved name was
-redeclared.</p>
-<div id="refs" class="references csl-bib-body hanging-indent"
-role="doc-bibliography">
-<div id="ref-Comon-LundhD05" class="csl-entry" role="doc-biblioentry">
-Comon-Lundh, Hubert, and Stéphanie Delaune. 2005. <span>“The Finite
-Variant Property: How to Get Rid of Some Algebraic Properties.”</span>
-In <em>RTA</em>, 294–307.
-</div>
-</div>
+      </dd>
+      </dl>
+      <h2 id="sec:reserved-names">Reserved function symbol names</h2>
+      <p>Due to their use in built-in message theories, the following
+      function names cannot be user-defined: <code>mun</code>,
+      <code>one</code>, <code>exp</code>, <code>mult</code>,
+      <code>inv</code>, <code>pmult</code>, <code>em</code>.</p>
+      <p>If a theory contains any of these as user-defined function
+      symbol the parser will reject the file, stating which reserved
+      name was redeclared.</p>
+      <div id="refs" class="references csl-bib-body hanging-indent"
+      role="doc-bibliography">
+      <div id="ref-Comon-LundhD05" class="csl-entry"
+      role="doc-biblioentry">
+      Comon-Lundh, Hubert, and Stéphanie Delaune. 2005. <span>“The
+      Finite Variant Property: How to Get Rid of Some Algebraic
+      Properties.”</span> In <em>RTA</em>, 294–307.
+      </div>
+      </div>
     </div>
   </div>
 </body>
+
 </html>
