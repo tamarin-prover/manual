@@ -73,12 +73,16 @@
       <ul>
       <li><em>Public constants</em> model publicly known atomic messages
       such as agent identities and labels. We use the notation
-      <code>'ident'</code> to denote public constants in Tamarin.</li>
-      <li><em>Fresh constants</em> model random values such as secret
-      keys or random nonces. We use the notation <code>~'ident'</code>
-      to denote fresh constants in Tamarin. Note that fresh
-      <em>constants</em> are rarely used in protocol specifications. A
-      fresh <em>variable</em> is almost always the right choice.</li>
+      <code>'ident'</code> to denote public constants in Tamarin. Such
+      constants are of sort <code>pub</code> and can hence be unified
+      with public variables. They are always known by the
+      adversary.</li>
+      <li><em>Functions</em> of arity 0 (see below). A function is
+      always of sort <code>msg</code>, and hence cannot be unified with
+      a public variable. By default the function is public and known by
+      the adversary. If the function is declared private, it is not
+      known by the adversary. However, <em>fresh</em> values are usually
+      a more appropriate modeling of secret values.</li>
       </ul>
       <h2 id="function-symbols">Function Symbols</h2>
       <p>Tamarin supports a fixed set of built-in function symbols and
