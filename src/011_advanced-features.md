@@ -637,7 +637,8 @@ It gets more complicated when working with operators that are on top of a rewrit
 Tamarins reasoning for subterms works well for irreducible operators. For reducible operators, however, the following situation can appear: No more goals are left but there are reducible operators in subterms. Usually, we have found a trace if no goals are left. However, if we have, e.g., `x⊏x⊕y` as a constraint left, then our constraint solving algorithm cannot solve this constraint, i.e., it is not clear whether we found a trace. In such a situation, Tamarin indicates with a yellow color in the proof tree that this part of the proof cannot be completed, i.e., there could be a trace, but we're not sure. Even with such a yellow part, it can be that we find a trace in another part of the proof tree and prove an `exists-trace` lemma.
 
 In the following picture one can see the subterm with the reducible operator `fst` on the right side. Therefore, on the left side, the proof is marked yellow (with the blue line marking the current position). Also, this example demonstrates in `lemma GreenYellow`, that in an `exists-trace` lemma, a trace can be still found and the lemma proven even if there is a part of the proof that cannot be finished. Analogously, `lemma RedYellow` demonstrates that a `all-traces` lemma can still be disproven if a violating trace was found. The last two lemmas are ones where no traces were found in the rest of the proof, thus the overall result of the computation is `Tamarin cannot prove this property`.
-![Subterms](../images/YellowSubterms.png "Subterms"){width=80%}\
+
+![Subterms](../images/YellowSubterms.png "Subterms")\
 
 
 #### Subterm Store
