@@ -92,6 +92,20 @@ The goal rankings are as follows.
 `O`:
 : is the oracle ranking based on the 'smart' heuristic `s`. It works the same as `o` but uses 'smart' instead of 'Consecutive' ranking to start with.
 
+`p`:
+: is the SAPIC-specific ranking. It is a modified version of the smart `s`
+heuristic, but resolves SAPIC's `state`-facts right away, as well as Unlock
+goals. This ranking also introduces a prioritisation for `Insert`-actions
+similar to (fact annotations)[#sec:fact-annotations] below.
+When the first element of the key
+is prefixed `F\_', the key is prioritized, e.g.,  
+`lookup <F_database,p> as value in ...`.
+Using ``L\_'' instead of ``F\_'' achieves deprioritsation. 
+See [@KK-jcs16] for *why* the prioritsations are useful.
+
+`P`:
+: is like 'p' but without delaying loop breakers.
+
 If several rankings are given for the heuristic flag, then they are employed
 in a round-robin fashion depending on the proof-depth. For example, a flag
 `--heuristic=ssC` always uses two times the smart ranking and then once the
