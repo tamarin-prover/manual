@@ -161,6 +161,32 @@
       <code>s</code>. It works the same as <code>o</code> but uses
       ‘smart’ instead of ‘Consecutive’ ranking to start with.
       </dd>
+      <dt><code>p</code>:</dt>
+      <dd>
+      is the SAPIC-specific ranking. It is a modified version of the
+      smart <code>s</code> heuristic, but resolves SAPIC’s
+      <code>state</code>-facts right away, as well as Unlock goals, and
+      some helper facts introduced in SAPICs translation
+      (<code>MID_Receiver</code>, <code>MID_Sender</code>).
+      <code>Progress_To</code> goals (which are generated when using the
+      optional <a
+      href="006_protocol-specification-processes.html#sec:local-progress">local
+      progress</a>) are also prioritised. Similar to <a
+      href="#sec:fact-annotations">fact annotations</a> below, this
+      ranking also introduces a prioritisation for
+      <code>Insert</code>-actions When the first element of the key is
+      prefixed <code>F_</code>, the key is prioritized, e.g.,
+      <code>lookup &lt;F_key,p&gt; as v in ...</code>. Using
+      <code>L_</code> instead of <code>F_</code> achieves
+      deprioritsation. Likewise, names and be (de)prioritized by
+      prefixes them in the same manner. See <span class="citation"
+      data-cites="KK-jcs16">(Kremer and Künnemann 2016)</span> for the
+      reasoning behind this ranking.
+      </dd>
+      <dt><code>P</code>:</dt>
+      <dd>
+      is like <code>p</code> but without delaying loop breakers.
+      </dd>
       </dl>
       <p>If several rankings are given for the heuristic flag, then they
       are employed in a round-robin fashion depending on the
@@ -790,6 +816,15 @@ end</code></pre>
       | ...
       | (Ex y_ol1 ... y_olk. x_ol1 = t_fresh_ol1 &amp; ... &amp; x_1lm = t_fresh_1lm)
       )</code></pre>
+      <div id="refs" class="references csl-bib-body hanging-indent"
+      role="doc-bibliography">
+      <div id="ref-KK-jcs16" class="csl-entry" role="doc-biblioentry">
+      Kremer, Steve, and Robert Künnemann. 2016. <span>“Automated
+      Analysis of Security Protocols with Global State.”</span>
+      <em>Journal of Computer Security</em> 24 (5): 583–616. <a
+      href="https://doi.org/10.3233/JCS-160556">https://doi.org/10.3233/JCS-160556</a>.
+      </div>
+      </div>
     </div>
   </div>
 </body>
