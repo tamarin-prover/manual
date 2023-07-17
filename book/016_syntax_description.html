@@ -118,7 +118,8 @@ modulo      := &#39;(&#39; &#39;modulo&#39; (&#39;E&#39; | &#39;AC&#39;) &#39;)&
 rule_attrs  := &#39;[&#39; rule_attr (&#39;,&#39; rule_attr)* [&#39;,&#39;] &#39;]&#39;
 rule_attr   := (&#39;color=&#39; | &#39;colour=&#39;) hexcolor
 let_block   := &#39;let&#39; (msg_var &#39;=&#39; msetterm)+ &#39;in&#39;
-msg_var     := ident [&#39;.&#39; natural] [&#39;:&#39; &#39;msg&#39;]</code></pre>
+msg_var     := ident [&#39;.&#39; natural] [&#39;:&#39; &#39;msg&#39;]
+hexcolor    := &quot;&#39;&quot; [&quot;#&quot;] hexdigit{6} &quot;&#39;&quot; | [&quot;#&quot;] hexdigit{6}</code></pre>
       <p>Rule annotations do not influence the rule’s semantics. A color
       is represented as a triplet of 8 bit hexadecimal values optionally
       preceded by ‘#’, and is used as the background color of the rule
