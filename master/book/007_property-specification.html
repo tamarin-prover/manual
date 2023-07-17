@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tamarin Prover Manual</title>
+  <link rel="stylesheet" type="text/css" href="book.css">
+  <script src="book.js"></script>
+  <link rel="stylesheet" href="styles/github.css">
+  <!--    <script src="highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+-->
+  </head>
+
+<body class="tamarindoc">
+  <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+  <div id="nav">
+    <button id="toggle-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </div>
+  <div id='toc' class='mobile-hidden'>
+    <ul class='chapter'>
+      <!-- <li><a href='000_prelims.html'><b>0. </b>Preliminaries</a></li> -->
+      <li><a href='001_introduction.html'><b>1. </b> Introduction</a></li>
+      <li><a href='002_installation.html'><b>2. </b> Installation</a></li>
+      <li><a href='003_example.html'><b>3. </b> First Example</a></li>
+      <li><a href='004_cryptographic-messages.html'><b>4. </b> Cryptographic Messages</a></li>
+      <li><a href='005_protocol-specification-rules.html'><b>5. </b> Protocol Specification using Rules</a></li>
+      <li><a href='006_protocol-specification-processes.html'><b>6. </b> Protocol Specification using Processes</a></li>
+      <li><a href='007_property-specification.html'><b>7. </b> Property Specification</a></li>
+      <li><a href='008_accountability.html'><b>8. </b> Accountability</a></li>
+      <li><a href='009_precomputation.html'><b>9. </b> Precomputation</a></li>
+      <li><a href='010_modeling-issues.html'><b>10. </b> Modeling Issues</a></li>
+      <li><a href='011_advanced-features.html'><b>11. </b> Advanced Features</a></li>
+      <li><a href='012_case-studies.html'><b>12.</b> Case Studies</a></li>
+      <li><a href='013_toolchains.html'><b>13.</b> Toolchains</a></li>
+      <li><a href='014_limitations.html'><b>14.</b> Limitations</a></li>
+      <li><a href='015_contact-and-further-reading.html'><b>15.</b> Contact Information and Further Reading</a></li>
+      <li><a href='016_syntax_description.html'><b>16.</b> Syntax Description</a></li>
+    </ul>
+  </div>
+  <div id='page-wrapper'>
+    <div id='page'>
+      <p class="halfbreak">
+      </p>
+      <h1 id="sec:property_specification">Property Specification</h1>
+      <p>In this section we present how to specify protocol properties
+      as trace and observational equivalence properties, based on the
+      action facts given in the model. Trace properties are given as
+      guarded first-order logic formulas and observational equivalence
+      properties are specified using the <code>diff</code> operator,
+      both of which we will see in detail below.</p>
+      <h2 id="trace-properties">Trace Properties</h2>
+      <p>The Tamarin multiset rewriting rules define a labeled
+      transition system. The system’s state is a multiset (bag) of facts
+      and the initial system state is the empty multiset. The rules
+      define how the system can make a transition to a new state. The
+      types of facts and their use are described in Section <a
+      href="005_protocol-specification-rules.html#sec:rules">Rules</a>.
+      Here we focus on the <em>action facts</em>, which are used to
+      reason about a protocol’s behaviour.</p>
+      <p>A rule can be applied to a state if it can be instantiated such
+      that its left hand side is contained in the current state. In this
+      case, the left-hand side facts are removed from the state, and
+      replaced by the instantiated right hand side. The application of
+      the rule is recorded in the <em>trace</em> by appending the
+      instantiated action facts to the trace.</p>
+      <p>For instance, consider the following fictitious rule</p>
+      <pre><code>rule fictitious:
+   [ Pre(x), Fr(~n) ]
+ --[ Act1(~n), Act2(x) ]--&gt;
+   [ Out(&lt;x,~n&gt;) ]</code></pre>
+      <p>The rule rewrites the system state by consuming the facts
+      <code>Pre(x)</code> and <code>Fr(~n)</code> and producing the fact
+      <code>Out(&lt;x,~n&gt;)</code>. The rule is labeled with the
+      actions <code>Act1(~n)</code> and <code>Act2(x)</code>. The rule
+      can be applied if there are two facts <code>Pre</code> and
+      <code>Fr</code> in the system state whose arguments are matched by
+      the variables <code>x</code> and <code>~n</code>. In the
+      application of this rule, <code>~n</code> and <code>x</code> are
+      instantiated with the matched values and the state transition is
+      labeled with the instantiations of <code>Act1(~n)</code> and
+      <code>Act2(x)</code>. The two instantiations are considered to
+      have occurred at the same timepoint.</p>
+      <p>A <em>trace property</em> is a set of traces. We define a set
+      of traces in Tamarin using first-order logic formulas over action
+      facts and timepoints. More precisely, Tamarin’s property
+      specification language is a guarded fragment of a many-sorted
+      first-order logic with a sort for timepoints. This logic supports
+      quantification over both messages and timepoints.</p>
+      <p>The syntax for specifying security properties is defined as
+      follows:</p>
+      <ul>
+      <li><p><code>All</code> for universal quantification, temporal
+      variables are prefixed with #</p></li>
+      <li><p><code>Ex</code> for existential quantification, temporal
+      variables are prefixed with #</p></li>
+      <li><p><code>==&gt;</code> for implication</p></li>
+      <li><p><code>&amp;</code> for conjunction</p></li>
+      <li><p><code>|</code> for disjunction</p></li>
+      <li><p><code>not</code> for negation</p></li>
+      <li><p><code>f @ i</code> for action constraints, the sort prefix
+      for the temporal variable ‘i’ is optional</p></li>
+      <li><p><code>i &lt; j</code> for temporal ordering, the sort
+      prefix for the temporal variables ‘i’ and ‘j’ is optional</p></li>
+      <li><p><code>#i = #j</code> for an equality between temporal
+      variables ‘i’ and ‘j’</p></li>
+      <li><p><code>x = y</code> for an equality between message
+      variables ‘x’ and ‘y’</p></li>
+      <li><p><code>Pred(t1,..,tn)</code> as syntactic sugar for
+      instantiating a predicate Pred for the terms <code>t1</code> to
+      <code>tn</code></p></li>
+      </ul>
+      <p>All action fact symbols may be used in formulas. The terms (as
+      arguments of those action facts) are more limited. Terms are only
+      allowed to be built from quantified variables, public constants
+      (names delimited using single-quotes), and free function symbols
+      including pairing. This excludes function symbols that appear in
+      any of the equations. Moreover, all variables must be guarded. If
+      they are not guarded, Tamarin will produce an error.</p>
+      <p><strong>Predicates.</strong> Are defined using the
+      <code>predicates</code> construct, and substituted while parsing
+      trace properties, whether they are part of lemmas, restrictions or
+      embedded restrictions:</p>
+      <pre><code>builtins: multiset
+predicates: Smaller(x,y) &lt;=&gt; Ex z. x + z = y
+
+[..]
+
+lemma one_smaller_two:
+    &quot;All x y #i. B(x,y)@i ==&gt; Smaller(x,y)&quot;</code></pre>
+      <p><strong>Guardedness. </strong> To ensure guardedness, for
+      universally quantified variables, one has to check that they all
+      occur in an action constraint right after the quantifier and that
+      the outermost logical operator inside the quantifier is an
+      implication. For existentially quantified variables, one has to
+      check that they all occur in an action constraint right after the
+      quantifier and that the outermost logical operator inside the
+      quantifier is a conjunction. We do recommend to use parentheses,
+      when in doubt about the precedence of logical connectives, but we
+      follow the standard precedence. Negation binds tightest, then
+      conjunction, then disjunction and then implication.
+      <!-- Equivalence binds weakest (and nobody uses it). --></p>
+      <p>To specify a property about a protocol to be verified, we use
+      the keyword <code>lemma</code> followed by a name for the property
+      and a guarded first-order formula. This expresses that the
+      property must hold for all traces of the protocol. For instance,
+      to express the property that the fresh value <code>~n</code> is
+      distinct in all applications of the fictitious rule (or rather, if
+      an action with the same fresh value appears twice, it actually is
+      the same instance, identified by the timepoint), we write</p>
+      <pre><code>lemma distinct_nonces:
+    &quot;All n #i #j. Act1(n)@i &amp; Act1(n)@j ==&gt; #i=#j&quot;</code></pre>
+      <p>or equivalently</p>
+      <pre><code>lemma distinct_nonces:
+  all-traces
+    &quot;All n #i #j. Act1(n)@i &amp; Act1(n)@j ==&gt; #i=#j&quot;</code></pre>
+      <p>We can also express that there exists a trace for which the
+      property holds. We do this by adding the keyword
+      <code>exists-trace</code> after the name and before the property.
+      For instance, the following lemma is true if and only if the
+      preceding lemma is false:</p>
+      <pre><code>lemma distinct_nonces:
+  exists-trace
+    &quot;not All n #i #j. Act1(n)@i &amp; Act1(n)@j ==&gt; #i=#j&quot;</code></pre>
+      <h3 id="secrecy">Secrecy</h3>
+      <p>In this section we briefly explain how you can express standard
+      secrecy properties in Tamarin and give a short example. See <a
+      href="#sec:elsewhere">Protocol and Standard Security Property
+      Specification Templates</a> for an in-depth discussion.</p>
+      <p>Tamarin’s built-in message deduction rule</p>
+      <pre><code>rule isend:
+   [ !KU(x) ]
+ --[  K(x)  ]--&gt;
+   [ In(x)  ]</code></pre>
+      <p>allows us to reason about the Dolev-Yao adversary’s knowledge.
+      To specify the property that a message <code>x</code> is secret,
+      we propose to label a suitable protocol rule with a
+      <code>Secret</code> action. We then specify a secrecy lemma that
+      states whenever the <code>Secret(x)</code> action occurs at
+      timepoint <code>i</code>, the adversary does not know
+      <code>x</code>.</p>
+      <pre><code>lemma secrecy:
+  &quot;All x #i.
+    Secret(x) @i ==&gt; not (Ex #j. K(x)@j)&quot;</code></pre>
+      <p><strong>Example.</strong> The following Tamarin theory
+      specifies a simple one-message protocol. Agent <code>A</code>
+      sends a message encrypted with agent <code>B</code>’s public key
+      to <code>B</code>. Both agents claim secrecy of a message, but
+      only agent <code>A</code>’s claim is true. To distinguish between
+      the two claims we add the action facts <code>Role('A')</code>
+      (respectively <code>Role('B')</code>) to the rule modeling role
+      <code>A</code> (respectively to the rule for role <code>B</code>).
+      We then specify two secrecy lemmas, one for each role.</p>
+      <pre class="tamarin"><code>theory secrecy_asym_enc
+begin
+
+builtins: asymmetric-encryption
+
+/* We formalize the following protocol:
+
+    1. A -&gt; B: {A,na}pk(B)
+
+*/
+
+// Public key infrastructure
+rule Register_pk:
+  [ Fr(~ltkX) ]
+  --&gt;
+  [ !Ltk($X, ~ltkX)
+  , !Pk($X, pk(~ltkX))
+  , Out(pk(~ltkX))
+  ] 
+
+// Compromising an agent&#39;s long-term key
+rule Reveal_ltk:
+  [ !Ltk($X, ltkX) ] --[ Reveal($X) ]-&gt; [ Out(ltkX) ]
+
+// Role A sends first message
+rule A_1_send:
+  [ Fr(~na)
+  , !Ltk($A, ltkA)
+  , !Pk($B, pkB)
+  ]
+--[ Send($A, aenc(&lt;$A, ~na&gt;, pkB)) 
+  , Secret(~na), Honest($A), Honest($B), Role(&#39;A&#39;)
+  ]-&gt;
+  [ St_A_1($A, ltkA, pkB, $B, ~na) 
+  , Out(aenc(&lt;$A, ~na&gt;, pkB))
+  ]
+
+// Role B receives first message
+rule B_1_receive:
+  [ !Ltk($B, ltkB)
+  , In(aenc(&lt;$A, na&gt;,pk(ltkB)))
+  ]
+--[ Recv($B, aenc(&lt;$A, na&gt;, pk(ltkB)))
+  , Secret(na), Honest($B), Honest($A), Role(&#39;B&#39;)
+  ]-&gt;
+  [ St_B_1($B, ltkB, $A, na)
+  ]
+
+lemma executable:
+  exists-trace
+    &quot;Ex A B m #i #j. Send(A,m)@i &amp; Recv(B,m) @j&quot;
+
+lemma secret_A:
+  all-traces
+    &quot;All n #i. Secret(n) @i &amp; Role(&#39;A&#39;) @i ==&gt; (not (Ex #j. K(n)@j)) | (Ex B #j. Reveal(B)@j &amp; Honest(B)@i)&quot;
+
+lemma secret_B:
+  all-traces
+    &quot;All n #i. Secret(n) @i &amp; Role(&#39;B&#39;) @i ==&gt; (not (Ex #j. K(n)@j)) | (Ex B #j. Reveal(B)@j &amp; Honest(B)@i)&quot;
+
+
+end</code></pre>
+      <p>In the above example the lemma <code>secret_A</code> holds as
+      the initiator generated the fresh value, while the responder has
+      no guarantees, i.e., lemma <code>secret_B</code> yields an
+      attack.</p>
+      <h3 id="sec:message-authentication">Authentication</h3>
+      <p>In this section we show how to specify a simple message
+      authentication property. For specifications of the properties in
+      Lowe’s hierarchy of authentication specifications <span
+      class="citation" data-cites="Lowe">(Lowe 1997)</span> see the
+      Section <a href="#sec:elsewhere">Protocol and Standard Security
+      Property Specification Templates</a>.</p>
+      <p>We specify the following <em>message authentication</em>
+      property: If an agent <code>a</code> believes that a message
+      <code>m</code> was sent by an agent <code>b</code>, then
+      <code>m</code> was indeed sent by <code>b</code>. To specify
+      <code>a</code>’s belief we label an appropriate rule in
+      <code>a</code>’s role specification with the action
+      <code>Authentic(b,m)</code>. The following lemma defines the set
+      of traces that satisfy the message authentication property.</p>
+      <pre><code>lemma message_authentication:
+    &quot;All b m #j. Authentic(b,m) @j ==&gt; Ex #i. Send(b,m) @i &amp;i&lt;j&quot;</code></pre>
+      <p>A simple message authentication example is the following
+      one-message protocol. Agent <code>A</code> sends a signed message
+      to agent <code>B</code>. We model the signature using asymmetric
+      encryption. A better model is shown in the section on
+      Restrictions.</p>
+      <pre class="tamarin"><code>theory auth_signing_simple
+begin
+
+builtins: asymmetric-encryption
+
+/* We formalize the following protocol:
+
+    1. A -&gt; B: {A,na}sk(A)
+
+*/
+
+// Public key infrastructure
+rule Register_pk:
+  [ Fr(~ltkX) ]
+  --&gt;
+  [ !Ltk($X, ~ltkX)
+  , !Pk($X, pk(~ltkX))
+  , Out(pk(~ltkX)) 
+  ] 
+
+// Role A sends first message
+rule A_1_send:
+  [ Fr(~na)
+  , !Ltk($A, ltkA)
+  ]
+--[ Send($A, &lt;$A, ~na&gt;) 
+  ]-&gt;
+  [ St_A_1($A, ltkA, ~na) 
+  , Out(aenc(&lt;$A, ~na&gt;,ltkA))
+  ]
+
+// Role B receives first message
+rule B_1_receive:
+  [ !Pk($A, pk(skA))
+  , In(aenc(&lt;$A, na&gt;,skA))
+  ]
+--[ Recv($B, &lt;$A, na&gt;)
+  , Authentic($A,&lt;$A, na&gt;), Honest($B), Honest($A)
+  ]-&gt;
+  [ St_B_1($B, pk(skA), $A, &lt;$A, na&gt;)
+  ]
+
+lemma executable:
+  exists-trace
+    &quot;Ex A B m #i #j. Send(A,m)@i &amp; Recv(B,m) @j&quot;
+
+lemma message_authentication: 
+    &quot;All b m #i. Authentic(b,m) @i
+     ==&gt; (Ex #j. Send(b,m) @j &amp; j&lt;i)&quot;
+
+end</code></pre>
+      <h2 id="observational-equivalence">Observational Equivalence</h2>
+      <p>All the previous properties are trace properties, i.e.,
+      properties that are defined on each trace independently. For
+      example, the definition of secrecy required that there is no trace
+      where the adversary could compute the secret without having
+      corrupted the agent.</p>
+      <p>In contrast, Observational Equivalence properties reason about
+      two systems (for example two instances of a protocol), by showing
+      that an intruder cannot distinguish these two systems. This can be
+      used to express privacy-type properties, or cryptographic
+      indistinguishability properties.</p>
+      <p>For example, a simple definition of privacy for voting requires
+      that an adversary cannot distinguish two instances of a voting
+      protocol where two voters swap votes. That is, in the first
+      instance, voter <code>A</code> votes for candidate <code>a</code>
+      and voter <code>B</code> votes for <code>b</code>, and in the
+      second instance voter <code>A</code> votes for candidate
+      <code>b</code> and voter <code>B</code> votes for <code>a</code>.
+      If the intruder cannot tell both instances apart, he does not know
+      which voter votes for which candidate, even though he might learn
+      the result, i.e., that there is one vote for a and one for b.</p>
+      <p>Tamarin can prove such properties for two systems that only
+      differ in terms using the <code>diff( , )</code> operator.
+      Consider the following toy example, where one creates a public
+      key, two fresh values <code>~a</code> and <code>~b</code>, and
+      publishes <code>~a</code>. Then one encrypts either
+      <code>~a</code> or <code>~b</code> (modeled using the
+      <code>diff</code> operator) and sends out the ciphertext:</p>
+      <pre class="tamarin"><code>// Generate a public key and output it
+// Choose two fresh values and reveal one of it
+// Encrypt either the first or the second fresh value
+rule Example:
+    [ Fr(~ltk)
+    , Fr(~a)
+    , Fr(~b) ]
+  --[ Secret( ~b ) ]-&gt;
+    [ Out( pk(~ltk) )
+    , Out( ~a )
+    , Out( aenc( diff(~a,~b), pk(~ltk) ) )
+    ]</code></pre>
+      <p>In this example, the intruder cannot compute <code>~b</code> as
+      formalized by the following lemma:</p>
+      <pre class="tamarin"><code>lemma B_is_secret:
+  &quot; /* The intruder cannot know ~b: */
+    All B #i. (
+      /* ~b is claimed secret implies */
+      Secret(B) @ #i ==&gt;
+      /* the adversary does not know &#39;~b&#39; */
+      not( Ex #j. K(B) @ #j )
+    )</code></pre>
+      <p>However, he can know whether in the last message
+      <code>~a</code> or <code>~b</code> was encrypted by simply taking
+      the output <code>~a</code>, encrypting it with the public key and
+      comparing it to the published ciphertext. This is captured using
+      observational equivalence.</p>
+      <p>To see how this works, we need to start Tamarin in
+      observational equivalence mode by adding a <code>--diff</code> to
+      the command:</p>
+      <pre><code>tamarin-prover interactive --diff ObservationalEquivalenceExample.spthy</code></pre>
+      <p>Now point your browser to <a href="http://localhost:3001"
+      class="uri">http://localhost:3001</a>. After clicking on the
+      theory <code>ObservationalEquivalenceExample</code>, you should
+      see the following.</p>
+      <p><img src="../images/tamarin-obseq-overview.jpg"
+      title="Observational Equivalence Overview" style="width:100.0%"
+      alt="Observational Equivalence Overview" /><br />
+      </p>
+      <p>There are multiple differences to the ‘normal’ trace mode.</p>
+      <p>First, there is a new option <code>Diff Rules</code>, which
+      will simply present the rewrite rules from the <code>.spthy</code>
+      file. (See image below.)</p>
+      <p>Second, all the other points (Message Theory, Multiset Rewrite
+      Rules, Raw/Refined Sources) have been quadruplicated. The reason
+      for this is that any input file with the <code>diff</code>
+      operator actually specifies two models: one model where each
+      instance of <code>diff(x,y)</code> is replaced with <code>x</code>
+      (the <em>left hand side</em>, or LHS for short), and one model
+      where each instance of <code>diff(x,y)</code> is replaced with
+      <code>y</code> (the <em>right hand side</em>, or RHS for short).
+      Moreover, as the observational equivalence mode requires different
+      precomputations, each of the two models is treated twice. For
+      example, the point <code>RHS: Raw sources [Diff]</code> gives the
+      raw sources for the RHS interpretation of the model in
+      observational equivalence mode, whereas
+      <code>LHS: Raw sources</code> gives the raw sources for the LHS
+      interpretation of the model in the ‘trace’ mode.</p>
+      <p>Third, all lemmas have been duplicated: the lemma
+      <code>B_is_secret</code> exists once on the left hand side (marked
+      using <code>[left]</code>) and once on the right hand side (marked
+      using <code>[right]</code>), as both models can differ and thus
+      the lemma needs to be proven on both sides.</p>
+      <p>Finally, there is a new lemma
+      <code>Observational_equivalence</code>, added automatically by
+      Tamarin (so no need to define it in the <code>.spthy</code> input
+      file). By proving this lemma we can prove observational
+      equivalence between the LHS and RHS models.</p>
+      <p>In the <code>Diff Rules</code>, we have the rules as written in
+      the input file:</p>
+      <p><img src="../images/tamarin-obseq-diff-rules.jpg"
+      title="Observational Equivalence Diff Rules" style="width:100.0%"
+      alt="Observational Equivalence Diff Rules" /><br />
+      </p>
+      <p>If we click on <code>LHS: Multiset rewriting rules</code>, we
+      get the LHS interpretation of the rules (here
+      <code>diff(~a, ~b)</code> was replaced by <code>~a</code>):</p>
+      <p><img src="../images/tamarin-obseq-lhs-rules.jpg"
+      title="Observational Equivalence LHS Rules" style="width:100.0%"
+      alt="Observational Equivalence LHS Rules" /><br />
+      </p>
+      <p>If we click on <code>RHS: Multiset rewriting rules</code>, we
+      get the RHS interpretation of the rules (here
+      <code>diff(~a, ~b)</code> was replaced by <code>~b</code>):</p>
+      <p><img src="../images/tamarin-obseq-rhs-rules.jpg"
+      title="Observational Equivalence RHS Rules" style="width:100.0%"
+      alt="Observational Equivalence RHS Rules" /><br />
+      </p>
+      <p>We can easily prove the <code>B_is_secret</code> lemma on both
+      sides:</p>
+      <p><img src="../images/tamarin-obseq-lemmas.jpg"
+      title="Observational Equivalence Lemmas" style="width:100.0%"
+      alt="Observational Equivalence Lemmas" /><br />
+      </p>
+      <p>To start proving observational equivalence, we only have the
+      proof step <code>1. rule-equivalence</code>. This generates
+      multiple subcases:</p>
+      <p><img src="../images/tamarin-obseq-lemma-step1.jpg"
+      title="Proving the Observational Equivalence Lemma"
+      style="width:100.0%"
+      alt="Proving the Observational Equivalence Lemma" /><br />
+      </p>
+      <p>Essentially, there is a subcase per protocol rule, and there
+      are also cases for several adversary rules. The idea of the proof
+      is to show that whenever a rule can be executed on either the LHS
+      or RHS, it can also be executed on the other side. Thus, no matter
+      what the adversary does, he will always see ‘equivalent’
+      executions. To prove this, Tamarin computes for each rule all
+      possible executions on both sides, and verifies whether an
+      ‘equivalent’ execution exists on the other side. If we continue
+      our proof by clicking on <code>backward-search</code>, Tamarin
+      generates two sub-cases, one for each side. For each side, Tamarin
+      will continue by constructing all possible executions of this
+      rule.</p>
+      <p><img src="../images/tamarin-obseq-lemma-step2.jpg"
+      title="Proving the Observational Equivalence Lemma"
+      style="width:100.0%"
+      alt="Proving the Observational Equivalence Lemma" /><br />
+      </p>
+      <p>During this search, Tamarin can encounter executions that can
+      be ‘mirrored’ on the other side, for example the following
+      execution where the published key is successfully compared to
+      itself:</p>
+      <p><img src="../images/tamarin-obseq-lemma-mirrored.jpg"
+      title="Proving the Observational Equivalence Lemma: Mirrored"
+      style="width:100.0%"
+      alt="Proving the Observational Equivalence Lemma: Mirrored" /><br />
+      </p>
+      <p>Or, Tamarin can encounter executions that do not map to the
+      other side. For example the following execution on the LHS that
+      encrypts <code>~a</code> using the public key and successfully
+      compares the result to the published ciphertext, is not possible
+      on the RHS (as there the ciphertext contains <code>~b</code>).
+      Such an execution corresponds to a potential attack, and thus
+      invalidates the “Observational_equivalence” lemma.</p>
+      <p><img src="../images/tamarin-obseq-lemma-attack.jpg"
+      title="Proving the Observational Equivalence Lemma: Attack"
+      style="width:100.0%"
+      alt="Proving the Observational Equivalence Lemma: Attack" /><br />
+      </p>
+      <p>Note that Tamarin needs to potentially consider numerous
+      possible executions, which can result in long proof times or even
+      non-termination. If possible it tries not to resolve parts of the
+      execution that are irrelevant, but this is not always
+      sufficient.</p>
+      <h2 id="sec:restrictions">Restrictions</h2>
+      <p>Restrictions restrict the set of traces to be considered in the
+      protocol analysis. They can be used for purposes ranging from
+      modeling branching behavior of protocols to the verification of
+      signatures. We give a brief example of the latter. Consider the
+      simple message authentication protocol, where an agent
+      <code>A</code> sends a signed message to an agent <code>B</code>.
+      We use Tamarin’s built-in equational <a
+      href="004_cryptographic-messages.html#sec:builtin-theories">theory
+      for signing</a>.</p>
+      <pre class="tamarin"><code>// Role A sends first message
+rule A_1_send:
+  let m = &lt;A, ~na&gt;
+  in 
+  [ Fr(~na)
+  , !Ltk(A, ltkA)
+  , !Pk(B, pkB)
+  ]
+--[ Send(A, m) 
+  ]-&gt;
+  [ St_A_1(A, ltkA, pkB, B, ~na) 
+  , Out(&lt;m,sign(m,ltkA)&gt;)
+  ]
+
+// Role B receives first message
+rule B_1_receive:
+  [ !Ltk(B, ltkB)
+  , !Pk(A, pkA)
+  , In(&lt;m,sig&gt;)
+  ]
+--[ Recv(B, m)
+  , Eq(verify(sig,m,pkA),true) 
+  , Authentic(A,m), Honest(B), Honest(A)
+  ]-&gt;
+  [ St_B_1(B, ltkB, pkA, A, m)
+  ]
+</code></pre>
+      <p>In the above protocol, agent <code>B</code> verifies the
+      signature <code>sig</code> on the received message <code>m</code>.
+      We model this by considering only those traces of the protocol in
+      which the application of the <code>verify</code> function to the
+      received message equals the constant <code>true</code>. To this
+      end, we specify the equality restriction</p>
+      <pre class="tamarin"><code>restriction Equality:
+  &quot;All x y #i. Eq(x,y) @i ==&gt; x = y&quot;
+</code></pre>
+      <p>The full protocol theory is given below.</p>
+      <pre class="tamarin"><code>theory auth_signing
+begin
+
+builtins: signing
+
+/* We formalize the following protocol:
+
+    1. A -&gt; B: {A,na}sk(A)
+
+using Tamarin&#39;s builtin signing and verification functions.
+
+*/
+
+// Public key infrastructure
+rule Register_pk:
+  [ Fr(~ltkA) ]
+  --&gt;
+  [ !Ltk($A, ~ltkA)
+  , !Pk($A, pk(~ltkA))
+  , Out(pk(~ltkA)) 
+  ] 
+
+// Compromising an agent&#39;s long-term key
+rule Reveal_ltk:
+  [ !Ltk(A, ltkA) ] --[ Reveal(A) ]-&gt; [ Out(ltkA) ]
+
+// Role A sends first message
+rule A_1_send:
+  let m = &lt;A, ~na&gt;
+  in 
+  [ Fr(~na)
+  , !Ltk(A, ltkA)
+  , !Pk(B, pkB)
+  ]
+--[ Send(A, m) 
+  ]-&gt;
+  [ St_A_1(A, ltkA, pkB, B, ~na) 
+  , Out(&lt;m,sign(m,ltkA)&gt;)
+  ]
+
+// Role B receives first message
+rule B_1_receive:
+  [ !Ltk(B, ltkB)
+  , !Pk(A, pkA)
+  , In(&lt;m,sig&gt;)
+  ]
+--[ Recv(B, m)
+  , Eq(verify(sig,m,pkA),true) 
+  , Authentic(A,m), Honest(B), Honest(A)
+  ]-&gt;
+  [ St_B_1(B, ltkB, pkA, A, m)
+  ]
+
+restriction Equality:
+  &quot;All x y #i. Eq(x,y) @i ==&gt; x = y&quot;
+
+lemma executable:
+  exists-trace
+    &quot;Ex A B m #i #j. Send(A,m)@i &amp; Recv(B,m) @j&quot;
+
+lemma message_authentication: 
+    &quot;All b m #i. Authentic(b,m) @i
+     ==&gt; (Ex #j. Send(b,m) @j &amp; j&lt;i)
+         | (Ex B #r. Reveal(B)@r &amp; Honest(B) @i &amp; r &lt; i)&quot;
+
+end</code></pre>
+      <p>Note that restrictions can also be used to verify observational
+      equivalence properties. As there are no user-specifiable lemmas
+      for observational equivalence, restrictions can be used to remove
+      state space, which essentially removes degenerate cases.</p>
+      <!-- Finally, one can use also use restrictions to simplify the writing of lemmas. -->
+      <h3 id="common-restrictions">Common restrictions</h3>
+      <p>Here is a list of common restrictions. Do note that you need to
+      add the appropriate action facts to your rules for these
+      restrictions to have impact.</p>
+      <h4 id="unique">Unique</h4>
+      <p>First, let us show a restriction forcing an action (with a
+      particular value) to be unique:</p>
+      <pre><code>restriction unique:
+  &quot;All x #i #j. UniqueFact(x) @#i &amp; UniqueFact(x) @#j ==&gt; #i = #j&quot;</code></pre>
+      <p>We call the action <code>UniqueFact</code> and give it one
+      argument. If it appears on the trace twice, it actually is only
+      once, as the two time points are identified.</p>
+      <h4 id="equality">Equality</h4>
+      <p>Next, let us consider an equality restriction. This is useful
+      if you do not want to use pattern-matching explicitly, but maybe
+      want to ensure that the decryption of an encrypted value is the
+      original value, assuming correct keys. The restriction looks like
+      this:</p>
+      <pre><code>restriction Equality:
+  &quot;All x y #i. Eq(x,y) @#i ==&gt; x = y&quot;</code></pre>
+      <p>which means that all instances of the <code>Eq</code> action on
+      the trace have the same value as both its arguments.</p>
+      <h4 id="inequality">Inequality</h4>
+      <p>Now, let us consider an inequality restriction, which ensures
+      that the two arguments of <code>Neq</code> are different:</p>
+      <pre><code>restriction Inequality:
+  &quot;All x #i. Neq(x,x) @ #i ==&gt; F&quot;</code></pre>
+      <p>This is very useful to ensure that certain arguments are
+      different.</p>
+      <h4 id="onlyonce">OnlyOnce</h4>
+      <p>If you have a rule that should only be executed once, put
+      <code>OnlyOnce()</code> as an action fact for that rule and add
+      this restriction:</p>
+      <pre><code>restriction OnlyOnce:
+  &quot;All #i #j. OnlyOnce()@#i &amp; OnlyOnce()@#j ==&gt; #i = #j&quot;</code></pre>
+      <p>Then that rule can only be executed once. Note that if you have
+      multiple rules that all have this action fact, at most one of them
+      can be executed a single time.</p>
+      <p>A similar construction can be used to limit multiple
+      occurrences of an action for specific instantiations of variables,
+      by adding these as arguments to the action. For example, one could
+      put <code>OnlyOnceV('Initiator')</code> in a rule creating an
+      initiator process, and <code>OnlyOnceV('Responder')</code> in the
+      rule for the responder. If used with the following restriction,
+      this would then yield the expected result of at most one initiator
+      and at most one responder:</p>
+      <pre><code>restriction OnlyOnceV:
+  &quot;All #i #j x. OnlyOnceV(x)@#i &amp; OnlyOnceV(x)@#j ==&gt; #i = #j&quot;</code></pre>
+      <h4 id="less-than">Less than</h4>
+      <p>If we use the <code>multiset</code> built-in we can construct
+      numbers as “1+1+…+1”, and have a restriction enforcing that one
+      number is less than another, say <code>LessThan</code>:</p>
+      <pre><code>restriction LessThan:
+  &quot;All x y #i. LessThan(x,y)@#i ==&gt; Ex z. x + z = y&quot;</code></pre>
+      <p>You would then add the <code>LessThan</code> action fact to a
+      rule where you want to enforce that a counter has strictly
+      increased.</p>
+      <p>Similarly you can use a <code>GreaterThan</code> where we want
+      <code>x</code> to be strictly larger than <code>y</code>:</p>
+      <pre><code>restriction GreaterThan:
+  &quot;All x y #i. GreaterThan(x,y)@#i ==&gt; Ex z. x = y + z&quot;</code></pre>
+      <h3 id="embedded-restrictions">Embedded restrictions</h3>
+      <p>Restrictions can be <a
+      href="005_protocol-specification-rules.html#sec:embeddedrestrictions">embedded
+      into rules</a>. This is syntactic sugar:</p>
+      <pre><code>rule X:
+    [ left-facts] --[_restrict(formula)]-&gt; [right-facts]</code></pre>
+      <p>translates to</p>
+      <pre><code>rule X:
+    [ left-facts] --[ NewActionFact(fv) ]-&gt; [right-facts]
+
+restriction Xrestriction:
+   &quot;All fv #NOW. NewActionFact(fv)@NOW ==&gt; formula
+</code></pre>
+      <p>where <code>fv</code> are the free variables in
+      <code>formula</code> appropriatly renamed.</p>
+      <p>Note that form can refer to the timepoint #NOW, which will be
+      bound to the time-point of the current instantiation of this rule.
+      Consider the following example:</p>
+      <pre><code>builtins: multiset
+
+predicates: Smaller(x,y) &lt;=&gt; Ex z. x + z = y
+          , Equal(x,y)   &lt;=&gt; x = y
+          , Added(x,y)   &lt;=&gt; Ex #a. A(x,y)@a &amp; #a &lt; #NOW
+
+rule A:
+  [In(x), In(y)] --[ _restrict(Smaller(x,y)), A(x,y), B(&#39;1&#39;,&#39;1&#39;+&#39;1&#39;)]-&gt; [ X(&#39;A&#39;)]
+
+rule B:
+    [In(x), In(y)] --[ _restrict(Added(x,y))]-&gt; []
+
+lemma one_smaller_two:
+    &quot;All x y #i. B(x,y)@i ==&gt; Smaller(x,y)&quot;
+
+lemma unequal:
+    &quot;All x y #i. A(x,y)@i ==&gt; not (Equal(x,y))&quot;</code></pre>
+      <h2 id="lemma-annotations">Lemma Annotations</h2>
+      <p>Tamarin supports a number of annotations to its lemmas, which
+      change their meaning. Any combination of them is allowed. We
+      explain them in this section. The usage is that any annotation
+      goes into square brackets after the lemma name, i.e., for a lemma
+      called “Name” and the added annotations “Annotation1” and
+      “Annotation2”, this looks like so:</p>
+      <pre><code>lemma Name [Annotation1,Annotation2]:</code></pre>
+      <h3 id="sources"><code>sources</code></h3>
+      <p>To declare a lemma as a source lemma, we use the annotation
+      <code>sources</code>:</p>
+      <pre><code>lemma example [sources]:
+  &quot;...&quot;</code></pre>
+      <p>This means a number of things:</p>
+      <ul>
+      <li>The lemma’s verification will use induction.</li>
+      <li>The lemma will be verified using the
+      <code>Raw sources</code>.</li>
+      <li>The lemma will be used to generate the
+      <code>Refined sources</code>, which are used for verification of
+      all non-<code>sources</code> lemmas.</li>
+      </ul>
+      <p>Source lemmas are necessary whenever the analysis reports
+      <code>partial deconstructions left</code> in the
+      <code>Raw sources</code>. See section on <a
+      href="008_precomputation.html#sec:openchains">Open chains</a> for
+      details on this.</p>
+      <p>All <code>sources</code> lemmas are used only for the case
+      distinctions and do not benefit from other lemmas being marked as
+      <code>reuse</code>.</p>
+      <h3 id="use_induction"><code>use_induction</code></h3>
+      <p>As you have seen before, the first choice in any proof is
+      whether to use simplification (the default) or induction. If you
+      know that a lemma will require induction, you just annotate it
+      with <code>use_induction</code>, which will make it use induction
+      instead of simplification.</p>
+      <h3 id="reuse"><code>reuse</code></h3>
+      <p>A lemma marked <code>reuse</code> will be used in the proofs of
+      all lemmas syntactically following it (except <code>sources</code>
+      lemmas as above). This includes other <code>reuse</code> lemmas
+      that can transitively depend on each other.</p>
+      <p>Note that <code>reuse</code> lemmas are ignored in the proof of
+      the equivalence lemma.</p>
+      <h3 id="diff_reuse"><code>diff_reuse</code></h3>
+      <p>A lemma marked <code>diff_reuse</code> will be used in the
+      proof of the observational equivalence lemma.</p>
+      <p>Note that <code>diff_reuse</code> lemmas are not reused for
+      trace lemmas.</p>
+      <h3 id="hide_lemmal"><code>hide_lemma=L</code></h3>
+      <p>It can sometimes be helpful to have lemmas that are used only
+      for the proofs of other lemmas. For example, assume 3 lemmas,
+      called <code>A</code>, <code>B</code>, and <code>C</code>. They
+      appear in that order, and <code>A</code> and <code>B</code> are
+      marked reuse. Then, during the proof of <code>C</code> both
+      <code>A</code> and <code>B</code> are reused, but sometimes you
+      might only want to use <code>B</code>, but the proof of
+      <code>B</code> needs <code>A</code>. The solution then is to hide
+      the lemma <code>A</code> in <code>C</code>:</p>
+      <pre><code>lemma A [reuse]:
+  ...
+
+lemma B [reuse]:
+  ...
+
+lemma C [hide_lemma=A]:
+  ...</code></pre>
+      <p>This way, <code>C</code> uses <code>B</code> which in turn uses
+      <code>A</code>, but <code>C</code> does not use <code>A</code>
+      directly.</p>
+      <h3 id="left-and-right"><code>left</code> and
+      <code>right</code></h3>
+      <p>In the observational equivalence mode you have two protocols,
+      the left instantiation of the <em>diff-terms</em> and their right
+      instantiation. If you want to consider a lemma only on the left or
+      right instantiation you annotate it with <code>left</code>,
+      respectively <code>right</code>. If you annotate a lemma with
+      <code>[left,right]</code> then both lemmas get generated, just as
+      if you did not annotate it with either of <code>left</code> or
+      <code>right</code>.</p>
+      <h2 id="sec:elsewhere">Protocol and Standard Security Property
+      Specification Templates</h2>
+      <p>In this section we provide templates for specifying protocols
+      and standard security properties in a unified manner.</p>
+      <h3 id="protocol-rules">Protocol Rules</h3>
+      <p>A protocol specifies two or more roles. For each role we
+      specify an initialization rule that generates a fresh run
+      identifier <code>id</code> (to distinguish parallel protocol runs
+      of an agent) and sets up an agent’s initial knowledge including
+      long term keys, private keys, shared keys, and other agent’s
+      public keys. We label such a rule with the action fact
+      <code>Create(A,id)</code>, where <code>A</code> is the agent name
+      (a public constant) and <code>id</code> the run identifier and the
+      action fact <code>Role('A')</code>, where <code>'A'</code> is a
+      public constant string. An example of this is the following
+      initialization rule:</p>
+      <pre class="tamarin"><code>// Initialize Role A
+rule Init_A:
+  [ Fr(~id)
+  , !Ltk(A, ltkA)
+  , !Pk(B, pkB)
+  ]
+--[ Create(A, ~id), Role(&#39;A&#39;) ]-&gt;
+  [ St_A_1(A, ~id, ltkA, pkB, B)
+  ]
+</code></pre>
+      <p>The pre-distributed key infrastructure is modeled with a
+      dedicated rule that may be accompanied by a key compromise rule.
+      The latter is to model compromised agents and is labeled with a
+      <code>Reveal(A)</code> action fact, where <code>A</code> is the
+      public constant denoting the compromised agent. For instance, a
+      public key infrastructure is modeled with the following two
+      rules:</p>
+      <pre class="tamarin"><code>// Public key infrastructure
+rule Register_pk:
+  [ Fr(~ltkA) ]
+  --&gt;
+  [ !Ltk($A, ~ltkA)
+  , !Pk($A, pk(~ltkA))
+  , Out(pk(~ltkA)) 
+  ] 
+
+rule Reveal_ltk:
+  [ !Ltk(A, ltkA) ] --[ Reveal(A) ]-&gt; [ Out(ltkA) ]
+</code></pre>
+      <h3 id="secrecy-1">Secrecy</h3>
+      <p>We use the <code>Secret(x)</code> action fact to indicate that
+      the message <code>x</code> is supposed to be secret. The simple
+      secrecy property
+      <code>"All x #i. Secret(x) @i ==&gt; not (Ex #j. K(x)@j)"</code>
+      may not be satisfiable when agents’ keys are compromised. We call
+      an agent whose keys are not compromised an <em>honest</em> agent.
+      We indicate assumptions on honest agents by labeling the same rule
+      that the <code>Secret</code> action fact appears in with an
+      <code>Honest(B)</code> action fact, where <code>B</code> is the
+      agent name that is assumed to be honest. For instance, in the
+      following rule the agent in role <code>'A'</code> is sending a
+      message, where the nonce <code>~na</code> is supposed to be secret
+      assuming that both agents <code>A</code> and <code>B</code> are
+      honest.</p>
+      <pre class="tamarin"><code>// Role A sends first message
+rule A_1_send:
+  [ St_A_1(A, ~id, ltkA, pkB, B) 
+  , Fr(~na)
+  ]
+--[ Send(A, aenc{A, ~na}pkB) 
+  , Secret(~na), Honest(A), Honest(B), Role(&#39;A&#39;)
+  ]-&gt;
+  [ St_A_2(A, ~id, ltkA, pkB, B, ~na) 
+  , Out(aenc{A, ~na}pkB)
+  ]
+</code></pre>
+      <p>We then specify the property that a message <code>x</code> is
+      secret as long as agents assumed to be honest have not been
+      compromised as follows</p>
+      <pre><code>lemma secrecy:
+  &quot;All x #i.
+    Secret(x) @i ==&gt;
+    not (Ex #j. K(x)@j)
+        | (Ex B #r. Reveal(B)@r &amp; Honest(B) @i)&quot;</code></pre>
+      <p>The lemma states that whenever a secret action
+      <code>Secret(x)</code> occurs at timepoint <code>i</code>, the
+      adversary does not know <code>x</code> or an agent claimed to be
+      honest at time point <code>i</code> has been compromised at a
+      timepoint <code>r</code>.</p>
+      <p>A stronger secrecy property is <em>perfect forward
+      secrecy</em>. It requires that messages labeled with a
+      <code>Secret</code> action before a compromise remain secret.</p>
+      <pre><code>lemma secrecy_PFS:
+  &quot;All x #i.
+    Secret(x) @i ==&gt;
+    not (Ex #j. K(x)@j)
+        | (Ex B #r. Reveal(B)@r &amp; Honest(B) @i &amp; r &lt; i)&quot;</code></pre>
+      <p><strong>Example.</strong> The following Tamarin theory
+      specifies a simple one-message protocol. Agent <code>A</code>
+      sends a message encrypted with agent <code>B</code>’s public key
+      to <code>B</code>. Both agents claim secrecy of a message, but
+      only agent <code>A</code>’s claim is true. To distinguish between
+      the two claims we add the action facts <code>Role('A')</code> and
+      <code>Role('B')</code> for role <code>A</code> and <code>B</code>,
+      respectively and specify two secrecy lemmas, one for each
+      role.</p>
+      <p>The perfect forward secrecy claim does not hold for agent
+      <code>A</code>. We show this by negating the perfect forward
+      secrecy property and stating an exists-trace lemma.</p>
+      <pre class="tamarin"><code>theory secrecy_template
+begin
+
+builtins: asymmetric-encryption
+
+/* We formalize the following protocol:
+
+    1. A -&gt; B: {A,na}pk(B)
+
+*/
+
+// Public key infrastructure
+rule Register_pk:
+  [ Fr(~ltkA) ]
+  --&gt;
+  [ !Ltk($A, ~ltkA)
+  , !Pk($A, pk(~ltkA))
+  , Out(pk(~ltkA)) 
+  ] 
+
+rule Reveal_ltk:
+  [ !Ltk(A, ltkA) ] --[ Reveal(A) ]-&gt; [ Out(ltkA) ]
+
+// Initialize Role A
+rule Init_A:
+  [ Fr(~id)
+  , !Ltk(A, ltkA)
+  , !Pk(B, pkB)
+  ]
+--[ Create(A, ~id), Role(&#39;A&#39;) ]-&gt;
+  [ St_A_1(A, ~id, ltkA, pkB, B)
+  ]
+
+// Initialize Role B
+rule Init_B:
+  [ Fr(~id)
+  , !Ltk(B, ltkB)
+  , !Pk(A, pkA)
+  ]
+--[ Create(B, ~id), Role(&#39;B&#39;) ]-&gt;
+  [ St_B_1(B, ~id, ltkB, pkA, A)
+  ]
+
+// Role A sends first message
+rule A_1_send:
+  [ St_A_1(A, ~id, ltkA, pkB, B) 
+  , Fr(~na)
+  ]
+--[ Send(A, aenc{A, ~na}pkB) 
+  , Secret(~na), Honest(A), Honest(B), Role(&#39;A&#39;)
+  ]-&gt;
+  [ St_A_2(A, ~id, ltkA, pkB, B, ~na) 
+  , Out(aenc{A, ~na}pkB)
+  ]
+
+// Role B receives first message
+rule B_1_receive:
+  [ St_B_1(B, ~id, ltkB, pkA, A)
+  , In(aenc{A, na}pkB)
+  ]
+--[ Recv(B, aenc{A, na}pkB) 
+  , Secret(na), Honest(B), Honest(A), Role(&#39;B&#39;)
+  ]-&gt;
+  [ St_B_2(B, ~id, ltkB, pkA, A, na)
+  ]
+
+lemma executable:
+  exists-trace
+    &quot;Ex A B m #i #j. Send(A,m)@i &amp; Recv(B,m) @j&quot;
+
+lemma secret_A:
+    &quot;All n #i. Secret(n) @i &amp; Role(&#39;A&#39;) @i ==&gt; 
+     (not (Ex #j. K(n)@j)) | (Ex X #j. Reveal(X)@j &amp; Honest(X)@i)&quot;
+
+lemma secret_B:
+    &quot;All n #i. Secret(n) @i &amp; Role(&#39;B&#39;) @i ==&gt; 
+     (not (Ex #j. K(n)@j)) | (Ex X #j. Reveal(X)@j &amp; Honest(X)@i)&quot;
+
+lemma secrecy_PFS_A:
+  exists-trace
+  &quot;not All x #i. 
+    Secret(x) @i &amp; Role(&#39;A&#39;) @i ==&gt; 
+    not (Ex #j. K(x)@j)
+        | (Ex B #r. Reveal(B)@r &amp; Honest(B) @i &amp; r &lt; i)&quot;
+
+end</code></pre>
+      <h3 id="authentication">Authentication</h3>
+      <p>In this section we show how to formalize the entity
+      authentication properties of Lowe’s hierarchy of authentication
+      specifications <span class="citation" data-cites="Lowe">(Lowe
+      1997)</span> for two-party protocols.</p>
+      <p>All the properties defined below concern the authentication of
+      an agent in role <code>'B'</code> to an agent in role
+      <code>'A'</code>. To analyze a protocol with respect to these
+      properties we label an appropriate rule in role <code>A</code>
+      with a <code>Commit(a,b,&lt;'A','B',t&gt;)</code> action and in
+      role <code>B</code> with the
+      <code>Running(b,a,&lt;'A','B',t&gt;)</code> action. Here
+      <code>a</code> and <code>b</code> are the agent names (public
+      constants) of roles <code>A</code> and <code>B</code>,
+      respectively and <code>t</code> is a term.</p>
+      <ol type="1">
+      <li>Aliveness</li>
+      </ol>
+      <p>A protocol guarantees to an agent <code>a</code> in role
+      <code>A</code> <em>aliveness</em> of another agent <code>b</code>
+      if, whenever <code>a</code> completes a run of the protocol,
+      apparently with <code>b</code> in role <code>B</code>, then
+      <code>b</code> has previously been running the protocol.</p>
+      <pre><code>lemma aliveness:
+   &quot;All a b t #i.
+     Commit(a,b,t)@i
+     ==&gt;  (Ex id #j. Create(b,id) @ j)
+          | (Ex C #r. Reveal(C) @ r &amp; Honest(C) @ i)&quot;</code></pre>
+      <ol start="2" type="1">
+      <li>Weak agreement</li>
+      </ol>
+      <p>A protocol guarantees to an agent <code>a</code> in role
+      <code>A</code> <em>weak agreement</em> with another agent
+      <code>b</code> if, whenever agent <code>a</code> completes a run
+      of the protocol, apparently with <code>b</code> in role
+      <code>B</code>, then <code>b</code> has previously been running
+      the protocol, apparently with <code>a</code>.</p>
+      <pre><code>lemma weak_agreement:
+  &quot;All a b t1 #i.
+    Commit(a,b,t1) @i
+    ==&gt; (Ex t2 #j. Running(b,a,t2) @j)
+        | (Ex C #r. Reveal(C) @ r &amp; Honest(C) @ i)&quot;</code></pre>
+      <ol start="3" type="1">
+      <li>Non-injective agreement</li>
+      </ol>
+      <p>A protocol guarantees to an agent <code>a</code> in role
+      <code>A</code> <em>non-injective agreement</em> with an agent
+      <code>b</code> in role <code>B</code> on a message <code>t</code>
+      if, whenever <code>a</code> completes a run of the protocol,
+      apparently with <code>b</code> in role <code>B</code>, then
+      <code>b</code> has previously been running the protocol,
+      apparently with <code>a</code>, and <code>b</code> was acting in
+      role <code>B</code> in his run, and the two principals agreed on
+      the message <code>t</code>.</p>
+      <pre><code>lemma noninjective_agreement:
+  &quot;All a b t #i.
+    Commit(a,b,t) @i
+    ==&gt; (Ex #j. Running(b,a,t) @j)
+        | (Ex C #r. Reveal(C) @ r &amp; Honest(C) @ i)&quot;</code></pre>
+      <ol start="4" type="1">
+      <li>Injective agreement</li>
+      </ol>
+      <p>We next show the lemma to analyze <em>injective agreement</em>.
+      A protocol guarantees to an agent <code>a</code> in role
+      <code>A</code> injective agreement with an agent <code>b</code> in
+      role <code>B</code> on a message <code>t</code> if, whenever
+      <code>a</code> completes a run of the protocol, apparently with
+      <code>b</code> in role <code>B</code>, then <code>b</code> has
+      previously been running the protocol, apparently with
+      <code>a</code>, and <code>b</code> was acting in role
+      <code>B</code> in his run, and the two principals agreed on the
+      message <code>t</code>. Additionally, there is a unique matching
+      partner instance for each completed run of an agent, i.e., for
+      each <code>Commit</code> by an agent there is a unique
+      <code>Running</code> by the supposed partner.</p>
+      <pre><code>lemma injectiveagreement:
+  &quot;All A B t #i.
+    Commit(A,B,t) @i
+    ==&gt; (Ex #j. Running(B,A,t) @j
+        &amp; j &lt; i
+        &amp; not (Ex A2 B2 #i2. Commit(A2,B2,t) @i2
+                           &amp; not (#i2 = #i)))
+              | (Ex C #r. Reveal(C)@r &amp; Honest(C) @i)&quot;</code></pre>
+      <p>The idea behind injective agreement is to prevent replay
+      attacks. Therefore, new freshness will have to be involved in each
+      run, meaning the term <code>t</code> must contain such a fresh
+      value.</p>
+      <div id="refs" class="references csl-bib-body hanging-indent"
+      role="doc-bibliography">
+      <div id="ref-Lowe" class="csl-entry" role="doc-biblioentry">
+      Lowe, Gavin. 1997. <span>“<span class="nocase">A Hierarchy of
+      Authentication Specifications</span>.”</span> In <em>10th Computer
+      Security Foundations Workshop (CSFW 1997), June 10-12, 1997,
+      Rockport, Massachusetts, USA</em>, 31–44. IEEE Computer Society.
+      <a
+      href="http://www.cs.ox.ac.uk/people/gavin.lowe/Security/Papers/authentication.ps">http://www.cs.ox.ac.uk/people/gavin.lowe/Security/Papers/authentication.ps</a>.
+      </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
