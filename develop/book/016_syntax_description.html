@@ -92,7 +92,7 @@ built_ins      := &#39;diffie-hellman&#39;
                 | &#39;hashing&#39; | &#39;symmetric-encryption&#39;
                 | &#39;asymmetric-encryption&#39; | &#39;signing&#39;
                 | &#39;bilinear-pairing&#39; | &#39;xor&#39;
-                | &#39;multiset&#39; | &#39;revealing-signing&#39;</code></pre>
+                | &#39;multiset&#39; | &#39;natural-numbers&#39; | &#39;revealing-signing&#39;</code></pre>
       <p>A global heuristic sets the default heuristic that will be used
       when autoproving lemmas in the file. The specified goal ranking
       can be any of those discussed in Section <a
@@ -199,7 +199,7 @@ goal           :=  fact &quot;▶&quot; natural_subscr node_var
 node_var       := [&#39;#&#39;] ident [&#39;.&#39; natural]      // temporal sort prefix
                 | ident [&#39;.&#39; natural] &#39;:&#39; &#39;node&#39; // temporal sort suffix
 natural        := digit+
-natural_sub    := (&#39;₀&#39;|&#39;₁&#39;|&#39;₂&#39;|&#39;₃&#39;|&#39;₄&#39;|&#39;₅&#39;|&#39;₆&#39;|&#39;₇&#39;|&#39;₈&#39;|&#39;₉&#39;)+</code></pre>
+natural_subscr := (&#39;₀&#39;|&#39;₁&#39;|&#39;₂&#39;|&#39;₃&#39;|&#39;₄&#39;|&#39;₅&#39;|&#39;₆&#39;|&#39;₇&#39;|&#39;₈&#39;|&#39;₉&#39;)+</code></pre>
       <p>Formal comments are used to make the input more readable. In
       contrast to <code>/*...*/</code> and <code>//...</code> comments,
       formal comments are stored and output again when pretty-printing a
@@ -221,7 +221,8 @@ natural_sub    := (&#39;₀&#39;|&#39;₁&#39;|&#39;₂&#39;|&#39;₃&#39;|&#39;
       arguments of an n-ary function application must agree with the
       arity given in the function definition.</p>
       <pre><code>tupleterm := &#39;&lt;&#39; msetterm (&#39;,&#39; msetterm)* &#39;&gt;&#39;
-msetterm  := xorterm (&#39;+&#39; xorterm)*
+msetterm  := natterm ((&#39;++&#39; | &#39;+&#39;) natterm)*
+natterm   := xorterm (&#39;%+&#39; xorterm)*
 xorterm   := multterm ((&#39;XOR&#39; | ⊕) multterm)*
 multterm  := expterm (&#39;*&#39; expterm)*
 expterm   := term    (&#39;^&#39; term   )*
@@ -272,14 +273,15 @@ imp         := disjunction [(&#39;==&gt;&#39; | &#39;⇒&#39;) imp]
 disjunction := conjunction ((&#39;|&#39; | &#39;∨&#39;) conjunction)* // left-associative
 conjunction := negation ((&#39;&amp;&#39; | &#39;∧&#39;) negation)*       // left-associative
 negation    := [&#39;not&#39; | &#39;¬&#39;] atom
-atom        := &#39;⊥&#39; | &#39;F&#39; | &#39;⊤&#39; | &#39;T&#39;        // true or false
-             | &#39;(&#39; formula &#39;)&#39;          // nested formula
-             | &#39;last&#39; &#39;(&#39; node_var &#39;)&#39;  // &#39;last&#39; temporal variable for induction
-             | fact &#39;@&#39; node_var        // action
-             | node_var &#39;&lt;&#39; node_var    // ordering of temporal variables
-             | msetterm &#39;=&#39; msetterm    // equality of terms
-             | node_var &#39;=&#39; node_var    // equality of temporal variables
-             | (&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;) // quantified formula
+atom        := &#39;⊥&#39; | &#39;F&#39; | &#39;⊤&#39; | &#39;T&#39;           // true or false
+             | &#39;(&#39; formula &#39;)&#39;                 // nested formula
+             | &#39;last&#39; &#39;(&#39; node_var &#39;)&#39;         // &#39;last&#39; temporal variable for induction
+             | fact &#39;@&#39; node_var               // action
+             | node_var &#39;&lt;&#39; node_var           // ordering of temporal variables
+             | msetterm &#39;=&#39; msetterm           // equality of terms
+             | msetterm (&#39;&lt;&lt;&#39; | &#39;⊏&#39;) msetterm  // subterm relation
+             | node_var &#39;=&#39; node_var           // equality of temporal variables
+             | (&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;)      // quantified formula
                     lvar+ &#39;.&#39; formula
 
 lvar        := node_var | nonnode_var</code></pre>

@@ -154,14 +154,15 @@ begin</code></pre>
       <ul>
       <li><code>~x</code> denotes <code>x:fresh</code></li>
       <li><code>$x</code> denotes <code>x:pub</code></li>
+      <li><code>%x</code> denotes <code>x:nat</code></li>
       <li><code>#i</code> denotes <code>i:temporal</code></li>
       <li><code>m</code> denotes <code>m:msg</code></li>
       </ul>
       <p>Moreover, a string constant <code>'c'</code> denotes a public
       name in <code>pub</code>, which is a fixed, global constant. We
-      have a top sort <code>msg</code> and two incomparable subsorts
-      <code>fresh</code> and <code>pub</code> of that top sort.
-      Timepoint variables of sort <code>temporal</code> are
+      have a top sort <code>msg</code> and three incomparable subsorts
+      <code>fresh</code>, <code>pub</code> and <code>nat</code> of that
+      top sort. Timepoint variables of sort <code>temporal</code> are
       unconnected.</p>
       <p>The above rule can therefore be read as follows. First,
       generate a fresh name <code>~ltk</code> (of sort fresh), which is

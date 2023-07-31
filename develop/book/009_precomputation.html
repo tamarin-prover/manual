@@ -269,11 +269,11 @@ lemma nonce_secrecy:
       <code>In(t)</code> to the lhs of the rule. If you are not sure if
       this transformation is sound, you may write a lemma to ensure that
       the rule can still fire.</p>
-      <p>Example: Counter values are public knowledge, so adding
-      <code>In(c)</code> to the second rule helps here:</p>
-      <pre><code>[] --&gt; [Counter(&#39;1&#39;)]
+      <p>Example: Hashes of a public value are public knowledge, so
+      adding <code>In(p)</code> to the second rule helps here:</p>
+      <pre><code>[] --&gt; [HashChain(&#39;hi&#39;)]
 
-[Counter(c)] --&gt; [Counter(c+&#39;1&#39;), Out(c+&#39;1&#39;)]
+[HashChain(p)] --&gt; [HashChain(h(p)), Out(h(p))]
 </code></pre></li>
       <li><p>Give fresh or public type if you know some values are
       atomic, but you see that pre-computation tries to deduce
