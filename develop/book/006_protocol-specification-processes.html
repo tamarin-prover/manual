@@ -11,6 +11,9 @@
   <!--    <script src="highlight.pack.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 -->
+    <script
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+    type="text/javascript"></script>
   </head>
 
 <body class="tamarindoc">
@@ -71,9 +74,9 @@
       data-cites="jacomme2017symbolic">(Jacomme, Kremer, and Scerri
       2017)</span> added support for <a href="#sec:iee">isolated
       execution environments</a>.</p></li>
-      <li><p><span class="citation" data-cites="sapicplus">(n.d.)</span>
-      extended SAPIC to SAPIC+, introducing the new syntax that we will
-      introduce in the followup and <a
+      <li><p><span class="citation" data-cites="sapicplus">(Cheval et
+      al. 2022)</span> extended SAPIC to SAPIC+, introducing the new
+      syntax that we will introduce in the followup and <a
       href="#sec:translation">translations to various
       tools</a>.</p></li>
       </ul>
@@ -294,9 +297,9 @@ equations:
       environment and to provide a certificate of the current state
       (including the executed program) of the enclave. A localized
       version of the applied pi-calculus, defined in <span
-      class="citation"
-      data-cites="JKS-eurosp17">(<strong>JKS-eurosp17?</strong>)</span>
-      and included in SAPIC, allows to model such environments.</p>
+      class="citation" data-cites="jacomme2017symbolic">(Jacomme,
+      Kremer, and Scerri 2017)</span> and included in SAPIC, allows to
+      model such environments.</p>
       <p>Processes can be given a unique identifier, which we call
       location:</p>
       <pre><code>let A = (...)@loc</code></pre>
@@ -327,9 +330,8 @@ Report(x,y) &lt;=&gt; phi(x,y)</code></pre>
       <p>The attacker can then produce any <code>report(m)@loc</code> if
       <code>phi(m,loc)</code> is true.</p>
       <p>More details can be found in the corresponding paper <span
-      class="citation"
-      data-cites="JKS-eurosp17">(<strong>JKS-eurosp17?</strong>)</span>,
-      and the examples.</p>
+      class="citation" data-cites="jacomme2017symbolic">(Jacomme,
+      Kremer, and Scerri 2017)</span>, and the examples.</p>
       <h2 id="process-declarations-using-let">Process declarations using
       <code>let</code></h2>
       <p>It is advisable to structure processes around the protocol
@@ -361,11 +363,118 @@ out(h(h(x)));                          // implictely types h as lol-&gt;lol
 // out(f(h(x)));                       // fails: as h goes to lol and f wants bitstring</code></pre>
       <p>and subprocesses:</p>
       <pre><code>let P(a:lol) =</code></pre>
+      <h2 id="sec:translation">Export features</h2>
+      <p>It is possible to export processes defined in .spthy files into
+      the formats used by other protocol verifiers, making it possible
+      to switch between tools. One can even translate lemmas in one tool
+      to assumptions in other to combine these results. The correctness
+      of the translation is proven in <span class="citation"
+      data-cites="sapicplus">(Cheval et al. 2022)</span>.</p>
+      <p>The <code>-m</code> flag selects an output module:</p>
+      <pre><code> -m --output-module[=spthy|spthytyped|msr|proverif|deepsec]</code></pre>
+      <p>The following outputs are supported:</p>
+      <ul>
+      <li><em>spthy:</em> parse .spthy file and output</li>
+      <li><em>spthytyped</em> - parse and type .spthy file ad
+      output</li>
+      <li><em>msr</em> - parse and type .spthy file and translate
+      processes to multiset-rewrite rules</li>
+      <li><em>proverif</em>: - translate to <a
+      href="https://bblanche.gitlabpages.inria.fr/proverif/">ProVerif</a>
+      input format</li>
+      <li><em>deepsec</em>: - translate to <a
+      href="https://deepsec-prover.github.io/">Deepsec</a> input
+      format</li>
+      </ul>
+      <h2 id="lemma-selection">Lemma selection</h2>
+      <p>The same spthy file may be used with multiple tools as backend.
+      To list the tools that a lemma should be exported to, use the
+      <code>output</code> attribute:</p>
+      <pre><code>lemma secrecy[reuse, output=[proverif,msr]]:</code></pre>
+      <p>Lemmas are omitted when the currently selected output module is
+      not in that list.</p>
+      <h2 id="exporting-queries">Exporting queries</h2>
+      <p>Security properties are automatically translated, if it is
+      possible. (ProVerif only supports two quantifier alternations, for
+      example.) As, e.g., DeepSec, supports queries that are not
+      expressible in Tamarin’s language, it is possible to define blocks
+      that are covered on export. They are written as:</p>
+      <pre><code>export IDENTIFIER:
+&quot;
+    text to export
+&quot;</code></pre>
+      <p>where IDENTIFIER is one of the following:</p>
+      <ul>
+      <li><p><code>requests</code>: is included in the requests the
+      target solver tries to prove. E.g.:</p>
+      <pre><code>export requests:
+&quot;
+let sys1 = new sk; (!^3 (new skP; P(sk,skP)) | !^3 S(sk)).
+
+let sys2 = new sk; ( ( new skP; !^3 P(sk,skP)) | !^3 S(sk)).
+
+query session_equiv(sys1,sys2).
+&quot;</code></pre></li>
+      </ul>
+      <h2 id="smart-export-features">Smart export features</h2>
+      <ul>
+      <li>Some predicates / conditions appear in <code>if ..</code>
+      processes have <a
+      href="007_property-specification.html#sec:predicates-special">dedicates
+      translations</a>.</li>
+      </ul>
+      <h2 id="natural-numbers">Natural numbers</h2>
+      <p>SAPIC supports the usage of the builtin natural numbers of both
+      GSVerif and Tamarin.</p>
+      <p>To use them, variables must be declared with the
+      <code>nat</code> type, and the corresponding builtin must be
+      declared:</p>
+      <pre><code>builtins: natural-numbers
+
+process:
+
+in(ctr0:nat);
+let ctr1:nat = ctr0 %+ %1 in
+out(ctr1)</code></pre>
+      <p>The subterm operator <code>&lt;&lt;</code> will be translated
+      for GSVerif as <code>&lt;</code>.</p>
+      <p>Beware, declaring a nat variable in SAPIC does not instantiate
+      a nat Tamarin variable, which may create additional possible
+      sources. To declare and use a true Tamarin nat variable, similar
+      to fresh variables and other, each occurence of the variable must
+      be prefixed with <code>%</code> (or <code>~</code> in the case of
+      fresh variables):</p>
+      <pre><code>builtins: natural-numbers
+
+process:
+
+in(%ctr0:nat);
+let ctr1:nat = %ctr0 %+ %1 in
+out(ctr1)</code></pre>
+      <p>This may however lead to divergence in Tamarin and Proverif
+      threat models.</p>
+      <h2 id="options">Options</h2>
+      <p>Some options allow altering the behaviour of the translation,
+      but can leat to divergence between Tamarin and Proverif. They
+      should be used with care. Adding an option is performed in the
+      headers of the file, with:</p>
+      <pre><code>options: opt1, opt2, ...</code></pre>
+      <p>The available options are:</p>
+      <ul>
+      <li><code>translation-state-optimisation</code>: this enables the
+      pure state translation described in the SAPIC+ paper. Both the
+      original and the optimized version do not always yield the same
+      benefit, hence the optional switch.</li>
+      <li><code>translation-compress-events</code>: by default, each
+      event is translated in a singular rule. This may create a Tamarin
+      slowdown when translating a sequence of events, but is due to the
+      fact that in Proverif, multiple events always occur at distinct
+      timestampe. This option allows compressing events into a single
+      rule.</li>
+      <li><code>translation-progress</code>: see above.</li>
+      </ul>
       <div id="refs" class="references csl-bib-body hanging-indent"
       role="doc-bibliography">
-      <div id="ref-sapicplus" class="csl-entry" role="doc-biblioentry">
-      n.d.
-      </div>
       <div id="ref-AF-popl01" class="csl-entry" role="doc-biblioentry">
       Abadi, Martín, and Cédric Fournet. 2001. <span>“Mobile Values, New
       Names, and Secure Communication.”</span> In <em>POPL</em>, 104–15.
@@ -377,6 +486,14 @@ out(h(h(x)));                          // implictely types h as lol-&gt;lol
       Künnemann. 2017. <span>“A Novel Approach for Reasoning about
       Liveness in Cryptographic Protocols and Its Application to Fair
       Exchange.”</span> In <em>EuroS&amp;p</em>. IEEE Computer Society.
+      </div>
+      <div id="ref-sapicplus" class="csl-entry" role="doc-biblioentry">
+      Cheval, Vincent, Charlie Jacomme, Steve Kremer, and Robert
+      Künnemann. 2022. <span>“<span
+      class="math inline">\(\{\)</span>SAPIC+<span
+      class="math inline">\(\}\)</span>: Protocol Verifiers of the
+      World, Unite!”</span> In <em>31st USENIX Security Symposium
+      (USENIX Security 22)</em>, 3935–52.
       </div>
       <div id="ref-jacomme2017symbolic" class="csl-entry"
       role="doc-biblioentry">

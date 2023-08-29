@@ -140,10 +140,6 @@ predicates: Smaller(x,y) &lt;=&gt; Ex z. x + z = y
 
 lemma one_smaller_two:
     &quot;All x y #i. B(x,y)@i ==&gt; Smaller(x,y)&quot;</code></pre>
-      <h4 id="sec:predicates-special">Special predicates</h4>
-      <p>In processes, the predicate <code>Smaller(x,y)</code> can be
-      written <code>(&lt;)</code> with the added bonus that it is
-      translated to an integer comparison in the ProVerif export.</p>
       <h3 id="guardedness">Guardedness</h3>
       <p>To ensure guardedness, for universally quantified variables,
       one has to check that they all occur in an action constraint right
