@@ -775,10 +775,7 @@ rule R_1:
       inductive proof method.</p>
       <p>We start by motivating the need for an inductive proof method
       on a simple example with two rules and one lemma:</p>
-      <pre class="tamarin"><code>theory InductionExample
-begin
-
-rule start:
+      <pre class="tamarin"><code>rule start:
   [ Fr(x) ]
 --[ Start(x) ]-&gt;
   [ A(x) ]
@@ -789,9 +786,7 @@ rule repeat:
   [ A(x) ]
 
 lemma AlwaysStarts [use_induction]:
-  &quot;All x #i. Loop(x) @i ==&gt; Ex #j. Start(x) @j&quot;
-
-end</code></pre>
+  &quot;All x #i. Loop(x) @i ==&gt; Ex #j. Start(x) @j&quot;</code></pre>
       <p>If we try to prove this with Tamarin without using induction
       (comment out the <code>[use_induction]</code> to try this) the
       tool will loop on the backwards search over the repeating
@@ -811,6 +806,36 @@ end</code></pre>
       For example, induction can help to prove that some later protocol
       step is always preceded by the initialization step of the
       corresponding protocol role, with similar parameters.</p>
+      <p>Induction, however, does not work for all types of lemmas. Let
+      us investigate the limitations of induction now as well. Consider
+      another rule and lemma, added to the model from above.</p>
+      <pre class="tamarin"><code>rule finish:
+  [ A(x) ]
+--[ End(x) ]-&gt;
+  []
+
+lemma AlwaysStartsWhenEnds [use_induction]:
+  &quot;All x #i. End(x) @i ==&gt; Ex #j. Start(x) @j&quot;</code></pre>
+      <p>Tamarin will fail to prove the
+      <code>AlwaysStartsWhenEnds</code> lemma, although we apply
+      induction. The induction hypothesis here is that
+      <code>AlwaysStartsWhenEnds</code> holds but not at the last
+      time-point; or more detailed: If there is an <code>End(x)</code>
+      but not at the last time-point, then there is a
+      <code>Start(x)</code> but not at the last time-point.</p>
+      <p>We cannot apply this induction hypothesis fruitfully, though,
+      as there will be always only one instance of <code>End(~x)</code>,
+      which will be at the last time-point. Intuitively speaking,
+      induction can only be applied fruitfully if the facts, on which
+      the lemma “depends” (e.g., on the left-hand side of an
+      implication), occur multiple times in the trace. Usually, this
+      applies to facts that “loop”.</p>
+      <p>Often, one can engineer around this restriction by connecting
+      non-looping facts to looping facts using auxiliary lemmas. In the
+      above example, the <code>AlwaysStarts</code> lemma provides such a
+      connection. If you mark it as a <code>reuse</code> lemma, you can
+      easily prove <code>AlwaysStartsWhenEnds</code> without
+      induction.</p>
       <h2 id="sec:integrated-preprocessor">Integrated Preprocessor</h2>
       <p>Tamarin’s integrated preprocessor can be used to include or
       exclude parts of your file. You can use this, for example, to

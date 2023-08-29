@@ -136,14 +136,14 @@
       <pre><code>builtins: multiset
 predicates: Smaller(x,y) &lt;=&gt; Ex z. x + z = y
 
-[..] 
+[..]
 
 lemma one_smaller_two:
     &quot;All x y #i. B(x,y)@i ==&gt; Smaller(x,y)&quot;</code></pre>
       <h4 id="sec:predicates-special">Special predicates</h4>
       <p>In processes, the predicate <code>Smaller(x,y)</code> can be
       written <code>(&lt;)</code> with the added bonus that it is
-      translated to an integer comparisson in the ProVerif export.</p>
+      translated to an integer comparison in the ProVerif export.</p>
       <h3 id="guardedness">Guardedness</h3>
       <p>To ensure guardedness, for universally quantified variables,
       one has to check that they all occur in an action constraint right
@@ -165,10 +165,10 @@ lemma one_smaller_two:
       distinct in all applications of the fictitious rule (or rather, if
       an action with the same fresh value appears twice, it actually is
       the same instance, identified by the timepoint), we write</p>
-      <pre><code>lemma distinct_nonces: 
+      <pre><code>lemma distinct_nonces:
     &quot;All n #i #j. Act1(n)@i &amp; Act1(n)@j ==&gt; #i=#j&quot;</code></pre>
       <p>or equivalently</p>
-      <pre><code>lemma distinct_nonces: 
+      <pre><code>lemma distinct_nonces:
   all-traces
     &quot;All n #i #j. Act1(n)@i &amp; Act1(n)@j ==&gt; #i=#j&quot;</code></pre>
       <p>We can also express that there exists a trace for which the
@@ -176,8 +176,8 @@ lemma one_smaller_two:
       <code>exists-trace</code> after the name and before the property.
       For instance, the following lemma is true if and only if the
       preceding lemma is false:</p>
-      <pre><code>lemma distinct_nonces: 
-  exists-trace 
+      <pre><code>lemma distinct_nonces:
+  exists-trace
     &quot;not All n #i #j. Act1(n)@i &amp; Act1(n)@j ==&gt; #i=#j&quot;</code></pre>
       <h3 id="secrecy">Secrecy</h3>
       <p>In this section we briefly explain how you can express standard
@@ -185,7 +185,7 @@ lemma one_smaller_two:
       href="#sec:elsewhere">Protocol and Standard Security Property
       Specification Templates</a> for an in-depth discussion.</p>
       <p>Tamarin’s built-in message deduction rule</p>
-      <pre><code>rule isend: 
+      <pre><code>rule isend:
    [ !KU(x) ]
  --[  K(x)  ]--&gt;
    [ In(x)  ]</code></pre>
@@ -197,7 +197,7 @@ lemma one_smaller_two:
       timepoint <code>i</code>, the adversary does not know
       <code>x</code>.</p>
       <pre><code>lemma secrecy:
-  &quot;All x #i. 
+  &quot;All x #i.
     Secret(x) @i ==&gt; not (Ex #j. K(x)@j)&quot;</code></pre>
       <p><strong>Example.</strong> The following Tamarin theory
       specifies a simple one-message protocol. Agent <code>A</code>
@@ -289,7 +289,7 @@ end</code></pre>
       <code>a</code>’s role specification with the action
       <code>Authentic(b,m)</code>. The following lemma defines the set
       of traces that satisfy the message authentication property.</p>
-      <pre><code>lemma message_authentication: 
+      <pre><code>lemma message_authentication:
     &quot;All b m #j. Authentic(b,m) @j ==&gt; Ex #i. Send(b,m) @i &amp;i&lt;j&quot;</code></pre>
       <p>A simple message authentication example is the following
       one-message protocol. Agent <code>A</code> sends a signed message
@@ -352,7 +352,7 @@ end</code></pre>
       properties that are defined on each trace independently. For
       example, the definition of secrecy required that there is no trace
       where the adversary could compute the secret without having
-      previously corrupted the agent.</p>
+      corrupted the agent.</p>
       <p>In contrast, Observational Equivalence properties reason about
       two systems (for example two instances of a protocol), by showing
       that an intruder cannot distinguish these two systems. This can be
@@ -470,7 +470,7 @@ rule Example:
       alt="Observational Equivalence Lemmas" /><br />
       </p>
       <p>To start proving observational equivalence, we only have the
-      proof step <code>1.  rule-equivalence</code>. This generates
+      proof step <code>1. rule-equivalence</code>. This generates
       multiple subcases:</p>
       <p><img src="../images/tamarin-obseq-lemma-step1.jpg"
       title="Proving the Observational Equivalence Lemma"
@@ -890,8 +890,8 @@ rule A_1_send:
       secret as long as agents assumed to be honest have not been
       compromised as follows</p>
       <pre><code>lemma secrecy:
-  &quot;All x #i. 
-    Secret(x) @i ==&gt; 
+  &quot;All x #i.
+    Secret(x) @i ==&gt;
     not (Ex #j. K(x)@j)
         | (Ex B #r. Reveal(B)@r &amp; Honest(B) @i)&quot;</code></pre>
       <p>The lemma states that whenever a secret action
@@ -903,8 +903,8 @@ rule A_1_send:
       secrecy</em>. It requires that messages labeled with a
       <code>Secret</code> action before a compromise remain secret.</p>
       <pre><code>lemma secrecy_PFS:
-  &quot;All x #i. 
-    Secret(x) @i ==&gt; 
+  &quot;All x #i.
+    Secret(x) @i ==&gt;
     not (Ex #j. K(x)@j)
         | (Ex B #r. Reveal(B)@r &amp; Honest(B) @i &amp; r &lt; i)&quot;</code></pre>
       <p><strong>Example.</strong> The following Tamarin theory
@@ -1029,8 +1029,8 @@ end</code></pre>
       apparently with <code>b</code> in role <code>B</code>, then
       <code>b</code> has previously been running the protocol.</p>
       <pre><code>lemma aliveness:
-   &quot;All a b t #i. 
-     Commit(a,b,t)@i 
+   &quot;All a b t #i.
+     Commit(a,b,t)@i
      ==&gt;  (Ex id #j. Create(b,id) @ j)
           | (Ex C #r. Reveal(C) @ r &amp; Honest(C) @ i)&quot;</code></pre>
       <ol start="2" type="1">
@@ -1043,7 +1043,7 @@ end</code></pre>
       <code>B</code>, then <code>b</code> has previously been running
       the protocol, apparently with <code>a</code>.</p>
       <pre><code>lemma weak_agreement:
-  &quot;All a b t1 #i. 
+  &quot;All a b t1 #i.
     Commit(a,b,t1) @i
     ==&gt; (Ex t2 #j. Running(b,a,t2) @j)
         | (Ex C #r. Reveal(C) @ r &amp; Honest(C) @ i)&quot;</code></pre>
@@ -1060,7 +1060,7 @@ end</code></pre>
       role <code>B</code> in his run, and the two principals agreed on
       the message <code>t</code>.</p>
       <pre><code>lemma noninjective_agreement:
-  &quot;All a b t #i. 
+  &quot;All a b t #i.
     Commit(a,b,t) @i
     ==&gt; (Ex #j. Running(b,a,t) @j)
         | (Ex C #r. Reveal(C) @ r &amp; Honest(C) @ i)&quot;</code></pre>
@@ -1081,9 +1081,9 @@ end</code></pre>
       each <code>Commit</code> by an agent there is a unique
       <code>Running</code> by the supposed partner.</p>
       <pre><code>lemma injectiveagreement:
-  &quot;All A B t #i. 
+  &quot;All A B t #i.
     Commit(A,B,t) @i
-    ==&gt; (Ex #j. Running(B,A,t) @j 
+    ==&gt; (Ex #j. Running(B,A,t) @j
         &amp; j &lt; i
         &amp; not (Ex A2 B2 #i2. Commit(A2,B2,t) @i2
                            &amp; not (#i2 = #i)))
