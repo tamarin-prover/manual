@@ -154,14 +154,15 @@ begin</code></pre>
       <ul>
       <li><code>~x</code> denotes <code>x:fresh</code></li>
       <li><code>$x</code> denotes <code>x:pub</code></li>
+      <li><code>%x</code> denotes <code>x:nat</code></li>
       <li><code>#i</code> denotes <code>i:temporal</code></li>
       <li><code>m</code> denotes <code>m:msg</code></li>
       </ul>
       <p>Moreover, a string constant <code>'c'</code> denotes a public
       name in <code>pub</code>, which is a fixed, global constant. We
-      have a top sort <code>msg</code> and two incomparable subsorts
-      <code>fresh</code> and <code>pub</code> of that top sort.
-      Timepoint variables of sort <code>temporal</code> are
+      have a top sort <code>msg</code> and three incomparable subsorts
+      <code>fresh</code>, <code>pub</code> and <code>nat</code> of that
+      top sort. Timepoint variables of sort <code>temporal</code> are
       unconnected.</p>
       <p>The above rule can therefore be read as follows. First,
       generate a fresh name <code>~ltk</code> (of sort fresh), which is
@@ -498,7 +499,7 @@ Finished loading theories ... server ready at
       instance of the rule <code>Register_pk</code> to create the
       necessary <code>!Ltk</code> fact. The other two sources are given
       below.</p>
-      <p><img src="../images/tamarin-tutorial-case-distinctions-2.jpg"
+      <p><img src="../images/tamarin-tutorial-case-distinctions-2.png"
       title="FirstExample Case Distinctions 2 of 3" style="width:70.0%"
       alt="FirstExample Case Distinctions 2 of 3" /><br />
       </p>
@@ -572,6 +573,45 @@ Finished loading theories ... server ready at
       <p>The lemma is now colored in green as it was successfully
       proven. If we had found a counterexample, it would be colored in
       red. You can prove the other lemmas in the same way.</p>
+      <p>As you may have noticed, there can be lots of different types
+      of arrows, which additionally can be colored differently.</p>
+      <p>There are normal (solid) arrows (in black or gray), which are
+      used to represent the origins of protocol facts (for linear or
+      persistent facts). There are also solid red orange arrows, which
+      represent steps where the adversary extracts values from a message
+      he received.</p>
+      <p>Then there dashed arrows, representing ordering constraints
+      between two actions, and their colors indicate the reasons for the
+      constraint :</p>
+      <ul>
+      <li>Black dashed arrows represent an ordering constraint stemming
+      from formulas, for example from the current lemma or a
+      restriction.</li>
+      <li>Dark blue indicates an ordering constraint deduced from a
+      fresh value: since fresh values are unique, all rule instances
+      using a fresh value must appear after the instance that created
+      the value.</li>
+      <li>Red dashed arrows are used to represent steps where the
+      adversary composes values.</li>
+      <li>Dark orange represents an ordering constraint implied by
+      Tamarin’s normal form conditions.</li>
+      <li>Purple denotes an ordering constraint originating from an
+      injective fact instance, see <a
+      href="011_advanced-features.html#reasoning-about-exclusivity-facts-symbols-with-injective-instances">injective-instances</a>
+      .</li>
+      </ul>
+      <p>Dashed edges can be colored with multiple colors at a time,
+      which means that there are several ordering constraints at the
+      same time.</p>
+      <p>For example, a black and blue dashed arrow indicates that there
+      are two constraints: one deduced from a formula, and one deduced
+      from a fresh value appearing in the rule instances.</p>
+      <p>Finally, in intermediate proof steps, there can also be dotted
+      green arrows, which are used during Tamarin’s proof search to
+      represent incomplete adversary deduction steps.</p>
+      <p>Note that by default Tamarin does not show all rules and arrows
+      to simplify the graphs, but this can be adjusted using the Options
+      button on the top right of the page.</p>
       <h2 id="running-tamarin-on-the-command-line">Running Tamarin on
       the Command Line</h2>
       <p>The call</p>

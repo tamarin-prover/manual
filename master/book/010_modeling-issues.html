@@ -188,7 +188,7 @@ rule R_1:
 WARNING: the following wellformedness checks failed!
 
 unbound:
-  rule `R_1&#39; has unbound variables: 
+  rule `R_1&#39; has unbound variables:
     ~n
 */</code></pre>
       <p>The warning <code>unbound variables</code> indicates that there
@@ -213,7 +213,7 @@ WARNING: the following wellformedness checks failed!
 
 formula terms:
   lemma `functional&#39; uses terms of the wrong form: `Free m&#39;, `Free m&#39;
-  
+
   The only allowed terms are public names and bound node and message
   variables. If you encounter free message variables, then you might
   have forgotten a #-prefix. Sort prefixes can only be dropped where
@@ -237,7 +237,7 @@ lemma nonce_secret:
 WARNING: the following wellformedness checks failed!
 
 lemma actions:
-  lemma `nonce_secret&#39; references action 
+  lemma `nonce_secret&#39; references action
     (ProtoFact Linear &quot;Secr&quot; 2,2,Linear)
   but no rule has such an action.
 */</code></pre>
@@ -275,7 +275,7 @@ rule setup:
 WARNING: the following wellformedness checks failed!
 
 unbound:
-  rule `setup&#39; has unbound variables: 
+  rule `setup&#39; has unbound variables:
     m
 
 sorts:
@@ -286,6 +286,42 @@ sorts:
       used. In the rule <code>setup</code>, this is the case because we
       used m once as a fresh value <code>~m</code> and another time
       without the <code>~</code>.</p>
+      <h3 id="message-derivation-errors">Message derivation errors</h3>
+      <p>It is good modelling practice to write our rules in such a way
+      that they do not give participants any additional capabilities,
+      and modify the equational theory for the express purpose of
+      modifying capabilities. Using rules for this is ill-advised, as it
+      is easy to unintentionally make a protocol not adhere to an
+      underlying model or make the adversary weaker than intended.
+      Because of this, Tamarin automatically checks if any rules may
+      introduce such capabilities.</p>
+      <p>Consider for example what happens if we change the rule
+      <code>R_1</code> to</p>
+      <pre class="tamarin"><code>// WARNING: this rule illustrates an error message
+rule R_1:
+    [ In(senc(m,~k))  ]
+    --[ Receive($R,m), Secret(m) ]-&gt;
+    [ Out(m) ]
+</code></pre>
+      <p>we get the error message</p>
+      <pre><code>/*
+WARNING: the following wellformedness checks failed!
+
+The variables of the follwing rule(s) are not derivable from their premises, you may be performing unintended pattern matching:
+  R_1
+Failed to derive Variable(s): ~k, m
+*/</code></pre>
+      <p>This warning indicates that in the rule <code>R_1</code>, we
+      introduce additional capabilities, namely, the derivation of both
+      <code>~k</code> and <code>m</code>.</p>
+      <p>If this is intentional, the rule can be annotated with
+      <code>[derivchecks]</code>, which will make Tamarin ignore that
+      rule during derivation checks. The behaviour of these derivation
+      checks can be further modified with the
+      <code>--derivcheck-timeout</code> flag. By default, it is set to a
+      value of <code>5</code> seconds. Setting it to <code>0</code>
+      disables the timeout, setting it to <code>-1</code> disables
+      derivation checks entirely.</p>
       <h3 id="what-to-do-when-tamarin-does-not-terminate">What to do
       when Tamarin does not terminate</h3>
       <p>Tamarin may fail to terminate when it automatically constructs

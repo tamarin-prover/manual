@@ -69,7 +69,7 @@
       <code>mn</code>. When specifying equations, we also allow for
       variables in addition to constants.</p>
       <h2 id="constants">Constants</h2>
-      <p>We distinguish between two types of constants:</p>
+      <p>We distinguish between these types of constants:</p>
       <ul>
       <li><em>Public constants</em> model publicly known atomic messages
       such as agent identities and labels. We use the notation
@@ -83,6 +83,9 @@
       the adversary. If the function is declared private, it is not
       known by the adversary. However, <em>fresh</em> values are usually
       a more appropriate modeling of secret values.</li>
+      <li><em>Natural Numbers</em> have only one constant which is
+      written <code>%1</code> or <code>1:nat</code> and models the
+      number one.</li>
       </ul>
       <h2 id="function-symbols">Function Symbols</h2>
       <p>Tamarin supports a fixed set of built-in function symbols and
@@ -255,8 +258,35 @@ x ⊕ x       = zero</code></pre>
       <dt><code>multiset</code>:</dt>
       <dd>
       <p>This theory introduces the associative-commutative operator
-      <code>+</code> which is usually used to model multisets.</p>
+      <code>++</code> which is usually used to model multisets<a
+      href="#fn1" class="footnote-ref" id="fnref1"
+      role="doc-noteref"><sup>1</sup></a>.</p>
       </dd>
+      <dt><code>natural-numbers</code>:</dt>
+      <dd>
+      This theory introduces the associative-commutative operator
+      <code>%+</code> and the public constant <code>%1</code> which are
+      used to model counters. It also introduces the sort
+      <code>nat</code> with which variables can be annotated like the
+      sort <code>pub $</code>: <code>n:nat</code> or <code>%n</code>.
+      Furthermore, the operator <code>%+</code> only accepts terms of
+      sort <code>nat</code> and is the only one to produce
+      <code>nat</code> terms. This guarantees, that any term of sort
+      <code>nat</code> is essentially a sum of <code>%1</code>. So all
+      natural numbers are public knowledge which speeds up Tamarin as no
+      attacker construction of a number has to be searched for.
+      </dd>
+      </dl>
+      <p>Note that these <code>nat</code> terms are only suited to model
+      small natural numbers like counters that are assumed to be
+      guessable by the attacker. To model big random numbers, it is
+      advised to use <code>fresh</code> variables.</p>
+      <p>In some protocols such as WPA-2, big natural numbers are
+      increased as a counter with a random start-point. For such models,
+      it is advised to use a pair <code>&lt;~x, %n&gt;</code> where
+      <code>~x</code> is the random start point and <code>%n</code> is
+      the guessable counter.</p>
+      <dl>
       <dt><code>reliable-channel</code>:</dt>
       <dd>
       <p>This theory introduces support for reliable channel in the <a
@@ -289,6 +319,18 @@ x ⊕ x       = zero</code></pre>
       Properties.”</span> In <em>RTA</em>, 294–307.
       </div>
       </div>
+      <section class="footnotes footnotes-end-of-document"
+      role="doc-endnotes">
+      <hr />
+      <ol>
+      <li id="fn1" role="doc-endnote"><p>In earlier versions of Tamarin,
+      this operator was <code>+</code> wich is still supported but
+      deprecated. The reason for this change is that in the end, we want
+      to use <code>+</code> for addition on natural numbers (instead of
+      the current <code>%+</code>).<a href="#fnref1"
+      class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+      </ol>
+      </section>
     </div>
   </div>
 </body>

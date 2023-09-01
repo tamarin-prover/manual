@@ -128,10 +128,11 @@
       including pairing. This excludes function symbols that appear in
       any of the equations. Moreover, all variables must be guarded. If
       they are not guarded, Tamarin will produce an error.</p>
-      <p><strong>Predicates.</strong> Are defined using the
-      <code>predicates</code> construct, and substituted while parsing
-      trace properties, whether they are part of lemmas, restrictions or
-      embedded restrictions:</p>
+      <h3 id="sec:predicates">Predicates</h3>
+      <p>Predicates are defined using the <code>predicates</code>
+      construct, and substituted while parsing trace properties, whether
+      they are part of lemmas, restrictions or embedded
+      restrictions:</p>
       <pre><code>builtins: multiset
 predicates: Smaller(x,y) &lt;=&gt; Ex z. x + z = y
 
@@ -139,17 +140,18 @@ predicates: Smaller(x,y) &lt;=&gt; Ex z. x + z = y
 
 lemma one_smaller_two:
     &quot;All x y #i. B(x,y)@i ==&gt; Smaller(x,y)&quot;</code></pre>
-      <p><strong>Guardedness. </strong> To ensure guardedness, for
-      universally quantified variables, one has to check that they all
-      occur in an action constraint right after the quantifier and that
-      the outermost logical operator inside the quantifier is an
-      implication. For existentially quantified variables, one has to
-      check that they all occur in an action constraint right after the
-      quantifier and that the outermost logical operator inside the
-      quantifier is a conjunction. We do recommend to use parentheses,
-      when in doubt about the precedence of logical connectives, but we
-      follow the standard precedence. Negation binds tightest, then
-      conjunction, then disjunction and then implication.
+      <h3 id="guardedness">Guardedness</h3>
+      <p>To ensure guardedness, for universally quantified variables,
+      one has to check that they all occur in an action constraint right
+      after the quantifier and that the outermost logical operator
+      inside the quantifier is an implication. For existentially
+      quantified variables, one has to check that they all occur in an
+      action constraint right after the quantifier and that the
+      outermost logical operator inside the quantifier is a conjunction.
+      We do recommend to use parentheses, when in doubt about the
+      precedence of logical connectives, but we follow the standard
+      precedence. Negation binds tightest, then conjunction, then
+      disjunction and then implication.
       <!-- Equivalence binds weakest (and nobody uses it). --></p>
       <p>To specify a property about a protocol to be verified, we use
       the keyword <code>lemma</code> followed by a name for the property
@@ -681,18 +683,19 @@ end</code></pre>
       <pre><code>restriction OnlyOnceV:
   &quot;All #i #j x. OnlyOnceV(x)@#i &amp; OnlyOnceV(x)@#j ==&gt; #i = #j&quot;</code></pre>
       <h4 id="less-than">Less than</h4>
-      <p>If we use the <code>multiset</code> built-in we can construct
-      numbers as “1+1+…+1”, and have a restriction enforcing that one
-      number is less than another, say <code>LessThan</code>:</p>
+      <p>If we use the <code>natural-numbers</code> built-in we can
+      construct numbers as “%1 %+ … %+ %1”, and have a restriction
+      enforcing that one number is less than another, say
+      <code>LessThan</code>:</p>
       <pre><code>restriction LessThan:
-  &quot;All x y #i. LessThan(x,y)@#i ==&gt; Ex z. x + z = y&quot;</code></pre>
+  &quot;All x y #i. LessThan(x,y)@#i ==&gt; x ⊏ y&quot;</code></pre>
       <p>You would then add the <code>LessThan</code> action fact to a
       rule where you want to enforce that a counter has strictly
       increased.</p>
       <p>Similarly you can use a <code>GreaterThan</code> where we want
       <code>x</code> to be strictly larger than <code>y</code>:</p>
       <pre><code>restriction GreaterThan:
-  &quot;All x y #i. GreaterThan(x,y)@#i ==&gt; Ex z. x = y + z&quot;</code></pre>
+  &quot;All x y #i. GreaterThan(x,y)@#i ==&gt; y ⊏ x&quot;</code></pre>
       <h3 id="embedded-restrictions">Embedded restrictions</h3>
       <p>Restrictions can be <a
       href="005_protocol-specification-rules.html#sec:embeddedrestrictions">embedded
@@ -711,14 +714,14 @@ restriction Xrestriction:
       <p>Note that form can refer to the timepoint #NOW, which will be
       bound to the time-point of the current instantiation of this rule.
       Consider the following example:</p>
-      <pre><code>builtins: multiset
+      <pre><code>builtins: natural-numbers
 
-predicates: Smaller(x,y) &lt;=&gt; Ex z. x + z = y
+predicates: Smaller(x,y) &lt;=&gt; x ⊏ y
           , Equal(x,y)   &lt;=&gt; x = y
           , Added(x,y)   &lt;=&gt; Ex #a. A(x,y)@a &amp; #a &lt; #NOW
 
 rule A:
-  [In(x), In(y)] --[ _restrict(Smaller(x,y)), A(x,y), B(&#39;1&#39;,&#39;1&#39;+&#39;1&#39;)]-&gt; [ X(&#39;A&#39;)]
+  [In(x), In(y)] --[ _restrict(Smaller(x,y)), A(x,y), B(%1,%1 %+ %1)]-&gt; [ X(&#39;A&#39;)]
 
 rule B:
     [In(x), In(y)] --[ _restrict(Added(x,y))]-&gt; []

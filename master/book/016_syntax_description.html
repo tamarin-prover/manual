@@ -63,7 +63,7 @@
       <code>begin</code> and <code>end</code>. We explain the
       non-terminals of the body in the following paragraphs.</p>
       <pre><code>security_protocol_theory := &#39;theory&#39; ident &#39;begin&#39; body &#39;end&#39;
-body := (signature_spec | global_heuristic | rule |
+body := (signature_spec | global_heuristic | tactic | rule |
             restriction | lemma | formal_comment)*</code></pre>
       <p>Here, we use the term signature more liberally to denote both
       the defined function symbols and the equalities describing their
@@ -92,7 +92,7 @@ built_ins      := &#39;diffie-hellman&#39;
                 | &#39;hashing&#39; | &#39;symmetric-encryption&#39;
                 | &#39;asymmetric-encryption&#39; | &#39;signing&#39;
                 | &#39;bilinear-pairing&#39; | &#39;xor&#39;
-                | &#39;multiset&#39; | &#39;revealing-signing&#39;</code></pre>
+                | &#39;multiset&#39; | &#39;natural-numbers&#39; | &#39;revealing-signing&#39;</code></pre>
       <p>A global heuristic sets the default heuristic that will be used
       when autoproving lemmas in the file. The specified goal ranking
       can be any of those discussed in Section <a
@@ -101,6 +101,26 @@ built_ins      := &#39;diffie-hellman&#39;
 goal_ranking          := standard_goal_ranking | oracle_goal_ganking
 standard_goal_ranking := &#39;C&#39; | &#39;I&#39; | &#39;P&#39; | &#39;S&#39; | &#39;c&#39; | &#39;i&#39; | &#39;p&#39; | &#39;s&#39;
 oracle_goal_ranking   := &#39;o&#39; &#39;&quot;&#39; [^&#39;&quot;&#39;]* &#39;&quot;&#39; | &#39;O&#39; &#39;&quot;&#39; [^&#39;&quot;&#39;]* &#39;&quot;&#39;</code></pre>
+      <p>The tactics allow the user to write their own heuristics based
+      on the lemmas there are trying to prove. Their use is descibed in
+      in Section <a
+      href="010_advanced-features.html#sec:fact-annotations#subsec:tactic">Using
+      a Tactic</a>.</p>
+      <pre><code>tactic                := &#39;tactic&#39; &#39;:&#39; ident
+                         [presort]
+                         (prio)+ (deprio)* | (prio)* (deprio)+
+presort               := &#39;presort&#39; &#39;:&#39; &#39;standard_goal_ranking
+prio                  := &#39;prio&#39; &#39;:&#39; [&#39;{&#39;post_ranking&#39;}&#39;]
+                             (function)+
+deprio                := &#39;deprio&#39; &#39;:&#39; [&#39;{&#39;post_ranking&#39;}&#39;]
+                             (function)+
+standard_goal_ranking := &#39;C&#39; | &#39;I&#39; | &#39;P&#39; | &#39;S&#39; | &#39;c&#39; | &#39;i&#39; | &#39;p&#39; | &#39;s&#39;
+post_ranking          := &#39;smallest&#39; | &#39;id&#39;                   
+function              := and_function [ &#39;|&#39; and_function]*
+and_function          := not_function [ &#39;&amp;&#39; not_function]*
+not_function          := (not)? function_name [&#39;&quot;&#39; param &#39;&quot;&#39;]*
+function_name         :=   &#39;regex&#39; | &#39;isFactName&#39; | &#39;isInFactTerms&#39; | &#39;dhreNoise&#39;
+                         | &#39;defaultNoise&#39; | &#39;reasonableNoncesNoise&#39; | &#39;nonAbsurdGoal&#39;</code></pre>
       <p>Multiset rewriting rules are specified as follows. The protocol
       corresponding to a security protocol theory is the set of all
       multiset rewriting rules specified in the body of the theory. Rule
@@ -132,6 +152,10 @@ in [] --&gt; [ A(y)]    is desugared to    [] --&gt; [ A(&lt;z,y&gt;) ]</code></
       <p>This becomes a lot less confusing if you keep the set of
       variables on the left-hand side separate from the free variables
       on the right-hand side.</p>
+      <p>Macros works similarly to let-blocks, but apply globally to all
+      rules.</p>
+      <pre><code>macros      := &#39;macros&#39; &#39;:&#39; macro (&#39;,&#39; macro)*
+macro       := ident &#39;(&#39; [(var) (&#39;,&#39; var)*] &#39;)&#39; &#39;=&#39; term</code></pre>
       <p>Restrictions specify restrictions on the set of traces
       considered, i.e., they filter the set of traces of a protocol. The
       formula of a restriction is available as an assumption in the
@@ -156,7 +180,7 @@ lemma_attr       := &#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39
 trace_quantifier := &#39;all-traces&#39; | &#39;exists-trace&#39;</code></pre>
       <p>In observational equivalence mode, lemmas can be associated to
       one side.</p>
-      <pre><code>lemma_attr      := &#39;[&#39; (&#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | 
+      <pre><code>lemma_attr      := &#39;[&#39; (&#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; |
                         &#39;hide_lemma=&#39; ident | &#39;heuristic=&#39; heuristic |
                         &#39;left&#39; | &#39;right&#39;) &#39;]&#39;</code></pre>
       <p>A proof skeleton is a complete or partial proof as output by
@@ -176,7 +200,7 @@ goal           :=  fact &quot;▶&quot; natural_subscr node_var
 node_var       := [&#39;#&#39;] ident [&#39;.&#39; natural]      // temporal sort prefix
                 | ident [&#39;.&#39; natural] &#39;:&#39; &#39;node&#39; // temporal sort suffix
 natural        := digit+
-natural_sub    := (&#39;₀&#39;|&#39;₁&#39;|&#39;₂&#39;|&#39;₃&#39;|&#39;₄&#39;|&#39;₅&#39;|&#39;₆&#39;|&#39;₇&#39;|&#39;₈&#39;|&#39;₉&#39;)+</code></pre>
+natural_subscr := (&#39;₀&#39;|&#39;₁&#39;|&#39;₂&#39;|&#39;₃&#39;|&#39;₄&#39;|&#39;₅&#39;|&#39;₆&#39;|&#39;₇&#39;|&#39;₈&#39;|&#39;₉&#39;)+</code></pre>
       <p>Formal comments are used to make the input more readable. In
       contrast to <code>/*...*/</code> and <code>//...</code> comments,
       formal comments are stored and output again when pretty-printing a
@@ -198,7 +222,8 @@ natural_sub    := (&#39;₀&#39;|&#39;₁&#39;|&#39;₂&#39;|&#39;₃&#39;|&#39;
       arguments of an n-ary function application must agree with the
       arity given in the function definition.</p>
       <pre><code>tupleterm := &#39;&lt;&#39; msetterm (&#39;,&#39; msetterm)* &#39;&gt;&#39;
-msetterm  := xorterm (&#39;+&#39; xorterm)*
+msetterm  := natterm ((&#39;++&#39; | &#39;+&#39;) natterm)*
+natterm   := xorterm (&#39;%+&#39; xorterm)*
 xorterm   := multterm ((&#39;XOR&#39; | ⊕) multterm)*
 multterm  := expterm (&#39;*&#39; expterm)*
 expterm   := term    (&#39;^&#39; term   )*
@@ -249,14 +274,15 @@ imp         := disjunction [(&#39;==&gt;&#39; | &#39;⇒&#39;) imp]
 disjunction := conjunction ((&#39;|&#39; | &#39;∨&#39;) conjunction)* // left-associative
 conjunction := negation ((&#39;&amp;&#39; | &#39;∧&#39;) negation)*       // left-associative
 negation    := [&#39;not&#39; | &#39;¬&#39;] atom
-atom        := &#39;⊥&#39; | &#39;F&#39; | &#39;⊤&#39; | &#39;T&#39;        // true or false
-             | &#39;(&#39; formula &#39;)&#39;          // nested formula
-             | &#39;last&#39; &#39;(&#39; node_var &#39;)&#39;  // &#39;last&#39; temporal variable for induction
-             | fact &#39;@&#39; node_var        // action
-             | node_var &#39;&lt;&#39; node_var    // ordering of temporal variables
-             | msetterm &#39;=&#39; msetterm    // equality of terms
-             | node_var &#39;=&#39; node_var    // equality of temporal variables
-             | (&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;) // quantified formula
+atom        := &#39;⊥&#39; | &#39;F&#39; | &#39;⊤&#39; | &#39;T&#39;           // true or false
+             | &#39;(&#39; formula &#39;)&#39;                 // nested formula
+             | &#39;last&#39; &#39;(&#39; node_var &#39;)&#39;         // &#39;last&#39; temporal variable for induction
+             | fact &#39;@&#39; node_var               // action
+             | node_var &#39;&lt;&#39; node_var           // ordering of temporal variables
+             | msetterm &#39;=&#39; msetterm           // equality of terms
+             | msetterm (&#39;&lt;&lt;&#39; | &#39;⊏&#39;) msetterm  // subterm relation
+             | node_var &#39;=&#39; node_var           // equality of temporal variables
+             | (&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;)      // quantified formula
                     lvar+ &#39;.&#39; formula
 
 lvar        := node_var | nonnode_var</code></pre>

@@ -172,6 +172,37 @@ rule MyRule2:
       substituting all variables occurring in the let by their
       right-hand sides. As the above example indicates, macros may use
       the left-hand sides of earlier defined macros.</p>
+      <p>### Global macros {#sec:macros}</p>
+      <p>Sometimes we want to use the same let binding(s) in multiples
+      rules. In such a case, we can use the <code>macros</code> keyword
+      to define global macros, which are applied to all rules. Consider
+      the following example:</p>
+      <pre><code>macros: macro1(x) = h(x), macro2(x, y) = &lt;x, y&gt;, ..., macro7() = $A</code></pre>
+      <p>Here <code>macro1</code> is the name of the first macro, and
+      <code>x</code> is its the parameter. The second macro is called
+      <code>macro2</code> and has two parameters <code>x</code> and
+      <code>y</code>. The last macro <code>macro7</code> has no
+      parameters. The the term on the right of the <code>=</code> sign
+      is the output of the macro. It can be any term built from the
+      functions defined in the equational theory and the parameters of
+      the macro.</p>
+      <p>To use a macro in a rule, we can use the macro like a function
+      inside terms. For example</p>
+      <pre><code>[ In(macro1(~ltk)) ] --[ ... ]-&gt; [ Out(macro2(pkA, pkB)) ]</code></pre>
+      <p>will become</p>
+      <pre><code>[ In(h(~ltk)) ] --[ ... ]-&gt; [ Out(&lt;pkA, pkB&gt;) ]</code></pre>
+      <p>after the above macros have been applied.</p>
+      <p>A macro can call a second macro, if the second one was defined
+      before. For example, one can define the following two macros:</p>
+      <pre><code>macros: innerMacro(x, y) = &lt;x, y&gt;, hashMacro(x, y) = h(innerMacro(x, y))</code></pre>
+      <p>However, the following snippet would result in an error</p>
+      <pre><code>macros: hashMacro(x, y) = h(innerMacro(x, y)), innerMacro(x, y) = &lt;x, y&gt;</code></pre>
+      <p>as <code>innerMacro</code> is not yet defined when
+      <code>hashMacro</code> is defined.</p>
+      <p>Macros only apply to rules, and are shown in interactive mode
+      together with the protocol rules. When exporting a theory, Tamarin
+      will export the original rules (before the macros were applied)
+      and the macros.</p>
       <h2 id="facts">Facts</h2>
       <p>Facts are of the form <code>F(t1,...,tn)</code> for a fact
       symbol <code>F</code> and terms <code>ti</code>. They have a fixed
