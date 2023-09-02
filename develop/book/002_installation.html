@@ -94,7 +94,7 @@
       feature. However, if you do want to install it from source:</p>
       <h3 id="sec:dependencies">Manually install dependencies</h3>
       <p>Tamarin requires Haskell Stack to build and GraphViz and Maude
-      2.7.1 (or newer) to run. The easiest way to install these is</p>
+      (2.7.1 or newer) to run. The easiest way to install these is</p>
       <pre><code>brew install tamarin-prover/tap/maude graphviz haskell-stack</code></pre>
       <p>Alternatively, you can install them yourself:</p>
       <ul>
@@ -110,17 +110,14 @@
       href="http://www.graphviz.org/"
       class="uri">http://www.graphviz.org/</a></p></li>
       <li><p><strong>Maude</strong> You can install Maude using your
-      package manager. However, if your package manager installs Maude
-      2.6, then you must install version 2.7.1, <a
-      href="http://maude.cs.illinois.edu/w/index.php?title=Maude_download_and_installation#Core_Maude_2.7.1">Core
-      Maude 2.7.1</a>, directly from <a
-      href="http://maude.cs.illinois.edu/"
-      class="uri">http://maude.cs.illinois.edu/</a>. In this case, you
-      should ensure that your <code>PATH</code> includes the install
-      path, so that calling <code>maude</code> starts version 2.7.1.
-      Note that even though the Maude executable is movable, the
-      <code>prelude.maude</code> file must be in the same folder that
-      you start Maude from.</p></li>
+      package manager (make sure to have version 2.7.1. or newer). You
+      can also install Maude manually from the [Maude website]
+      (http://maude.cs.illinois.edu/w/index.php/Maude_download_and_installation).
+      In this case, you should ensure that your <code>PATH</code>
+      includes the install path, so that calling <code>maude</code> runs
+      the right version. Note that even though the Maude executable is
+      movable, the <code>prelude.maude</code> file must be in the same
+      folder that you start Maude from.</p></li>
       </ul>
       <h3 id="compile">Compile</h3>
       <p>Check out the source code with</p>

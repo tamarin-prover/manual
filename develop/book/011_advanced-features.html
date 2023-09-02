@@ -274,13 +274,13 @@
       <pre><code>tactic: uniqueness
 presort: C</code></pre>
       <p>Then we will start to write the priorities following which we
-      want to order the goals. Everey priority, announced by the
+      want to order the goals. Every priority, announced by the
       <code>prio</code> keywords, is composed of functions that will try
-      to recognize caracteristics in the goals given by the Tamarin
+      to recognize characteristics in the goals given by the Tamarin
       proofs. If a goal is recognized by a function in a priority, it
-      will be be ranked as such, ie the higher the priority in the
+      will be be ranked as such, i.e., the higher the priority in the
       tactic, the higher the goals it recognizes will be ranked. The
-      particularity recaognized by every function will be detailled in a
+      particularity recognized by every function will be detailed in a
       paragraph below. The tactic language authorizes to combine
       functions using <code>|</code>, <code>&amp;</code> and
       <code>not</code>. Even if the option is not necessary for the
@@ -290,42 +290,40 @@ presort: C</code></pre>
       recognized goals at the bottom of the ranking. In case several
       <code>deprio</code> are written, the first one will be ranked
       higher than the last ones. If a goal is recognized by two or more
-      ‘priorities’ or ‘depriorities’, only the first one (ie the higher
-      rank possible) will be taken into account for the final ranking.
-      The order of the goals recognized by the same priority is usually
-      predetermined by the presort. However, if this order is not
-      appropriate for one priority, the user can call a ‘postranking
+      ‘priorities’ or ‘depriorities’, only the first one (i.e., the
+      higher rank possible) will be taken into account for the final
+      ranking. The order of the goals recognized by the same priority is
+      usually predetermined by the presort. However, if this order is
+      not appropriate for one priority, the user can call a ‘postranking
       function’. This function will reorder the goals inside the
       priority given a criteria. If no postranking function is
       determined, Tamarin will use the identity. For now, the only other
       option is <code>smallest</code>, a function that will order the
-      goals by increasing size of their prettyprinted strings.</p>
+      goals by increasing size of their pretty-printed strings.</p>
       <pre><code>prio:
     isFactName &quot;ReceiverKeySimple&quot;
-prio: 
+prio:
     regex &quot;senc\(xsimple&quot; | regex &quot;senc\(~xsimple&quot;
 prio: {smallest}
     regex &quot;KU\( ~key&quot;
 }</code></pre>
       <h4 id="calling-a-tactic">Calling a tactic</h4>
-      <p>As the other heuristics, tactics can be called two ways. The
+      <p>Like the other heuristics, tactics can be called two ways. The
       first one is using the command line. In the case study above, it
       would be:
       <code>tamarin-prover --prove --heuristic={prove=uniqueness} SourceOfUniqueness.spthy</code>.
       The other way is directly integrated in the file by adding
       <code>[heuristic={uniqueness}]</code> next to the name of the
-      lemma that is supposed to use it. The option won’t need to be
-      called again from the command line. The second function has been
-      proven very helpful when working with a file containing several
-      tactics used by different lemmas since it allows to run all proofs
-      at once.</p>
+      lemma that is supposed to use it. The option does not need to be
+      called again from the command line. The second option is helpful
+      when working with a file containing several tactics used by
+      different lemmas.</p>
       <h4 id="ranking-functions">Ranking functions</h4>
-      <p>As explained above, the functions used in the tactic language
-      have already been implemented in Tamarin. For now, here is a list
-      of the toolkit we have put in place. At the end at this section,
-      you will however find an explanation on how to write your own
-      functions if the one described here do not suffice for your
-      usage.</p>
+      <p>The functions used in the tactic language are implemented in
+      Tamarin. Below you can find a list of the currently available
+      functions. At the end at this section, you will find an
+      explanation on how to write your own functions if the one
+      described here do not suffice for your usage.</p>
       <p>Pre-implemented functions * <code>regex</code>: as explain
       above, this function takes in parameter a string and will use it
       as a pattern to match against the goals. (Since it is based on the
@@ -339,21 +337,21 @@ prio: {smallest}
       same results. * <code>isInFactTerms</code>: the function will look
       in the list contained in the field FactTest whether an element
       corresponding the parameter can be found. The following functions
-      are also preimplemented but specifically designed to translate the
-      oracles of the Vacarme tool in tactic: * <code>dhreNoise</code>:
-      recognize goals containing a Diffie-Hellman exponentiation. For
-      example, the goal
+      are also implemented but specifically designed to translate the
+      oracles of the Vacarme tool into tactics: *
+      <code>dhreNoise</code>: recognize goals containing a
+      Diffie-Hellman exponentiation. For example, the goal
       <code>Recv( &lt;'g'^~e.1,aead(kdf2(&lt;ck, 'g'^(~e*~e.1)&gt;), '0', h(&lt;hash, 'g'^~e.1&gt;), peer),aead(kdf2(&lt;kdf1(&lt;ck, 'g'^(~e*~e.1)&gt;), z&gt;), '0',h(&lt;h(&lt;hash, 'g'^~e.1&gt;),aead(kdf2(&lt;ck, 'g'^(~e*~e.1)&gt;), '0', h(&lt;hash, 'g'^~e.1&gt;), peer)&gt;), payload)&gt;) ▶₁ #claim</code>
       is recognized thanks to the presence of the following pattern
       <code>'g'^~e.1</code>. The function does need one parameter from
       the user, the type of oracle it is used for. It can be
-      <code>def</code> for the vacarme default case, <code>curve</code>
-      for vacarme oracle_C25519_K1X1 case and <code>diff</code> if the
+      <code>def</code> for the Vacarme default case, <code>curve</code>
+      for Vacarme oracle_C25519_K1X1 case and <code>diff</code> if the
       tactic is used to prove an equivalence lemma. If the parameter
       specified is anything else, the default case will be used. It
       works as follows. First, it will retrieve from the system state
       the formulas that have the <code>Reveal</code> fact name and
-      matchs the regex <code>exp\\('g'</code>. For the retrieved
+      matches the regex <code>exp\\('g'</code>. For the retrieved
       formulas, it will then put in a list the content of the
       <code>Free</code> variables along the variable <code>~n</code>. In
       the case of the example given above, the list would be
@@ -383,34 +381,34 @@ prio: {smallest}
       for <code>dhreNoise</code> and checks if they do not appear in the
       goal. If both the conditions are verified, the goal is recognized.
       It only takes one argument (the same as dhreNoise).</p>
-      <p>Now here is a brief tour on how to write your own function. The
-      functions will need to be written in the
+      <h4 id="how-to-write-your-own-functions">How to write your own
+      function(s)</h4>
+      <p>The functions need to be added to the
       lib/theory/src/Theory/Text/Parser/Tactics.hs file, in the function
       named tacticFunctions. The implementation has been designed to be
-      modular so adding new functions should be easy and not compromise
-      what is already working. The first step is to record the function
-      in the repertory, the name in quote will be the one used by the
-      user in the tactic, the other, the one used for the
-      implementation. They can be different if necessary. The “user
-      function name” also need to be added to the nameToFunction list,
-      along with a quick description for the error message. Regarding
-      the implementation of the function, the first thing to know is
-      that every function you write will take two parameters. The first
-      one is the list of strings that the user may pass to the function
-      (the pattern for regex for example). Nothing forbids the user to
-      write as many parameters as he wants, we will however only use the
-      first ones we need. The second parameter is a triplet composed of
-      the goal being tested, the proof context and the system. The
-      function then needs to return a boolean, <code>True</code> if the
-      goal, proof context or system have been recognized,
-      <code>False</code> if not. If needed, new postranking functions
-      can be added by doing the following steps. First registering the
-      name of the new function in the <code>rankingFunctions</code>
-      function in lib/theory/src/Theory/Text/Parser/Tactics.hs. Then
-      writing the function. It only needs to take in parameters the
-      goals to sort and return them in the new order. To be considered,
-      the code then needs to be recompiled, using <code>make</code>. The
-      new function is now ready to be used.</p>
+      modular. The first step is to record the function in the
+      repertory, the name in quote will be the one used by the user in
+      the tactic, the other, the one used for the implementation. They
+      can be different if necessary. The “user function name” also need
+      to be added to the nameToFunction list, along with a quick
+      description for the error message. Regarding the implementation of
+      the function, the first thing to know is that every function you
+      write will take two parameters. The first one is the list of
+      strings that the user may pass to the function (the pattern for
+      regex for example). Nothing forbids the user to write as many
+      parameters as he wants, we will however only use the first ones we
+      need. The second parameter is a triplet composed of the goal being
+      tested, the proof context and the system. The function then needs
+      to return a boolean, <code>True</code> if the goal, proof context
+      or system have been recognized, <code>False</code> if not. If
+      needed, new postranking functions can be added by doing the
+      following steps. First registering the name of the new function in
+      the <code>rankingFunctions</code> function in
+      lib/theory/src/Theory/Text/Parser/Tactics.hs. Then writing the
+      function. It only needs to take in parameters the goals to sort
+      and return them in the new order. To be considered, the code then
+      needs to be recompiled, using <code>make</code>. The new function
+      is then ready to be used.</p>
       <h3 id="using-an-oracle">Using an Oracle</h3>
       <p>Oracles allow to implement user-defined heuristics as custom
       rankings of proof goals. They are invoked as a process with the
