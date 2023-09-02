@@ -143,8 +143,7 @@ rule setup:
       <p>The following statement that some wellformedness check failed
       will appear at the very end of the text when loading this
       theory.</p>
-      <pre><code>WARNING: 1 wellformedness check failed!
-         The analysis results might be wrong!</code></pre>
+      <pre><code>WARNING: 1 wellformedness check failed!</code></pre>
       <p>Such a wellformedness warning appears in many different error
       messages at the bottom and indicates that there might be a
       problem. However, to get further information, one must scroll up
@@ -153,27 +152,30 @@ rule setup:
       <pre><code>/*
 WARNING: the following wellformedness checks failed!
 
-fact usage:
-1. rule `setup&#39;, fact &quot;agst&quot;: (&quot;AgSt&quot;,3,Linear)
-        AgSt( $I, ~k, ~m )
+Fact usage
+==========
 
-2. rule `setup&#39;, fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)
-        AgSt( $R, ~k )
+Possible reasons:
+1. Fact names are case-sensitive, different capitalizations are considered as different facts, i.e., Fact() is different from FAct(). Check the capitalization of your fact names.
+2. Same fact is used with different arities, i.e., Fact(&#39;A&#39;,&#39;B&#39;) is different from Fact(&#39;A&#39;). Check the arguments of your facts.
 
-3. rule `I_1&#39;, fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)
-        AgSt( $I, &lt;~k, ~m&gt; )
 
-4. rule `R_1&#39;, fact &quot;agst&quot;: (&quot;AgSt&quot;,2,Linear)
-        AgSt( $R, ~k )
+Fact `agst&#39;:
+
+    1. Rule `setup&#39;, capitalization  &quot;AgSt&quot;, 2, Linear
+     AgSt( $R, ~k )
+
+    2. Rule `setup&#39;, capitalization  &quot;AgSt&quot;, 3, Linear
+         AgSt( $I, ~k, ~m )
 */</code></pre>
       <p>The problem lists all the fact usages of fact
       <code>AgSt</code>. The statement
-      <code>1. rule 'setup', fact "agst":("AgSt",3,Linear)</code> means
-      that in the rule <code>setup</code> the fact <code>AgSt</code> is
-      used as a linear fact with 3 arguments. This is not consistent
-      with its use in other rules. For example
-      <code>2. rule 'setup', fact "agst": ("AgSt",2,Linear)</code>
-      indicates that it is also used with 2 arguments in the
+      <code>1. Rule 'setup', capitalization  "AgSt", 2, Linear</code>
+      means that in the rule <code>setup</code> the fact
+      <code>AgSt</code> is used as a linear fact with 2 arguments. This
+      is not consistent with its use in other rules. For example
+      <code>2. Rule 'setup', capitalization  "AgSt", 3, Linear</code>
+      indicates that it is also used with 3 arguments in the
       <code>setup</code> rule. To solve this problem we must ensure that
       we only use the same fact with the same number of arguments.</p>
       <h3 id="unbound-variables">Unbound variables</h3>
@@ -187,8 +189,10 @@ rule R_1:
       <pre><code>/*
 WARNING: the following wellformedness checks failed!
 
-unbound:
-  rule `R_1&#39; has unbound variables:
+Unbound variables
+=================
+
+rule `R_1&#39; has unbound variables: 
     ~n
 */</code></pre>
       <p>The warning <code>unbound variables</code> indicates that there
@@ -211,13 +215,16 @@ lemma functional: exists-trace
       <pre><code>/*
 WARNING: the following wellformedness checks failed!
 
-formula terms:
-  lemma `functional&#39; uses terms of the wrong form: `Free m&#39;, `Free m&#39;
+Formula terms
+=============
 
-  The only allowed terms are public names and bound node and message
-  variables. If you encounter free message variables, then you might
-  have forgotten a #-prefix. Sort prefixes can only be dropped where
-  this is unambiguous.
+lemma `functional&#39; uses terms of the wrong form: `Free m&#39;, `Free m&#39;
+
+The only allowed terms are public names and bound node and message
+variables. If you encounter free message variables, then you might
+have forgotten a #-prefix. Sort prefixes can only be dropped where
+this is unambiguous. Moreover, reducible function symbols are
+disallowed.
 */</code></pre>
       <p>The warning indicates that in this lemma the term
       <code>m</code> occurs free. This means that it is not bound to any
@@ -236,10 +243,12 @@ lemma nonce_secret:
       <pre><code>/*
 WARNING: the following wellformedness checks failed!
 
-lemma actions:
-  lemma `nonce_secret&#39; references action
-    (ProtoFact Linear &quot;Secr&quot; 2,2,Linear)
-  but no rule has such an action.
+Inexistant lemma actions
+========================
+
+lemma `nonce_secret&#39; references action 
+    fact &quot;Secr&quot; (arity 2, Linear) 
+but no rule has such an action.
 */</code></pre>
       <p>Such a warning always occurs when a lemma uses a fact that
       never appears as an action fact in any rule. The cause of this is
@@ -272,14 +281,20 @@ rule setup:
     [ AgSt($I,&lt;~k,m&gt;), AgSt($R,~k) ]</code></pre>
       <p>we get the error message</p>
       <pre><code>/*
-WARNING: the following wellformedness checks failed!
+Unbound variables
+=================
 
-unbound:
-  rule `setup&#39; has unbound variables:
+rule `setup&#39; has unbound variables: 
     m
 
-sorts:
-  rule `setup&#39; clashing sorts, casings, or multiplicities:
+Variable with mismatching sorts or capitalization
+=================================================
+
+Possible reasons:
+1. Identifiers are case sensitive, i.e.,&#39;x&#39; and &#39;X&#39; are considered to be different.
+2. The same holds for sorts:, i.e., &#39;$x&#39;, &#39;x&#39;, and &#39;~x&#39; are considered to be different.
+
+rule `setup&#39;: 
     1. ~m, m
 */</code></pre>
       <p>This indicates that the sorts of a message were inconsistently
@@ -305,10 +320,12 @@ rule R_1:
 </code></pre>
       <p>we get the error message</p>
       <pre><code>/*
-WARNING: the following wellformedness checks failed!
+Message Derivation Checks
+=========================
 
-The variables of the follwing rule(s) are not derivable from their premises, you may be performing unintended pattern matching:
-  R_1
+The variables of the follwing rule(s) are not derivable from their premises, you may be performing unintended pattern matching.
+
+Rule R_1: 
 Failed to derive Variable(s): ~k, m
 */</code></pre>
       <p>This warning indicates that in the rule <code>R_1</code>, we
