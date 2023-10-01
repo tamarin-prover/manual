@@ -192,7 +192,7 @@ WARNING: the following wellformedness checks failed!
 Unbound variables
 =================
 
-rule `R_1&#39; has unbound variables: 
+rule `R_1&#39; has unbound variables:
     ~n
 */</code></pre>
       <p>The warning <code>unbound variables</code> indicates that there
@@ -246,8 +246,8 @@ WARNING: the following wellformedness checks failed!
 Inexistant lemma actions
 ========================
 
-lemma `nonce_secret&#39; references action 
-    fact &quot;Secr&quot; (arity 2, Linear) 
+lemma `nonce_secret&#39; references action
+    fact &quot;Secr&quot; (arity 2, Linear)
 but no rule has such an action.
 */</code></pre>
       <p>Such a warning always occurs when a lemma uses a fact that
@@ -284,7 +284,7 @@ rule setup:
 Unbound variables
 =================
 
-rule `setup&#39; has unbound variables: 
+rule `setup&#39; has unbound variables:
     m
 
 Variable with mismatching sorts or capitalization
@@ -294,7 +294,7 @@ Possible reasons:
 1. Identifiers are case sensitive, i.e.,&#39;x&#39; and &#39;X&#39; are considered to be different.
 2. The same holds for sorts:, i.e., &#39;$x&#39;, &#39;x&#39;, and &#39;~x&#39; are considered to be different.
 
-rule `setup&#39;: 
+rule `setup&#39;:
     1. ~m, m
 */</code></pre>
       <p>This indicates that the sorts of a message were inconsistently
@@ -325,20 +325,19 @@ Message Derivation Checks
 
 The variables of the follwing rule(s) are not derivable from their premises, you may be performing unintended pattern matching.
 
-Rule R_1: 
+Rule R_1:
 Failed to derive Variable(s): ~k, m
 */</code></pre>
       <p>This warning indicates that in the rule <code>R_1</code>, we
       introduce additional capabilities, namely, the derivation of both
       <code>~k</code> and <code>m</code>.</p>
       <p>If this is intentional, the rule can be annotated with
-      <code>[derivchecks]</code>, which will make Tamarin ignore that
+      <code>[no_derivcheck]</code>, which will make Tamarin ignore that
       rule during derivation checks. The behaviour of these derivation
       checks can be further modified with the
-      <code>--derivcheck-timeout</code> flag. By default, it is set to a
-      value of <code>5</code> seconds. Setting it to <code>0</code>
-      disables the timeout, setting it to <code>-1</code> disables
-      derivation checks entirely.</p>
+      <code>--derivcheck-timeout</code> (or <code>-d</code>) flag. By
+      default, it is set to a value of <code>5</code> seconds. Setting
+      it to <code>0</code> disables derivation checks.</p>
       <h3 id="what-to-do-when-tamarin-does-not-terminate">What to do
       when Tamarin does not terminate</h3>
       <p>Tamarin may fail to terminate when it automatically constructs
