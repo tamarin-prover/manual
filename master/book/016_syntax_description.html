@@ -239,8 +239,8 @@ binary_app  := binary_fun &#39;{&#39; tupleterm &#39;}&#39; term
 binary_fun  := &lt;all-binary-functions-defined-up-to-here&gt;
 nary_app    := nary_fun &#39;(&#39; multterm* &#39;)&#39;
 
-literal     := &quot;&#39;&quot;  ident &quot;&#39;&quot; // a fixed, public name
-             | &quot;~&#39;&quot; ident &quot;&#39;&quot; // a fixed, fresh name
+literal     := &quot;&#39;&quot;  ~(&#39;\&#39;&#39; | &#39;\n&#39;)+ &quot;&#39;&quot; // a fixed, public name
+             | &quot;~&#39;&quot; ~(&#39;\&#39;&#39; | &#39;\n&#39;)+ &quot;&#39;&quot; // a fixed, fresh name
              | nonnode_var    // a non-temporal variable
 nonnode_var := [&#39;$&#39;] ident [&#39;.&#39; natural]         // &#39;pub&#39; sort prefix
              | ident [&#39;.&#39; natural] &#39;:&#39; &#39;pub&#39;     // &#39;pub&#39; sort suffix
