@@ -56,7 +56,7 @@
       <h1 id="syntax-description">Syntax Description</h1>
       <p>Here, we explain the formal syntax of the security protocol
       theory format that is processed by Tamarin.</p>
-      <p>Comments are C-style:</p>
+      <p>Comments are C-style and are allowed to be nested:</p>
       <pre><code>/* for a multi-line comment */
 // for a line-comment</code></pre>
       <p>All security protocol theory are named and delimited by
@@ -70,7 +70,7 @@ body := (signature_spec | global_heuristic | tactic | rule |
       interaction. Note that our parser is stateful and remembers what
       functions have been defined. It will only parse function
       applications of defined functions.</p>
-      <pre><code>signature_spec := functions | equations | built_in
+      <pre><code>signature_spec := functions | equations | built_in | macros
 functions      := &#39;functions&#39; &#39;:&#39; function_sym (&#39;,&#39; function_sym)* [&#39;,&#39;]
 function_sym   := ident &#39;/&#39; arity [&#39;[private]&#39;]
 arity          := digit+
@@ -98,9 +98,11 @@ built_ins      := &#39;diffie-hellman&#39;
       can be any of those discussed in Section <a
       href="010_advanced-features.html#sec:heuristics">Heuristics</a>.</p>
       <pre><code>global_heuristic      := &#39;heuristic&#39; &#39;:&#39; goal_ranking+
-goal_ranking          := standard_goal_ranking | oracle_goal_ganking
+goal_ranking          := standard_goal_ranking | oracle_goal_ganking | tactic_goal_ranking
 standard_goal_ranking := &#39;C&#39; | &#39;I&#39; | &#39;P&#39; | &#39;S&#39; | &#39;c&#39; | &#39;i&#39; | &#39;p&#39; | &#39;s&#39;
-oracle_goal_ranking   := &#39;o&#39; &#39;&quot;&#39; [^&#39;&quot;&#39;]* &#39;&quot;&#39; | &#39;O&#39; &#39;&quot;&#39; [^&#39;&quot;&#39;]* &#39;&quot;&#39;</code></pre>
+oracle_goal_ranking   := &#39;o&#39; &#39;&quot;&#39; [^&#39;&quot;&#39;]* &#39;&quot;&#39; | &#39;O&#39; &#39;&quot;&#39; [^&#39;&quot;&#39;]* &#39;&quot;&#39;
+tactic_goal_ranking   := &#39;{&#39; tactic_name &#39;}&#39;
+tactic_name           := &lt;all-tactic-names-defined-up-to-here&gt;</code></pre>
       <p>The tactics allow the user to write their own heuristics based
       on the lemmas there are trying to prove. Their use is descibed in
       in Section <a
@@ -132,7 +134,7 @@ function_name         :=   &#39;regex&#39; | &#39;isFactName&#39; | &#39;isInFac
 diff_rule   := simple_rule [&#39;left&#39; rule &#39;right&#39; rule]
 simple_rule := &#39;rule&#39; [modulo] ident [rule_attrs] &#39;:&#39;
         [let_block]
-        &#39;[&#39; facts &#39;]&#39; ( &#39;--&gt;&#39; | &#39;--[&#39; facts &#39;]-&gt;&#39;) &#39;[&#39; facts &#39;]&#39;
+        &#39;[&#39; [facts] &#39;]&#39; ( &#39;--&gt;&#39; | &#39;--[&#39; facts &#39;]-&gt;&#39;) &#39;[&#39; [facts] &#39;]&#39;
 variants    := &#39;variants&#39; simple_rule (&#39;,&#39; simple_rule)*
 modulo      := &#39;(&#39; &#39;modulo&#39; (&#39;E&#39; | &#39;AC&#39;) &#39;)&#39;
 rule_attrs  := &#39;[&#39; rule_attr (&#39;,&#39; rule_attr)* [&#39;,&#39;] &#39;]&#39;
@@ -173,7 +175,7 @@ restriction_attrs      := &#39;[&#39; (&#39;left&#39; | &#39;right&#39;) &#39;]&
       <pre><code>lemma := &#39;lemma&#39; [modulo] ident [lemma_attrs] &#39;:&#39;
          [trace_quantifier]
          &#39;&quot;&#39; formula &#39;&quot;&#39;
-         proof_skeleton
+         [proof_skeleton]
 lemma_attrs      := &#39;[&#39; lemma_attr (&#39;,&#39; lemma_attr)* [&#39;,&#39;] &#39;]&#39;
 lemma_attr       := &#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; |
                          &#39;hide_lemma=&#39; ident | &#39;heuristic=&#39; goalRanking+
@@ -186,12 +188,13 @@ trace_quantifier := &#39;all-traces&#39; | &#39;exists-trace&#39;</code></pre>
       <p>A proof skeleton is a complete or partial proof as output by
       the Tamarin prover. It indicates the proof method used at each
       step, which may include multiple cases.</p>
-      <pre><code>proof_skeleton :=  &#39;SOLVED&#39; | &#39;by&#39; proof_method
+      <pre><code>proof_skeleton :=  &#39;SOLVED&#39; | &#39;MIRRORED&#39; | by&#39; proof_method
                 | proof_method proof_skeleton
                 | proof_method &#39;case&#39; ident proof_skeleton
-                    (&#39;next &#39;case&#39; ident proof_skeleton)* &#39;qed&#39;
-proof_method   := &#39;sorry&#39; | &#39;simplify&#39; | &#39;solve &#39;(&#39; goal &#39;)&#39; |
-                  &#39;contradiction&#39; | &#39;induction&#39;
+                    (&#39;next&#39; &#39;case&#39; ident proof_skeleton)* &#39;qed&#39;
+proof_method   := &#39;sorry&#39; | &#39;simplify&#39; | &#39;solve&#39; &#39;(&#39; goal &#39;)&#39; |
+                  &#39;contradiction&#39; | &#39;induction&#39; | &#39;rule-equivalence&#39; |
+                  &#39;backward-search&#39; | &#39;ATTACK&#39;
 goal           :=  fact &quot;▶&quot; natural_subscr node_var
                 | fact &#39;@&#39; node_var
                 | &#39;(&#39; node_var &#39;,&#39; natural &#39;)&#39; &#39;~~&gt;&#39; &#39;(&#39; node_var &#39;,&#39; natural &#39;)&#39;
