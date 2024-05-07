@@ -365,6 +365,27 @@ lemma nonce_secrecy:
       smaller values for both parameters, and analyze the sources shown
       in interactive mode to understand what exactly caused the
       problem.</p>
+      <h2 id="sec:loopbreakers">Loop breakers</h2>
+      <p>During the precomputation phase, Tamarin determines a minimal
+      set of ‘loop-breakers’, which are premises that can be excluded
+      from the general precomputation of all premise goals to prevent
+      looping. Specifically, the set of loop breakers is a minimal set
+      of premises that can be excluded to make the directed graph of
+      rules, when connected from conclusions to premises, acyclic.</p>
+      <p>It is important to note that there is often no unique minimal
+      set of loop-breakers. The loop-breaker computation is
+      deterministic for a given set of rules, but a change to the set of
+      rules may result in different premises being considered
+      loop-breakers. As such, you may find that a small change or
+      addition of a rule to your model can result in changes to how some
+      seemingly unrelated properties are solved.</p>
+      <p>It is possible to manually break loops in particular places by
+      annotating the relevant premise with the <code>no_precomp</code>
+      annotation. These premises will then be excluded when computing
+      loop-breakers over the rule set, and will not have their sources
+      precomputed. For more on fact annotations, see <a
+      href="011_advanced-features.html#sec:fact-annotations">Fact
+      Annotations</a>.</p>
       <div id="refs" class="references csl-bib-body hanging-indent"
       role="doc-bibliography">
       <div id="ref-esorics2020" class="csl-entry"
