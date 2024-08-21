@@ -219,14 +219,14 @@ lemma nonce_secrecy:
        IN_R_1_ni( ni, m1) @ i
        ==&gt;
        ( (Ex #j. KU(ni) @ j &amp; j &lt; i)
-       | (Ex #j. OUT_I_1( m1 ) @ j)
+       | (Ex #j. OUT_I_1( m1 ) @ j &amp; j &lt; i)
        )
     )
   &amp; (All nr m2 #i.
        IN_I_2_nr( nr, m2) @ i
        ==&gt;
        ( (Ex #j. KU(nr) @ j &amp; j &lt; i)
-       | (Ex #j. OUT_R_1( m2 ) @ j)
+       | (Ex #j. OUT_R_1( m2 ) @ j &amp; j &lt; i)
        )
     )
   &quot;
@@ -238,17 +238,17 @@ lemma nonce_secrecy:
       <p>This lemma relates the point of instantiation to the point of
       sending by either the adversary or the communicating partner. In
       other words, it says that whenever the responder receives the
-      first nonce, either the nonce was known to the adversary or the
-      initiator sent the first message prior to that moment. Similarly,
-      the second part states that whenever the initiator receives the
-      second message, either the adversary knew the corresponding nonce
-      or the responder has sent the second message before. Generally, in
-      a protocol with partial deconstructions left it is advisable to
-      try if the problem can be solved by a sources lemma that considers
-      where a term could be coming from. As in the above example, one
-      idea to do so is by stating that a used term must either have
-      occurred in one of a list of rules before, or it must have come
-      from the adversary.</p>
+      first nonce, then prior to that moment either the nonce was known
+      to the adversary or the initiator had sent the first message.
+      Similarly, the second part states that whenever the initiator
+      receives the second message, then prior to that moment either the
+      adversary knew the corresponding nonce or the responder had sent
+      the second message. Generally, in a protocol with partial
+      deconstructions left it is advisable to try if the problem can be
+      solved by a sources lemma that considers where a term could be
+      coming from. As in the above example, one idea to do so is by
+      stating that a used term must either have occurred in one of a
+      list of rules before, or it must have come from the adversary.</p>
       <p>The above sources lemma can be automatically proven by Tamarin.
       With the sources lemma, Tamarin can then automatically prove the
       lemma <code>nonce_secrecy</code>.</p>

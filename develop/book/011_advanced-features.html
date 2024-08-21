@@ -502,13 +502,11 @@ for line in lines:
         l2.append(num)
       elif &quot;KU( ~key&quot; in line:
         l3.append(num)
-      else:
-        l4.append(num)
 
   else:
     exit(0)
 
-ranked = l1 + l2 + l3 + l4
+ranked = l1 + l2 + l3
 
 for i in ranked:
   print(i)</code></pre>
@@ -519,6 +517,16 @@ for i in ranked:
       <pre><code>tamarin-prover --prove=uniqueness SourceOfUniqueness.spthy</code></pre>
       <p>The generated proof consists of only 10 steps. (162 steps with
       ‘consecutive’ ranking, non-termination with ‘smart’ ranking).</p>
+      <p>Sometimes, one makes mistakes when writing an oracle or forgets
+      to address a case in which the oracle would need to rank a goal
+      for termination. For example in the oracle above, it could happen
+      that none of the three checks apply to any of the goals and the
+      oracle prints nothing. To help debugging oracles, the interactive
+      mode of Tamarin provides an autoprove option that stops proving
+      whenever the oracle ranks no goals (it is called
+      <code>o. autoprove until oracle returns nothing</code>). This way,
+      you can easily find and inspect the cases in which you might need
+      to refine your oracle.</p>
       <!--Advanced Encoding
       ----------------------------
 
@@ -528,6 +536,15 @@ for i in ranked:
       <p>See Section <a href="003_example.html#sec:gui">Example</a> for
       a short demonstration of the main features of the GUI.</p>
       <!-- downloading proofs, keyboard commands (a vs A vs b vs B) etc. -->
+      <h3 id="disabling-server-access-logs">Disabling Server Access
+      Logs</h3>
+      <p>Sometimes the web server access logs can be too noisy if you
+      are trying to do print debugging while using the interactive mode.
+      The logs are on by default but can be disabled with the
+      <code>--no-logging</code> CLI argument.</p>
+      <pre><code>tamarin-prover interactive --no-logging &lt;Theory&gt;</code></pre>
+      <p>This will run Tamarin in interactive mode and suppress the web
+      server logs.</p>
       <h2 id="sec:channel-models">Different Channel Models</h2>
       <p>Tamarin’s built-in adversary model is often referred to as the
       Dolev-Yao adversary. This models an active adversary that has
@@ -1146,6 +1163,66 @@ end</code></pre>
       is deduced (as t⊏s must hold because of monotonicity) - for
       decreasing and strictly decreasing, the inverse of the increasing
       cases holds</p>
+      <h2 id="convenience-functions-for-print-debugging">Convenience
+      Functions for Print Debugging</h2>
+      <p>For debugging Haskell programs it is still convenient to use
+      simple print debugging. The standard library includes the
+      <code>Debug.trace</code> family of functions that can even be used
+      from a pure context to print debug output. Since adding too many
+      debug prints can lead to a noisy output we implement some
+      convenience functions on top of <code>Debug.trace</code>, which
+      can be selectively turned on when debugging a certain section of
+      the code.</p>
+      <p>The following functions are implemented in the
+      <code>Debug.Trace.EnvTracer</code> module. Functions usable in an
+      Applicative/Monad have an “M” suffix.</p>
+      <pre><code>etraceSectionLn :: String -&gt; String -&gt; b -&gt; b    
+etraceSectionLnM :: Applicative f =&gt; String -&gt; String -&gt; f ()
+etraceLn :: String -&gt; String -&gt; String -&gt; b -&gt; b    
+etraceLnM :: Applicative f =&gt; String -&gt; String -&gt; String -&gt; f ()</code></pre>
+      <p>The first argument to all functions is a <em>trace key</em>
+      string. When running Tamarin you can set the
+      <code>DEBUG_TRACE</code> environment variable to a comma-separated
+      list of trace keys, which will then enable the corresponding debug
+      outputs. Any debug trace whose key is not contained in the
+      environment variable will be suppressed.</p>
+      <p>The <code>etraceSectionLn*</code> functions are used to make
+      visual separators for debug outputs. The <code>etraceLn*</code>
+      functions take a label to give context and an arbitrary string to
+      print.</p>
+      <p>For example, the following example program would result in the
+      debug output below if the <code>DEBUG_TRACE</code> variable
+      contains “foo”.</p>
+      <pre><code>etraceSectionLn &quot;foo&quot; &quot;TITLE&quot; $
+etraceLn &quot;foo&quot; &quot;functionA&quot; &quot;called functionA&quot; $
+...
+
+=== TITLE ======================================================================
+functionA: called functionA</code></pre>
+      <h2
+      id="outputting-constraint-systems-when-satisfying-traces-are-found.">Outputting
+      constraint systems when satisfying traces are found.</h2>
+      <p>It can be useful for further analysis to output the constraint
+      system of the state of the proof of a lemma when either a
+      satisfying trace is found in an “exists-trace” lemma, or when a
+      counterexample trace is found in an “all-traces” lemma. For this
+      you can use the command line options <code>--output-json</code>
+      (or <code>--oj</code>) and <code>--output-dot</code> (or
+      <code>--od</code>) in the non-interactive mode of tamarin. The
+      command line options take a required filename and will output all
+      those constraint systems into the file in the respective
+      format.</p>
+      <pre><code>tamarin-prover --prove --output-json=traces.json --output-dot=traces.dot examples/Tutorial.spthy</code></pre>
+      <p>For dot, the file is simply the concatenation of all ‘digraph’
+      expressions, which can then be rendered into individual image
+      files using the <code>-O</code> option of the dot command line
+      program.</p>
+      <pre><code># will output images to traces.dot.png, traces.dot.2.png, traces.dot.3.png, ...
+dot -Tpng -O traces.dot</code></pre>
+      <p>For JSON, the standard schema already defines a single
+      top-level object with a “graphs” key that holds a list of the
+      individual graphs, which we use to output the constrain
+      systems.</p>
       <div id="refs" class="references csl-bib-body hanging-indent"
       role="doc-bibliography">
       <div id="ref-KK-jcs16" class="csl-entry" role="doc-biblioentry">
