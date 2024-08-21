@@ -257,11 +257,11 @@ nonnode_var := [&#39;$&#39;] ident [&#39;.&#39; natural]         // &#39;pub&#39
       <p>Facts do not have to be defined up-front. This will probably
       change once we implement user-defined sorts. Facts prefixed with
       <code>!</code> are persistent facts. All other facts are linear.
-      There are six reserved fact symbols: In, Out, KU, KD, and K. KU
-      and KD facts are used for construction and deconstruction rules.
-      KU-facts also log the messages deduced by construction rules. Note
-      that KU-facts have arity 2. Their first argument is used to track
-      the exponentiation tags. See the
+      There are six reserved fact symbols: In, Out, KU, KD, Fr, and K.
+      KU and KD facts are used for construction and deconstruction
+      rules. KU-facts also log the messages deduced by construction
+      rules. Note that KU-facts have arity 2. Their first argument is
+      used to track the exponentiation tags. See the
       <code>loops/Crypto_API_Simple.spthy</code> example for more
       information.</p>
       <pre><code>facts := fact (&#39;,&#39; fact)*
