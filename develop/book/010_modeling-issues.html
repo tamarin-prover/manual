@@ -301,6 +301,39 @@ rule `setup&#39;:
       used. In the rule <code>setup</code>, this is the case because we
       used m once as a fresh value <code>~m</code> and another time
       without the <code>~</code>.</p>
+      <h3 id="subterm-convergence-warning">Subterm Convergence
+      Warning</h3>
+      <p>The equational theory used by Tamarin must always be
+      convergent, meaning that any sequence of rewriting steps must
+      eventually terminate, and have the finite variant property.
+      Tamarin verifies if the equational theory is subterm convergent.
+      If it is subterm convergent, it is guaranteed to be convergent an
+      to have the finite variant property. However, if it is not subterm
+      convergent, it does not necessarily imply non-convergence; it only
+      indicates a potential risk of non-convergence. Non-convergence of
+      an equation can result in infinite loops or incorrect results.</p>
+      <p>An equation is subterm convergent if the right-hand side is a
+      constant (such as <code>true</code> or <code>false</code>) or a
+      subterm of the left-hand side. For instance, the equation
+      <code>f(g(x)) = x</code> is subterm convergent since the
+      right-hand side is a subterm of the left-hand side. Conversely,
+      the equation <code>f(x) = g(x)</code> is not subterm
+      convergent.</p>
+      <p>Consider the following example from the warning:</p>
+      <pre><code>/*
+Subterm Convergence Warning
+===========================
+
+User-defined equations must be convergent and have the finite variant property. The following equations are not subterm convergent. If you are sure that the set of equations is nevertheless convergent and has the finite variant property, you can ignore this warning and continue 
+
+unblind(sign(blind(m, r), sk), r) = sign(m, sk)
+
+For more information, please refer to the manual : https://tamarin-prover.com/manual/master/book/010_modeling-issues.html 
+*/</code></pre>
+      <p>If you are sure that your equational theory is convergent and
+      has the finite variant theory you can deactivate the warning using
+      the annotation <code>convergent</code> as follows:</p>
+      <pre><code>equations [convergent]: ...</code></pre>
       <h3 id="message-derivation-errors">Message derivation errors</h3>
       <p>It is good modelling practice to write our rules in such a way
       that they do not give participants any additional capabilities,
