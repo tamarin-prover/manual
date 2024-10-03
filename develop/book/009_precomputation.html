@@ -127,7 +127,14 @@ lemma nonce_secrecy:
 </code></pre>
       <p>This proof attempt will not terminate due to there being
       <code>12 partial deconstructions left</code> when looking at this
-      example in the GUI as described in detail below.</p>
+      example in the GUI as described in detail below. The number of
+      partial deconstructions is also visible without GUI when using the
+      command line parameter <code>--precompute-only</code>. On this
+      example, running Tamarin using <code>--precompute-only</code>
+      results in the following output:</p>
+      <pre><code>Multiset rewriting rules: 9
+Raw sources: 11 cases, 12 partial deconstructions left
+Refined sources: 11 cases, 12 partial deconstructions left</code></pre>
       <h2 id="sec:openchains">Partial deconstructions left</h2>
       <p>In the precomputation phase, Tamarin goes through all rules and
       inspects their premises. For each of these facts, Tamarin will
