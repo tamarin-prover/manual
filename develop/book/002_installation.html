@@ -153,13 +153,25 @@
       network failure may require you to restart Tamarin and start over
       on the proof.</p>
       <h2 id="tamarin-code-editors">Tamarin Code Editors</h2>
+      <h2 id="vscode">VSCode</h2>
+      <p>Tamarin has an official plugin for <a
+      href="https://code.visualstudio.com/">Visual Studio Code</a>
+      providing syntax highlighting, detection of syntax errors, and
+      numerous wellformedness checks. It is available from the <a
+      href="https://marketplace.visualstudio.com/items?itemName=tamarin-prover.tamarin-prover">VSCode
+      marketplace</a> or from <a
+      href="https://open-vsx.org/extension/tamarin-prover/tamarin-prover">Open
+      VSX</a>. Its source code can be found in <a
+      href="https://github.com/tamarin-prover/vscode-tamarin">vscode-tamarin</a>
+      repository.</p>
+      <h2 id="other-editors">Other editors</h2>
       <p>Under the <a
       href="https://github.com/tamarin-prover/tamarin-prover/tree/develop/etc">etc</a>
       folder contained in the Tamarin Prover project, plug-ins are
       available for VIM, Sublime Text 3, Emacs and Notepad++. Below we
       details the steps required to install your preferred plug-in.</p>
-      <h4 id="vim">VIM</h4>
-      <h5 id="using-vim-plugin-managers">Using Vim plugin managers</h5>
+      <h3 id="vim">VIM</h3>
+      <h4 id="using-vim-plugin-managers">Using Vim plugin managers</h4>
       <p>This example will use <a
       href="https://github.com/VundleVim/Vundle.vim">Vundle</a> to
       install the plugin directly from this repository. The instructions
@@ -177,8 +189,8 @@
       equivalent)</li>
       </ol>
       <p>You can install updates through <code>:PluginUpdate</code>.</p>
-      <h5 id="manual-installation-not-recommended">Manual installation
-      (not recommended)</h5>
+      <h4 id="manual-installation-not-recommended">Manual installation
+      (not recommended)</h4>
       <p>If you install the Vim support files using this method, you
       will need to keep the files up-to-date yourself.</p>
       <ol type="1">
@@ -187,7 +199,7 @@
       <li>Copy the contents of <code>etc/vim</code> to
       <code>~/.vim/</code>, including the folders.</li>
       </ol>
-      <h4 id="sublime-text-3">Sublime Text 3</h4>
+      <h3 id="sublime-text-3">Sublime Text 3</h3>
       <p><a
       href="https://github.com/tamarin-prover/editor-sublime">editor-sublime</a>
       is a plug-in developed for the Sublime Text 3 editor. The plug-in
@@ -228,19 +240,19 @@
       please <a
       href="https://github.com/tamarin-prover/editor-sublime">visit the
       project GitHub page</a>.</em></p>
-      <h4 id="notepad">Notepad++</h4>
+      <h3 id="notepad">Notepad++</h3>
       <p>Follow steps from the <a
       href="http://docs.notepad-plus-plus.org/index.php/User_Defined_Language_Files#How_to_install_user_defined_language_files">Notepad++
       Wiki</a> using the <a
       href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/notepad_plus_plus_spthy.xml">notepad_plus_plus_spthy.xml</a>
       file.</p>
-      <h4 id="emacs">Emacs</h4>
+      <h3 id="emacs">Emacs</h3>
       <p>The <a
       href="https://github.com/tamarin-prover/tamarin-prover/blob/develop/etc/spthy-mode.el">spthy.el</a>
       implements a SPTHY major mode. You can load it with
       <code>M-x load-file</code>, or add it to your <code>.emacs</code>
       in your favourite way.</p>
-      <h4 id="atom">Atom</h4>
+      <h3 id="atom">Atom</h3>
       <p>The <a
       href="https://atom.io/packages/language-tamarin">language-tamarin</a>
       package provides Tamarin syntax highlighting for Atom. To install
