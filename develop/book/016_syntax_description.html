@@ -119,27 +119,19 @@
                   | &#39;dest-symmetric-encryption&#39; 
                   | &#39;dest-asymmetric-encryption&#39;</code></pre>
       <p>A global heuristic sets the default heuristic that will be used
-      when autoproving lemmas in the file. The specified goal ranking
-      can be any of those discussed in Section <a
+      when autoproving lemmas in the file. The specified proof method
+      ranking can be any of those discussed in Section <a
       href="010_advanced-features.html#sec:heuristics">Heuristics</a>.</p>
-      <pre class="tamarin"><code>  global_heuristic  ::=  &#39;heuristic&#39; &#39;:&#39; (_goal_ranking+: goal_ranking)
-  _goal_ranking  ::=  standard_goal_ranking 
-                              | oracle_goal_ranking 
-                              | tactic_goal_ranking
-  standard_goal_ranking  ::=  /[CISPcisp][CISPcisp]?[CISPcisp]?[CISPcisp]?/
-  oracle_goal_ranking  ::=  (&#39;O&#39; 
-                              | &#39;o&#39;) (&#39;&quot;&#39; param &#39;&quot;&#39;)?
-  tactic_goal_ranking  ::=  &#39;{&#39; ident &#39;}&#39;
+      <pre class="tamarin"><code>  global_heuristic  ::=  &#39;heuristic&#39; &#39;:&#39; (_proof_method_ranking+: proof_method_ranking)
   param  ::=  /[^&quot;]*/</code></pre>
       <p>The tactics allow the user to write their own heuristics based
       on the lemmas there are trying to prove. Their use is descibed in
       in Section <a
       href="010_advanced-features.html#sec:fact-annotations#subsec:tactic">Using
       a Tactic</a>.</p>
-      <pre class="tamarin"><code>  standard_goal_ranking  ::=  /[CISPcisp][CISPcisp]?[CISPcisp]?[CISPcisp]?/
-  tactic  ::=  &#39;tactic&#39; &#39;:&#39; ident presort? ((prio+ deprio*) 
+      <pre class="tamarin"><code>  tactic  ::=  &#39;tactic&#39; &#39;:&#39; ident presort? ((prio+ deprio*) 
                               | (prio* deprio+))
-  presort  ::=  &#39;presort&#39; &#39;:&#39; standard_goal_ranking
+  presort  ::=  &#39;presort&#39; &#39;:&#39; standard_proof_method_ranking
   prio  ::=  &#39;prio&#39; &#39;:&#39; (&#39;{&#39; post_ranking &#39;}&#39;)? _function+
   deprio  ::=  &#39;deprio&#39; &#39;:&#39; (&#39;{&#39; post_ranking &#39;}&#39;)? _function+
   post_ranking  ::=  &#39;smallest&#39; 
@@ -156,7 +148,7 @@
                               | &#39;dhreNoise&#39; 
                               | &#39;defaultNoise&#39; 
                               | &#39;reasonableNoncesNoise&#39; 
-                              | &#39;nonAbsurdGoal&#39;</code></pre>
+                              | &#39;nonAbsurdConstraint&#39;</code></pre>
       <p>Multiset rewriting rules are specified as follows. The protocol
       corresponding to a security protocol theory is the set of all
       multiset rewriting rules specified in the body of the theory. Rule
@@ -239,7 +231,7 @@ search_method := &#39;DFS&#39; | &#39;BFS&#39; | &#39;SEQDFS&#39; | &#39;NONE&#3
                          | &#39;use_induction&#39; 
                          | (&#39;output=&#39; &#39;[&#39; language (&#39;,&#39; language)* &#39;]&#39;) 
                          | (&#39;hide_lemma=&#39; ident) 
-                         | (&#39;heuristic=&#39; (_goal_ranking+: goal_ranking))
+                         | (&#39;heuristic=&#39; (_proof_method_ranking+: proof_method_ranking))
   trace_quantifier  ::=  &#39;all-traces&#39; 
                          | &#39;exists-trace&#39;</code></pre>
       <p>In observational equivalence mode, lemmas can be associated to
@@ -267,24 +259,12 @@ search_method := &#39;DFS&#39; | &#39;BFS&#39; | &#39;SEQDFS&#39; | &#39;NONE&#3
                                | step+)
   proof_method  ::=  &#39;sorry&#39; 
                                | &#39;simplify&#39; 
-                               | (&#39;solve&#39; &#39;(&#39; goal &#39;)&#39;) 
+                               | (&#39;solve&#39; &#39;(&#39; constraint &#39;)&#39;) 
                                | &#39;contradiction&#39; 
                                | &#39;induction&#39; 
                                | &#39;rule-equivalence&#39; 
                                | &#39;backward-search&#39; 
                                | &#39;ATTACK&#39;
-  goal  ::=  premise_goal 
-                               | action_goal 
-                               | chain_goal 
-                               | disjunction_split_goal 
-                               | eq_split_goal
-  premise_goal  ::=  _fact &#39;▶&#39; natural_subscript temporal_var
-  premise_goal  ::=  _fact &#39;▶&#39; natural_subscript temporal_var
-  action_goal  ::=  _fact &#39;@&#39; temporal_var
-  chain_goal  ::=  &#39;(&#39; temporal_var &#39;,&#39; natural &#39;)&#39; &#39;~~&gt;&#39; &#39;(&#39; temporal_var &#39;,&#39; natural &#39;)&#39;
-  disjunction_split_goal  ::=  CHAIN_GOAL((_formula: formula) ((&#39;||&#39; 
-                               | &#39;∥&#39;) (_formula: formula))+)
-  eq_split_goal  ::=  &#39;splitEqs&#39; &#39;(&#39; natural &#39;)&#39;
   natural  ::=  /[0-9]+/
   natural_subscript  ::=  (&#39;₀&#39; 
                                | &#39;₁&#39; 
@@ -393,7 +373,7 @@ fact  := [&#39;!&#39;] ident &#39;(&#39; [msetterm (&#39;,&#39; msetterm)*] &#39
 fact_annotes := &#39;[&#39; fact_annote (&#39;,&#39; fact_annote)* &#39;]&#39;
 fact_annote  := &#39;+&#39; | &#39;-&#39; | &#39;no_precomp&#39;</code></pre>
       <p>Fact annotations can be used to adjust the priority of
-      corresponding goals in the heuristics, or influence the
+      corresponding proof methods in the heuristics, or influence the
       precomputation step performed by Tamarin, as described in Section
       <a href="010_advanced-features.html#sec:fact-annotations">Advanced
       Features</a>.</p>
@@ -437,7 +417,7 @@ conflicts  ::=  { { pub_var } { fresh_var } { msg_var_or_nullary_fun } { tempora
 
 externals  ::=  { multi_comment single_comment }
 
-precedences  ::=  { { &#39;NESTED&#39; &#39;FUNCTION&#39; &#39;VARIABLE&#39; &#39;EXPONENTIAL&#39; &#39;MULTIPLY&#39; &#39;ADD&#39; &#39;MUL_SET&#39; &#39;TUPLE&#39; &#39;NULLARY_FUN&#39; &#39;ATOM&#39; &#39;LOGICAL_NOT&#39; &#39;EXCLUSIVE_OR&#39; &#39;LOGICAL_AND&#39; &#39;LOGICAL_OR&#39; &#39;LOGICAL_IMPLICATION&#39; &#39;LOGICAL_IFF&#39; &#39;CHAIN_GOAL&#39; } { &#39;NON_DIFF&#39; &#39;DIFF&#39; } { &#39;REPLICATION&#39; &#39;EVENT&#39; &#39;CHOICE&#39; &#39;PROCESS_LET&#39; &#39;LOOKUP&#39; &#39;CONDITIONAL&#39; } }
+precedences  ::=  { { &#39;NESTED&#39; &#39;FUNCTION&#39; &#39;VARIABLE&#39; &#39;EXPONENTIAL&#39; &#39;MULTIPLY&#39; &#39;ADD&#39; &#39;MUL_SET&#39; &#39;TUPLE&#39; &#39;NULLARY_FUN&#39; &#39;ATOM&#39; &#39;LOGICAL_NOT&#39; &#39;EXCLUSIVE_OR&#39; &#39;LOGICAL_AND&#39; &#39;LOGICAL_OR&#39; &#39;LOGICAL_IMPLICATION&#39; &#39;LOGICAL_IFF&#39; &#39;CHAIN_CONSTRAINT&#39; } { &#39;NON_DIFF&#39; &#39;DIFF&#39; } { &#39;REPLICATION&#39; &#39;EVENT&#39; &#39;CHOICE&#39; &#39;PROCESS_LET&#39; &#39;LOOKUP&#39; &#39;CONDITIONAL&#39; } }
 
 word  ::=  ident
 
@@ -470,13 +450,13 @@ rules:
   predicate_def  ::=  (ident: predicate_identifier) &#39;(&#39; arguments? &#39;)&#39;
   options  ::=  &#39;options&#39; &#39;:&#39; option (&#39;,&#39; option)* &#39;,&#39;?
   option  ::=  &#39;translation-state-optimisation&#39; | &#39;translation-progress&#39; | &#39;translation-asynchronous-channels&#39; | &#39;translation-compress-events&#39; | &#39;translation-allow-pattern-lookups&#39;
-  global_heuristic  ::=  &#39;heuristic&#39; &#39;:&#39; (_goal_ranking+: goal_ranking)
-  _goal_ranking  ::=  standard_goal_ranking | oracle_goal_ranking | tactic_goal_ranking
-  standard_goal_ranking  ::=  /[CISPcisp][CISPcisp]?[CISPcisp]?[CISPcisp]?/
-  oracle_goal_ranking  ::=  (&#39;O&#39; | &#39;o&#39;) (&#39;&quot;&#39; param &#39;&quot;&#39;)?
-  tactic_goal_ranking  ::=  &#39;{&#39; ident &#39;}&#39;
+  global_heuristic  ::=  &#39;heuristic&#39; &#39;:&#39; (_proof_method_ranking+: proof_method_ranking)
+  _proof_method_ranking  ::=  standard_proof_method_ranking | oracle_proof_method_ranking | tactic_proof_method_ranking
+  standard_proof_method_ranking  ::=  /[CISPcisp][CISPcisp]?[CISPcisp]?[CISPcisp]?/
+  oracle_proof_method_ranking  ::=  (&#39;O&#39; | &#39;o&#39;) (&#39;&quot;&#39; param &#39;&quot;&#39;)?
+  tactic_proof_method_ranking  ::=  &#39;{&#39; ident &#39;}&#39;
   tactic  ::=  &#39;tactic&#39; &#39;:&#39; ident presort? ((prio+ deprio*) | (prio* deprio+))
-  presort  ::=  &#39;presort&#39; &#39;:&#39; standard_goal_ranking
+  presort  ::=  &#39;presort&#39; &#39;:&#39; standard_proof_method_ranking
   prio  ::=  &#39;prio&#39; &#39;:&#39; (&#39;{&#39; post_ranking &#39;}&#39;)? _function+
   deprio  ::=  &#39;deprio&#39; &#39;:&#39; (&#39;{&#39; post_ranking &#39;}&#39;)? _function+
   post_ranking  ::=  &#39;smallest&#39; | &#39;id&#39;
@@ -485,7 +465,7 @@ rules:
   and_function  ::=  &lt;LOGICAL_AND(_function &#39;&amp;&#39; _function)
   not_function  ::=  LOGICAL_NOT(&#39;not&#39; _function)
   std_function  ::=  function_name (&#39;&quot;&#39; param &#39;&quot;&#39;)*
-  function_name  ::=  &#39;regex&#39; | &#39;isFactName&#39; | &#39;isInFactTerms&#39; | &#39;dhreNoise&#39; | &#39;defaultNoise&#39; | &#39;reasonableNoncesNoise&#39; | &#39;nonAbsurdGoal&#39;
+  function_name  ::=  &#39;regex&#39; | &#39;isFactName&#39; | &#39;isInFactTerms&#39; | &#39;dhreNoise&#39; | &#39;defaultNoise&#39; | &#39;reasonableNoncesNoise&#39; | &#39;nonAbsurdConstraint&#39;
   process  ::=  &#39;process&#39; &#39;:&#39; _process
   _process  ::=  _elementary_process | _extended_process | _stateful_process | inline_msr_process | _nested_process | location_process | predefined_process
   _elementary_process  ::=  binding | output | input | conditional | process_let | deterministic_choice | non_deterministic_choice | null
@@ -545,7 +525,7 @@ rules:
   case_test  ::=  &#39;test&#39; (ident: test_identifier) &#39;:&#39; &#39;&quot;&#39; (_formula: formula) &#39;&quot;&#39;
   _lemma  ::=  lemma | diff_lemma | accountability_lemma | equiv_lemma | diff_equiv_lemma
   lemma  ::=  &#39;lemma&#39; modulo? (ident: lemma_identifier) diff_lemma_attrs? &#39;:&#39; trace_quantifier? &#39;&quot;&#39; (_formula: formula) &#39;&quot;&#39; (_proof_skeleton: proof_skeleton)?
-  lemma_attr  ::=  &#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | (&#39;output=&#39; &#39;[&#39; language (&#39;,&#39; language)* &#39;]&#39;) | (&#39;hide_lemma=&#39; ident) | (&#39;heuristic=&#39; (_goal_ranking+: goal_ranking))
+  lemma_attr  ::=  &#39;sources&#39; | &#39;reuse&#39; | &#39;use_induction&#39; | (&#39;output=&#39; &#39;[&#39; language (&#39;,&#39; language)* &#39;]&#39;) | (&#39;hide_lemma=&#39; ident) | (&#39;heuristic=&#39; (_proof_method_ranking+: proof_method_ranking))
   language  ::=  &#39;spthy&#39; | &#39;spthytyped&#39; | &#39;msr&#39; | &#39;proverif&#39; | &#39;deepsec&#39;
   diff_lemma  ::=  &#39;diffLemma&#39; modulo? (ident: lemma_identifier) diff_lemma_attrs? &#39;:&#39; (_proof_skeleton: proof_skeleton)?
   diff_lemma_attrs  ::=  &#39;[&#39; (diff_lemma_attr | lemma_attr) (&#39;,&#39; (diff_lemma_attr | lemma_attr))* &#39;,&#39;? &#39;]&#39;
@@ -562,14 +542,14 @@ rules:
   cases  ::=  case (&#39;next&#39; case)* &#39;qed&#39;
   case  ::=  &#39;case&#39; (ident: case_identifier) (_proof_skeleton: proof_skeleton)
   _proof_methods  ::=  &gt;(proof_method | step+)
-  proof_method  ::=  &#39;sorry&#39; | &#39;simplify&#39; | (&#39;solve&#39; &#39;(&#39; goal &#39;)&#39;) | &#39;contradiction&#39; | &#39;induction&#39; | &#39;rule-equivalence&#39; | &#39;backward-search&#39; | &#39;ATTACK&#39;
+  proof_method  ::=  &#39;sorry&#39; | &#39;simplify&#39; | (&#39;solve&#39; &#39;(&#39; constraint &#39;)&#39;) | &#39;contradiction&#39; | &#39;induction&#39; | &#39;rule-equivalence&#39; | &#39;backward-search&#39; | &#39;ATTACK&#39;
   step  ::=  &#39;step&#39; &#39;(&#39; proof_method &#39;)&#39;
-  goal  ::=  premise_goal | action_goal | chain_goal | disjunction_split_goal | eq_split_goal
-  premise_goal  ::=  _fact &#39;▶&#39; natural_subscript temporal_var
-  action_goal  ::=  _fact &#39;@&#39; temporal_var
-  chain_goal  ::=  &#39;(&#39; temporal_var &#39;,&#39; natural &#39;)&#39; &#39;~~&gt;&#39; &#39;(&#39; temporal_var &#39;,&#39; natural &#39;)&#39;
-  disjunction_split_goal  ::=  CHAIN_GOAL((_formula: formula) ((&#39;||&#39; | &#39;∥&#39;) (_formula: formula))+)
-  eq_split_goal  ::=  &#39;splitEqs&#39; &#39;(&#39; natural &#39;)&#39;
+  constraint  ::=  premise_constraint | action_constraint | chain_constraint | disjunction_split_constraint | eq_split_constraint
+  premise_constraint  ::=  _fact &#39;▶&#39; natural_subscript temporal_var
+  action_constraint  ::=  ATOM((_fact: fact) &#39;@&#39; ((temporal_var_optional_prefix -&gt; temporal_var): variable))
+  chain_constraint  ::=  &#39;(&#39; temporal_var &#39;,&#39; natural &#39;)&#39; &#39;~~&gt;&#39; &#39;(&#39; temporal_var &#39;,&#39; natural &#39;)&#39;
+  disjunction_split_constraint  ::=  CHAIN_CONSTRAINT((_formula: formula) ((&#39;||&#39; | &#39;∥&#39;) (_formula: formula))+)
+  eq_split_constraint  ::=  &#39;splitEqs&#39; &#39;(&#39; natural &#39;)&#39;
   _term  ::=  tuple_term | mset_term | nested_term | nullary_fun | binary_app | nary_app | _literal
   tuple_term  ::=  TUPLE(&#39;&lt;&#39; ((mset_term): term) (&#39;,&#39; (mset_term: term))* &#39;&gt;&#39;)
   mset_term  ::=  &lt;MUL_SET((nat_term: left) (&#39;++&#39; | &#39;+&#39;) (nat_term: right))
@@ -607,7 +587,6 @@ rules:
   temp_var_induction  ::=  ATOM(&#39;last&#39; &#39;(&#39; temporal_var &#39;)&#39;)
   temp_var_order  ::=  ATOM(((temporal_var_optional_prefix -&gt; temporal_var): left) &#39;&lt;&#39; ((temporal_var_optional_prefix -&gt; temporal_var): right))
   temp_var_eq  ::=  ATOM(((temporal_var_optional_prefix -&gt; temporal_var): left) &#39;=&#39; ((temporal_var_optional_prefix -&gt; temporal_var): right))
-  action_constraint  ::=  ATOM((_fact: fact) &#39;@&#39; ((temporal_var_optional_prefix -&gt; temporal_var): variable))
   term_eq  ::=  ATOM((_term: left) &#39;=&#39; (_term: right))
   subterm_rel  ::=  ATOM((_term: left) (&#39;&lt;&lt;&#39; | &#39;⊏&#39;) (_term: right))
   quantified_formula  ::=  ATOM((&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;) (_lvar+: variable) &#39;.&#39; (_formula: formula))

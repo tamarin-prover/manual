@@ -346,17 +346,18 @@ Refined sources: 11 cases, 12 partial deconstructions left</code></pre>
       <ul>
       <li><p><code>--open-chains=X</code> or <code>-c=X</code>, where
       <code>X</code> is a positive integer, limits the number of chain
-      goals Tamarin will solve during precomputations. In particular,
-      this value stops Tamarin from solving any deconstruction chains
-      that are longer than the given value <code>X</code>. This is
-      useful as some equational theories can cause loops when solving
-      deconstruction chains. At the same time, some equational theories
-      may need larger values (without looping), in which case it can be
-      necessary to increase this value. However, a too small value can
-      lead to sources that contain open deconstruction chains which
-      would be easy to solve, rendering the precomputations inefficient.
-      Tamarin shows a warning on the command line when this limit is
-      reached. Default value: <code>10</code></p></li>
+      constraints Tamarin will solve during precomputations. In
+      particular, this value stops Tamarin from solving any
+      deconstruction chains that are longer than the given value
+      <code>X</code>. This is useful as some equational theories can
+      cause loops when solving deconstruction chains. At the same time,
+      some equational theories may need larger values (without looping),
+      in which case it can be necessary to increase this value. However,
+      a too small value can lead to sources that contain open
+      deconstruction chains which would be easy to solve, rendering the
+      precomputations inefficient. Tamarin shows a warning on the
+      command line when this limit is reached. Default value:
+      <code>10</code></p></li>
       <li><p><code>--saturation=X</code> or <code>--s=X</code>, where
       <code>X</code> is a positive integer, limits the number of
       saturation steps Tamarin will do during precomputations. In a
