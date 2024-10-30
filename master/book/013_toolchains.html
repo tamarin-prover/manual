@@ -54,7 +54,15 @@
       <p class="halfbreak">
       </p>
       <h1 id="sec:tool-chains">Toolchains</h1>
-      <p>There are multiple tools that use Tamarin as a backend.</p>
+      <p>There exist several tools that accept Tamarin files as input
+      for further processing.</p>
+      <h2 id="tree-sitter-grammar">Tree-sitter grammar</h2>
+      <p>There exists a Tree-sitter grammar for Spthy files with support
+      for SAPiC+: <a
+      href="https://github.com/tamarin-prover/tamarin-prover/tree-sitter">tree-sitter-spthy</a></p>
+      <p>The grammar allows generating parsers that can be used in
+      third-party tools without dependencies to the Tamarin
+      implementation.</p>
       <h2 id="alicebob-input">Alice&amp;Bob input</h2>
       <p>There exists a tool that translates
       Alice&amp;Bob-specifications to Tamarin: <a

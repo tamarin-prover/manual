@@ -59,16 +59,17 @@
       internal preprocessor, and how to measure the time needed for
       proofs. <!--manual proofs,encoding tricks,--></p>
       <h2 id="sec:heuristics">Heuristics</h2>
-      <p>A heuristic describes a method to rank the open goals of a
-      constraint system and is specified as a sequence of goal rankings.
-      Each goal ranking is abbreviated by a single character from the
-      set <code>{s,S,c,C,i,I,o,O}</code>.</p>
+      <p>A heuristic describes a method to rank the open constraints of
+      a constraint system and is specified as a sequence of proof method
+      rankings. Each proof method ranking is abbreviated by a single
+      character from the set <code>{s,S,c,C,i,I,o,O}</code>.</p>
       <p>A global heuristic for a protocol file can be defined using the
-      <code>heuristic:</code> statement followed by the sequence of goal
-      rankings. The heuristic which is used for a particular lemma can
-      be overwritten using the <code>heuristic</code> lemma attribute.
-      Finally, the heuristic can be specified using the
-      <code>--heuristic</code> command line option.</p>
+      <code>heuristic:</code> statement followed by the sequence of
+      proof method rankings. The heuristic which is used for a
+      particular lemma can be overwritten using the
+      <code>heuristic</code> lemma attribute. Finally, the heuristic can
+      be specified using the <code>--heuristic</code> command line
+      option.</p>
       <p>The precedence of heuristics is:</p>
       <ol type="1">
       <li>Command line option (<code>--heuristic</code>)</li>
@@ -76,18 +77,18 @@
       <li>Global (<code>heuristic:</code>)</li>
       <li>Default (<code>s</code>)</li>
       </ol>
-      <p>The goal rankings are as follows.</p>
+      <p>The proof method rankings are as follows.</p>
       <dl>
       <dt><code>s</code>:</dt>
       <dd>
       the ‘smart’ ranking is the ranking described in the extended
       version of our CSF’12 paper. It is the default ranking and works
       very well in a wide range of situations. Roughly, this ranking
-      prioritizes chain goals, disjunctions, facts, actions, and
+      prioritizes chain constraints, disjunctions, facts, actions, and
       adversary knowledge of private and fresh terms in that order
-      (e.g., every action will be solved before any knowledge goal).
-      Goals marked ‘Probably Constructable’ and ‘Currently Deducible’ in
-      the GUI are lower priority.
+      (e.g., every action will be solved before any knowledge
+      constraint). Constraints marked ‘Probably Constructable’ and
+      ‘Currently Deducible’ in the GUI are lower priority.
       </dd>
       <dt><code>S</code>:</dt>
       <dd>
@@ -102,10 +103,11 @@
       </dd>
       <dt><code>c</code>:</dt>
       <dd>
-      is the ‘consecutive’ or ‘conservative’ ranking. It solves goals in
-      the order they occur in the constraint system. This guarantees
-      that no goal is delayed indefinitely, but often leads to large
-      proofs because some of the early goals are not worth solving.
+      is the ‘consecutive’ or ‘conservative’ ranking. It solves
+      constraints in the order they occur in the constraint system. This
+      guarantees that no constraint is delayed indefinitely, but often
+      leads to large proofs because some of the early constraints are
+      not worth solving.
       </dd>
       <dt><code>C</code>:</dt>
       <dd>
@@ -114,17 +116,18 @@
       <dt><code>i</code>:</dt>
       <dd>
       is a ranking developed to be well-suited to injective stateful
-      protocols. The priority of goals is similar to the ‘S’ ranking,
-      but instead of a strict priority hierarchy, the fact, action, and
-      knowledge goals are considered equal priority and solved by their
-      age. This is useful for stateful protocols with an unbounded
-      number of runs, in which for example solving a fact goal may
-      create a new fact goal for the previous protocol run. This ranking
-      will prioritize existing fact, action, and knowledge goals before
-      following up on the fact goal of that previous run. In contrast
-      the ‘S’ ranking would prioritize this new fact goal ahead of any
-      existing action or knowledge goal, although solving the new goal
-      may create yet another earlier fact goal and so on, preventing
+      protocols. The priority of proof methods is similar to the ‘S’
+      ranking, but instead of a strict priority hierarchy, the fact,
+      action, and knowledge constraints are considered equal priority
+      and solved by their age. This is useful for stateful protocols
+      with an unbounded number of runs, in which for example solving a
+      fact constraint may create a new fact constraint for the previous
+      protocol run. This ranking will prioritize existing fact, action,
+      and knowledge constraints before following up on the fact
+      constraint of that previous run. In contrast the ‘S’ ranking would
+      prioritize this new fact constraint ahead of any existing action
+      or knowledge constraint, although solving the new constraint may
+      create yet another earlier fact constraint and so on, preventing
       termination.
       </dd>
       <dt><code>I</code>:</dt>
@@ -134,7 +137,7 @@
       <dt><code>{.}</code>:</dt>
       <dd>
       is the tactic ranking. It allows the user to provide an arbitrary
-      ranking for the proof goals, specified in a language native to
+      ranking for the proof methods, specified in a language native to
       Tamarin. Each tactic needs to be given a name. For the tactic
       named <code>default</code>, the call would be
       <code>{default}</code>. The syntax of the tactics will be detailed
@@ -142,39 +145,40 @@
       quick overview, a tactic is composed of several fields. The first
       one, <code>tactic</code>, specifies the name of the tactic and is
       mandatory. Then <code>presort</code> (optional) allows the user to
-      choose the based ranking of the input. The keywords
+      choose the base ranking of the input. The keywords
       <code>prio</code> and <code>deprio</code> defines the ranks of the
-      goals. They gather functions that will recognize the goals. The
-      higher the prio that recognize a goal, the sooner it will be
-      treated and the lower the deprio, the later. The user can choose
-      to write as much of prio or deprio as needed. A tactic can also be
-      composed of only prio or deprio. The functions are preimplemented
-      and allow to reach information unavailable from oracle (the state
-      of the system or the proof context).
+      proof methods. They gather functions that will recognize the
+      constraints. The higher the prio that recognizes a constraint, the
+      sooner it will be treated and the lower the deprio, the later. The
+      user can choose to write as much of prio or deprio as needed. A
+      tactic can also be composed of only prio or deprio. The functions
+      are preimplemented and allow to reach information unavailable from
+      oracle (the state of the system or the proof context).
       </dd>
       <dt><code>o</code>:</dt>
       <dd>
       is the oracle ranking. It allows the user to provide an arbitrary
       program that runs independently of Tamarin and ranks the proof
-      goals. The path of the program can be specified after the goal
-      ranking, e.g., <code>o "oracles/oracle-default"</code> to use the
-      program <code>oracles/oracle-default</code> as the oracle. If no
-      path is specified, the default is <code>oracle</code>. The path of
-      the program is relative to the directory of the protocol file
-      containing the goal ranking. If the heuristic is specified using
-      the <code>--heuristic</code> option, the path can be given using
-      the <code>--oraclename</code> command line option. In this case,
-      the path is relative to the current working directory. The
-      oracle’s input is a numbered list of proof goals, given in the
-      ‘Consecutive’ ranking (as generated by the heuristic
-      <code>C</code>). Every line of the input is a new goal and starts
-      with “%i:”, where %i is the index of the goal. The oracle’s output
-      is expected to be a line-separated list of indices, prioritizing
-      the given proof goals. Note that it suffices to output the index
-      of a single proof goal, as the first ranked goal will always be
-      selected. Moreover, the oracle is also allowed to terminate
-      without printing a valid index. In this case, the first goal of
-      the ‘Consecutive’ ranking will be selected.
+      methods. The path of the program can be specified after the proof
+      method ranking, e.g., <code>o "oracles/oracle-default"</code> to
+      use the program <code>oracles/oracle-default</code> as the oracle.
+      If no path is specified, the default is <code>oracle</code>. The
+      path of the program is relative to the directory of the protocol
+      file containing the proof method ranking. If the heuristic is
+      specified using the <code>--heuristic</code> option, the path can
+      be given using the <code>--oraclename</code> command line option.
+      In this case, the path is relative to the current working
+      directory. The oracle’s input is a numbered list of proof methods,
+      given in the ‘Consecutive’ ranking (as generated by the heuristic
+      <code>C</code>). Every line of the input is a new constraint and
+      starts with “%i:”, where %i is the index of the constraint. The
+      oracle’s output is expected to be a line-separated list of
+      indices, prioritizing the given proof methods. Note that it
+      suffices to output the index of a single proof method, as the
+      first ranked proof method will always be selected. Moreover, the
+      oracle is also allowed to terminate without printing a valid
+      index. In this case, the first proof method of the ‘Consecutive’
+      ranking will be selected.
       </dd>
       <dt><code>O</code>:</dt>
       <dd>
@@ -186,11 +190,11 @@
       <dd>
       is the SAPIC-specific ranking. It is a modified version of the
       smart <code>s</code> heuristic, but resolves SAPIC’s
-      <code>state</code>-facts right away, as well as Unlock goals, and
-      some helper facts introduced in SAPICs translation
-      (<code>MID_Receiver</code>, <code>MID_Sender</code>).
-      <code>Progress_To</code> goals (which are generated when using the
-      optional <a
+      <code>state</code>-facts right away, as well as Unlock
+      constraints, and some helper facts introduced in SAPICs
+      translation (<code>MID_Receiver</code>, <code>MID_Sender</code>).
+      <code>Progress_To</code> constraints (which are generated when
+      using the optional <a
       href="006_protocol-specification-processes.html#sec:local-progress">local
       progress</a>) are also prioritised. Similar to <a
       href="#sec:fact-annotations">fact annotations</a> below, this
@@ -213,8 +217,8 @@
       are employed in a round-robin fashion depending on the
       proof-depth. For example, a flag <code>--heuristic=ssC</code>
       always uses two times the smart ranking and then once the
-      ‘Consecutive’ goal ranking. The idea is that you can mix goal
-      rankings easily in this way.</p>
+      ‘Consecutive’ proof method ranking. The idea is that you can mix
+      proof method rankings easily in this way.</p>
       <h2 id="sec:fact-annotations">Fact annotations</h2>
       <p>Facts can be annotated with <code>+</code> or <code>-</code> to
       influence their priority in heuristics. Annotating a fact with
@@ -269,7 +273,7 @@
       <h3 id="using-a-tactic-subsec-tactic">Using a Tactic {subsec:
       tactic}</h3>
       <p>The tactics are a language native to Tamarin designed to allow
-      user to write custom rankings of proof goals.</p>
+      user to write custom rankings of proof methods.</p>
       <h4 id="writing-a-tactic">Writing a tactic</h4>
       <p>In order to explain the way a tactic should be written, we will
       use the simple example (theory SourceOfUniqueness). The first step
@@ -283,32 +287,33 @@
       <pre><code>tactic: uniqueness
 presort: C</code></pre>
       <p>Then we will start to write the priorities following which we
-      want to order the goals. Every priority, announced by the
+      want to order the proof methods. Every priority, announced by the
       <code>prio</code> keywords, is composed of functions that will try
-      to recognize characteristics in the goals given by the Tamarin
-      proofs. If a goal is recognized by a function in a priority, it
-      will be be ranked as such, i.e., the higher the priority in the
-      tactic, the higher the goals it recognizes will be ranked. The
-      particularity recognized by every function will be detailed in a
-      paragraph below. The tactic language authorizes to combine
-      functions using <code>|</code>, <code>&amp;</code> and
-      <code>not</code>. Even if the option is not necessary for the
-      proof of the lemma uniqueness, let’s now explore the
-      <code>deprio</code> keyword. It works as the <code>prio</code> one
-      but with the opposite goal since it allows the user to put the
-      recognized goals at the bottom of the ranking. In case several
-      <code>deprio</code> are written, the first one will be ranked
-      higher than the last ones. If a goal is recognized by two or more
-      ‘priorities’ or ‘depriorities’, only the first one (i.e., the
-      higher rank possible) will be taken into account for the final
-      ranking. The order of the goals recognized by the same priority is
-      usually predetermined by the presort. However, if this order is
-      not appropriate for one priority, the user can call a ‘postranking
-      function’. This function will reorder the goals inside the
-      priority given a criteria. If no postranking function is
-      determined, Tamarin will use the identity. For now, the only other
-      option is <code>smallest</code>, a function that will order the
-      goals by increasing size of their pretty-printed strings.</p>
+      to recognize characteristics in the proof methods given by
+      Tamarin. If a proof method is recognized by a function in a
+      priority, it will be be ranked as such, i.e., the higher the
+      priority in the tactic, the higher the proof methods it recognizes
+      will be ranked. The particularity recognized by every function
+      will be detailed in a paragraph below. The tactic language
+      authorizes to combine functions using <code>|</code>,
+      <code>&amp;</code> and <code>not</code>. Even if the option is not
+      necessary for the proof of the lemma uniqueness, let’s now explore
+      the <code>deprio</code> keyword. It works as the <code>prio</code>
+      one but with the opposite goal since it allows the user to put the
+      recognized proof methods at the bottom of the ranking. In case
+      several <code>deprio</code> are written, the first one will be
+      ranked higher than the last ones. If a proof method is recognized
+      by two or more ‘priorities’ or ‘depriorities’, only the first one
+      (i.e., the higher rank possible) will be taken into account for
+      the final ranking. The order of the proof methods recognized by
+      the same priority is usually predetermined by the presort.
+      However, if this order is not appropriate for one priority, the
+      user can call a ‘postranking function’. This function will reorder
+      the proof methods inside the priority given a criteria. If no
+      postranking function is determined, Tamarin will use the identity.
+      For now, the only other option is <code>smallest</code>, a
+      function that will order the proof methods by increasing size of
+      their pretty-printed strings.</p>
       <pre><code>prio:
     isFactName &quot;ReceiverKeySimple&quot;
 prio:
@@ -335,9 +340,9 @@ prio: {smallest}
       described here do not suffice for your usage.</p>
       <p>Pre-implemented functions * <code>regex</code>: as explain
       above, this function takes in parameter a string and will use it
-      as a pattern to match against the goals. (Since it is based on the
-      Text.Regex.PCRE module of Haskell, some characters, as the
-      parenthesis, will need to be escaped to achieve the desired
+      as a pattern to match against the proof methods. (Since it is
+      based on the Text.Regex.PCRE module of Haskell, some characters,
+      as the parenthesis, will need to be escaped to achieve the desired
       behavior). * <code>isFactName</code>: as is given by its name,
       this function will go look in the Tamarin object ‘goal’ and check
       if the field FactName matches its parameter. To give an example of
@@ -348,8 +353,8 @@ prio: {smallest}
       corresponding the parameter can be found. The following functions
       are also implemented but specifically designed to translate the
       oracles of the Vacarme tool into tactics: *
-      <code>dhreNoise</code>: recognize goals containing a
-      Diffie-Hellman exponentiation. For example, the goal
+      <code>dhreNoise</code>: recognize constraints containing a
+      Diffie-Hellman exponentiation. For example, the constraint
       <code>Recv( &lt;'g'^~e.1,aead(kdf2(&lt;ck, 'g'^(~e*~e.1)&gt;), '0', h(&lt;hash, 'g'^~e.1&gt;), peer),aead(kdf2(&lt;kdf1(&lt;ck, 'g'^(~e*~e.1)&gt;), z&gt;), '0',h(&lt;h(&lt;hash, 'g'^~e.1&gt;),aead(kdf2(&lt;ck, 'g'^(~e*~e.1)&gt;), '0', h(&lt;hash, 'g'^~e.1&gt;), peer)&gt;), payload)&gt;) ▶₁ #claim</code>
       is recognized thanks to the presence of the following pattern
       <code>'g'^~e.1</code>. The function does need one parameter from
@@ -365,31 +370,33 @@ prio: {smallest}
       <code>Free</code> variables along the variable <code>~n</code>. In
       the case of the example given above, the list would be
       <code>[~n,~e,~e.1]</code>. They are the variable that the function
-      will try to match against. Once it is done, the tested goal will
-      be recognized if it includes an exponentiation that uses the
+      will try to match against. Once it is done, the tested constraint
+      will be recognized if it includes an exponentiation that uses the
       previously listed elements (just one as exponent or a
       multiplication).<br />
       * <code>defaultNoise</code>: this function takes two parameter:
       the oracle type (as explained for <code>dhreNoise</code>) and a
       regex pattern. The regex pattern should allow the program to
-      extract the nonces targeted by the user from the goal. For
+      extract the nonces targeted by the user from the constraint. For
       example, in the default case of Vacarme, the regex is
       <code>(?&lt;!'g'\^)\~[a-zA-Z.0-9]*</code> and aims at recovering
       the nonces used in exponentiation. The goal of the function is to
       verify that all the recovered nonces can be found in the list
       extracted from the system state as explained for
-      <code>dhreNoise</code>. The goal will only be recognized if all
-      his nonces are in the list. * <code>reasonableNoncesNoise</code>:
-      takes one parameter (same as <code>dhreNoise</code>). It works as
-      <code>defaultNoise</code> but works with all the nonces of the
-      goal and therefore does not need a regex pattern to retrieve them.
-      * <code>nonAbsurdGoal</code>: this function retrieve the functions
-      names present in the goal and verifies if they are “Ku” or “inv”
-      (this means the key words coming before parenthesis). It also
-      retrieves the list of nonces form the system state as explained
-      for <code>dhreNoise</code> and checks if they do not appear in the
-      goal. If both the conditions are verified, the goal is recognized.
-      It only takes one argument (the same as dhreNoise).</p>
+      <code>dhreNoise</code>. The constraint will only be recognized if
+      all his nonces are in the list. *
+      <code>reasonableNoncesNoise</code>: takes one parameter (same as
+      <code>dhreNoise</code>). It works as <code>defaultNoise</code> but
+      works with all the nonces of the constraint and therefore does not
+      need a regex pattern to retrieve them. *
+      <code>nonAbsurdConstraint</code>: this function retrieve the
+      functions names present in the constraint and verifies if they are
+      “Ku” or “inv” (this means the key words coming before
+      parenthesis). It also retrieves the list of nonces form the system
+      state as explained for <code>dhreNoise</code> and checks if they
+      do not appear in the constraint. If both the conditions are
+      verified, the constraint is recognized. It only takes one argument
+      (the same as dhreNoise).</p>
       <h4 id="how-to-write-your-own-functions">How to write your own
       function(s)</h4>
       <p>The functions need to be added to the
@@ -406,37 +413,38 @@ prio: {smallest}
       strings that the user may pass to the function (the pattern for
       regex for example). Nothing forbids the user to write as many
       parameters as he wants, we will however only use the first ones we
-      need. The second parameter is a triplet composed of the goal being
-      tested, the proof context and the system. The function then needs
-      to return a boolean, <code>True</code> if the goal, proof context
-      or system have been recognized, <code>False</code> if not. If
-      needed, new postranking functions can be added by doing the
-      following steps. First registering the name of the new function in
-      the <code>rankingFunctions</code> function in
+      need. The second parameter is a triplet composed of the constraint
+      being tested, the proof context and the system. The function then
+      needs to return a boolean, <code>True</code> if the constraint,
+      proof context or system have been recognized, <code>False</code>
+      if not. If needed, new postranking functions can be added by doing
+      the following steps. First registering the name of the new
+      function in the <code>rankingFunctions</code> function in
       lib/theory/src/Theory/Text/Parser/Tactics.hs. Then writing the
-      function. It only needs to take in parameters the goals to sort
-      and return them in the new order. To be considered, the code then
-      needs to be recompiled, using <code>make</code>. The new function
-      is then ready to be used.</p>
+      function. It only needs to take in parameters the proof methods to
+      sort and return them in the new order. To be considered, the code
+      then needs to be recompiled, using <code>make</code>. The new
+      function is then ready to be used.</p>
       <h3 id="using-an-oracle">Using an Oracle</h3>
       <p>Oracles allow to implement user-defined heuristics as custom
-      rankings of proof goals. They are invoked as a process with the
+      rankings of proof methods. They are invoked as a process with the
       lemma under scrutiny as the first argument and all current proof
-      goals seperated by EOL over stdin. Proof goals match the regex
-      <code>(\d+):(.+)</code> where <code>(\d+)</code> is the goal’s
-      index, and <code>(.+)</code> is the actual goal. A proof goal is
-      formatted like one of the applicable proof methods shown in the
-      interactive view, but without <strong>solve(…)</strong>
+      methods seperated by EOL over stdin. Proof methods match the regex
+      <code>(\d+):(.+)</code> where <code>(\d+)</code> is the method’s
+      index, and <code>(.+)</code> is the actual constraint. A proof
+      method is formatted like one of the applicable proof methods shown
+      in the interactive view, but without <strong>solve(…)</strong>
       surrounding it. One can also observe the input to the oracle in
       the stdout of tamarin itself. Oracle calls are logged between
       <code>START INPUT</code>, <code>START OUTPUT</code>, and
       <code>END Oracle call</code>.</p>
-      <p>The oracle can set the new order of proof goals by writing the
-      proof indices to stdout, separated by EOL. The order of the
-      indices determines the new order of proof goals. An oracle does
-      not need to rank all goals. Unranked goals will be ranked with
-      lower priority than ranked goals but kept in order. For example,
-      if an oracle was given the goals 1-4, and would output:</p>
+      <p>The oracle can set the new order of proof methods by writing
+      the proof indices to stdout, separated by EOL. The order of the
+      indices determines the new order of proof methods. An oracle does
+      not need to rank all proof methods. Unranked proof methods will be
+      ranked with lower priority than ranked proof methods but kept in
+      order. For example, if an oracle was given the proof methods 1-4,
+      and would output:</p>
       <pre><code>4
 2</code></pre>
       <p>the new ranking would be 4, 2, 1, 3. In particular, this
@@ -511,13 +519,11 @@ for line in lines:
         l2.append(num)
       elif &quot;KU( ~key&quot; in line:
         l3.append(num)
-      else:
-        l4.append(num)
 
   else:
     exit(0)
 
-ranked = l1 + l2 + l3 + l4
+ranked = l1 + l2 + l3
 
 for i in ranked:
   print(i)</code></pre>
@@ -528,6 +534,16 @@ for i in ranked:
       <pre><code>tamarin-prover --prove=uniqueness SourceOfUniqueness.spthy</code></pre>
       <p>The generated proof consists of only 10 steps. (162 steps with
       ‘consecutive’ ranking, non-termination with ‘smart’ ranking).</p>
+      <p>Sometimes, one makes mistakes when writing an oracle or forgets
+      to address a case in which the oracle would need to rank a proof
+      method for termination. For example in the oracle above, it could
+      happen that none of the three checks apply to any of the proof
+      method and the oracle prints nothing. To help debugging oracles,
+      the interactive mode of Tamarin provides an autoprove option that
+      stops proving whenever the oracle ranks no proof methods (it is
+      called <code>o. autoprove until oracle returns nothing</code>).
+      This way, you can easily find and inspect the cases in which you
+      might need to refine your oracle.</p>
       <!--Advanced Encoding
       ----------------------------
 
@@ -537,6 +553,15 @@ for i in ranked:
       <p>See Section <a href="003_example.html#sec:gui">Example</a> for
       a short demonstration of the main features of the GUI.</p>
       <!-- downloading proofs, keyboard commands (a vs A vs b vs B) etc. -->
+      <h3 id="disabling-server-access-logs">Disabling Server Access
+      Logs</h3>
+      <p>Sometimes the web server access logs can be too noisy if you
+      are trying to do print debugging while using the interactive mode.
+      The logs are on by default but can be disabled with the
+      <code>--no-logging</code> CLI argument.</p>
+      <pre><code>tamarin-prover interactive --no-logging &lt;Theory&gt;</code></pre>
+      <p>This will run Tamarin in interactive mode and suppress the web
+      server logs.</p>
       <h2 id="sec:channel-models">Different Channel Models</h2>
       <p>Tamarin’s built-in adversary model is often referred to as the
       Dolev-Yao adversary. This models an active adversary that has
@@ -1005,16 +1030,17 @@ end</code></pre>
       <h4 id="non-provable-lemmas">Non-Provable Lemmas</h4>
       <p>Tamarins reasoning for subterms works well for irreducible
       operators. For reducible operators, however, the following
-      situation can appear: No more goals are left but there are
+      situation can appear: No more constraints are left but there are
       reducible operators in subterms. Usually, we have found a trace if
-      no goals are left. However, if we have, e.g., <code>x⊏x⊕y</code>
-      as a constraint left, then our constraint solving algorithm cannot
-      solve this constraint, i.e., it is not clear whether we found a
-      trace. In such a situation, Tamarin indicates with a yellow color
-      in the proof tree that this part of the proof cannot be completed,
-      i.e., there could be a trace, but we’re not sure. Even with such a
-      yellow part, it can be that we find a trace in another part of the
-      proof tree and prove an <code>exists-trace</code> lemma.</p>
+      no constraints are left. However, if we have, e.g.,
+      <code>x⊏x⊕y</code> as a constraint left, then our constraint
+      solving algorithm cannot solve this constraint, i.e., it is not
+      clear whether we found a trace. In such a situation, Tamarin
+      indicates with a yellow color in the proof tree that this part of
+      the proof cannot be completed, i.e., there could be a trace, but
+      we’re not sure. Even with such a yellow part, it can be that we
+      find a trace in another part of the proof tree and prove an
+      <code>exists-trace</code> lemma.</p>
       <p>In the following picture one can see the subterm with the
       reducible operator <code>fst</code> on the right side. Therefore,
       on the left side, the proof is marked yellow (with the blue line
@@ -1155,9 +1181,69 @@ end</code></pre>
       is deduced (as t⊏s must hold because of monotonicity) - for
       decreasing and strictly decreasing, the inverse of the increasing
       cases holds</p>
+      <h2 id="convenience-functions-for-print-debugging">Convenience
+      Functions for Print Debugging</h2>
+      <p>For debugging Haskell programs it is still convenient to use
+      simple print debugging. The standard library includes the
+      <code>Debug.trace</code> family of functions that can even be used
+      from a pure context to print debug output. Since adding too many
+      debug prints can lead to a noisy output we implement some
+      convenience functions on top of <code>Debug.trace</code>, which
+      can be selectively turned on when debugging a certain section of
+      the code.</p>
+      <p>The following functions are implemented in the
+      <code>Debug.Trace.EnvTracer</code> module. Functions usable in an
+      Applicative/Monad have an “M” suffix.</p>
+      <pre><code>etraceSectionLn :: String -&gt; String -&gt; b -&gt; b    
+etraceSectionLnM :: Applicative f =&gt; String -&gt; String -&gt; f ()
+etraceLn :: String -&gt; String -&gt; String -&gt; b -&gt; b    
+etraceLnM :: Applicative f =&gt; String -&gt; String -&gt; String -&gt; f ()</code></pre>
+      <p>The first argument to all functions is a <em>trace key</em>
+      string. When running Tamarin you can set the
+      <code>DEBUG_TRACE</code> environment variable to a comma-separated
+      list of trace keys, which will then enable the corresponding debug
+      outputs. Any debug trace whose key is not contained in the
+      environment variable will be suppressed.</p>
+      <p>The <code>etraceSectionLn*</code> functions are used to make
+      visual separators for debug outputs. The <code>etraceLn*</code>
+      functions take a label to give context and an arbitrary string to
+      print.</p>
+      <p>For example, the following example program would result in the
+      debug output below if the <code>DEBUG_TRACE</code> variable
+      contains “foo”.</p>
+      <pre><code>etraceSectionLn &quot;foo&quot; &quot;TITLE&quot; $
+etraceLn &quot;foo&quot; &quot;functionA&quot; &quot;called functionA&quot; $
+...
+
+=== TITLE ======================================================================
+functionA: called functionA</code></pre>
+      <h2
+      id="outputting-constraint-systems-when-satisfying-traces-are-found.">Outputting
+      constraint systems when satisfying traces are found.</h2>
+      <p>It can be useful for further analysis to output the constraint
+      system of the state of the proof of a lemma when either a
+      satisfying trace is found in an “exists-trace” lemma, or when a
+      counterexample trace is found in an “all-traces” lemma. For this
+      you can use the command line options <code>--output-json</code>
+      (or <code>--oj</code>) and <code>--output-dot</code> (or
+      <code>--od</code>) in the non-interactive mode of tamarin. The
+      command line options take a required filename and will output all
+      those constraint systems into the file in the respective
+      format.</p>
+      <pre><code>tamarin-prover --prove --output-json=traces.json --output-dot=traces.dot examples/Tutorial.spthy</code></pre>
+      <p>For dot, the file is simply the concatenation of all ‘digraph’
+      expressions, which can then be rendered into individual image
+      files using the <code>-O</code> option of the dot command line
+      program.</p>
+      <pre><code># will output images to traces.dot.png, traces.dot.2.png, traces.dot.3.png, ...
+dot -Tpng -O traces.dot</code></pre>
+      <p>For JSON, the standard schema already defines a single
+      top-level object with a “graphs” key that holds a list of the
+      individual graphs, which we use to output the constrain
+      systems.</p>
       <div id="refs" class="references csl-bib-body hanging-indent"
-      role="doc-bibliography">
-      <div id="ref-KK-jcs16" class="csl-entry" role="doc-biblioentry">
+      data-entry-spacing="0" role="list">
+      <div id="ref-KK-jcs16" class="csl-entry" role="listitem">
       Kremer, Steve, and Robert Künnemann. 2016. <span>“Automated
       Analysis of Security Protocols with Global State.”</span>
       <em>Journal of Computer Security</em> 24 (5): 583–616. <a

@@ -593,6 +593,57 @@ end</code></pre>
       <p>Note that the protocol description only specifies a model, but
       not which properties it might satisfy. We discuss these in the
       next section.</p>
+      <h3 id="clustering-by-role">Clustering by Role</h3>
+      <p>To enhance the clarity of the graph and identify the roles
+      involved, nodes can be grouped into clusters based on their
+      respective roles. Clusters are purely a matter of display and do
+      not affect Tamarin’s reasoning. The goal is to make the graph
+      easier to read, and the clustering can be enabled or disabled by
+      the user. The clusters will be displayed as colored boxes
+      containing the relevant nodes.</p>
+      <p>The clustering splits different sessions of the same role into
+      different clusters. For that, it uses the following heuristic: two
+      nodes from the same role are part of the same cluster if they are
+      connected by an edge resulting from the use of a linear fact. The
+      rules within a cluster will take the color of the cluster.</p>
+      <p>There are two methods to group by role:</p>
+      <h4 id="manual-clustering">Manual Clustering</h4>
+      <p>On can manually specify the rule(s) representing the behavior
+      of a role. For this, the rules are annotated with the role’s name
+      as follows:</p>
+      <pre class="plaintext"><code>rule test[role=&quot;Alice&quot;]:
+   [...]
+   --&gt;
+   [...]</code></pre>
+      <p>Look at the example below to see how this would appear in an
+      image:</p>
+      <p><img src="../images/manual_clusturing.png" style="width:80.0%"
+      alt="Manual Clustering" /><br />
+      </p>
+      <h4 id="automatic-clustering">Automatic Clustering</h4>
+      <p>An option called “Clustering By Role” is available among the
+      settings, which, when enabled, automatically sorts by role. This
+      option is disabled by default. It groups all rules with similar
+      names into clusters, taking precedence over manual clustering. For
+      example, rules named <code>Alice_1</code>, <code>Alice_2</code>,
+      <code>Alice_test_1</code> and <code>Bob_1</code> will be
+      automatically separated into three clusters:</p>
+      <ul>
+      <li>A cluster named <code>Alice</code> containing rules
+      <code>Alice_1</code> and <code>Alice_2</code>.</li>
+      <li>A cluster named <code>Alice_test</code> containing the rule
+      <code>Alice_test_1</code>.</li>
+      <li>A cluster named <code>Bob</code> containing the rule
+      <code>Bob_1</code>.</li>
+      </ul>
+      <p>You can activate this option in the settings menu. If you opt
+      to manually write the clustering, do not enable this option, as it
+      will cluster independently of the manually written roles.</p>
+      <p>Look at the example below to see how this would appear in an
+      image:</p>
+      <p><img src="../images/Automatic_clusturing.png"
+      style="width:80.0%" alt="Automatic Clustering" /><br />
+      </p>
       <!--
       **FIX Cas: need to do either pattern matching or explicit construct/deconstruct;
       not a big deal for naxos, but should pop up somewhere**
@@ -615,39 +666,37 @@ end</code></pre>
           you would use each. (This should go in the next section)
       -->
       <div id="refs" class="references csl-bib-body hanging-indent"
-      role="doc-bibliography">
-      <div id="ref-opsem2012" class="csl-entry" role="doc-biblioentry">
+      data-entry-spacing="0" role="list">
+      <div id="ref-opsem2012" class="csl-entry" role="listitem">
       Cremers, Cas, and Sjouke Mauw. 2012. <em><span
       class="nocase">Operational Semantics and Verification of Security
       Protocols</span></em>. Springer-Verlag Berlin Heidelberg. <a
       href="https://doi.org/10.1007/978-3-540-78636-8">https://doi.org/10.1007/978-3-540-78636-8</a>.
       </div>
-      <div id="ref-benediktthesis" class="csl-entry"
-      role="doc-biblioentry">
+      <div id="ref-benediktthesis" class="csl-entry" role="listitem">
       Schmidt, Benedikt. 2012. <span>“Formal Analysis of Key Exchange
       Protocols and Physical Protocols.”</span> PhD thesis, ETH Zurich.
       <a
       href="http://dx.doi.org/10.3929/ethz-a-009898924">http://dx.doi.org/10.3929/ethz-a-009898924</a>.
       </div>
       </div>
-      <section class="footnotes footnotes-end-of-document"
-      role="doc-endnotes">
+      <section id="footnotes"
+      class="footnotes footnotes-end-of-document" role="doc-endnotes">
       <hr />
       <ol>
-      <li id="fn1" role="doc-endnote"><p>Note that in contrast,
-      replacing <code>X</code> by <code>~X</code> would change the
-      interpretation of the model, effectively restricting the
-      instantiations of the rule to those where <code>X</code> is a
-      fresh value.<a href="#fnref1" class="footnote-back"
+      <li id="fn1"><p>Note that in contrast, replacing <code>X</code> by
+      <code>~X</code> would change the interpretation of the model,
+      effectively restricting the instantiations of the rule to those
+      where <code>X</code> is a fresh value.<a href="#fnref1"
+      class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+      <li id="fn2"><p>This modeling approach, as with the responder, is
+      similar to the approach taken in cryptographic security models in
+      the game-based setting, where each rule corresponds to a
+      “query”.<a href="#fnref2" class="footnote-back"
       role="doc-backlink">↩︎</a></p></li>
-      <li id="fn2" role="doc-endnote"><p>This modeling approach, as with
-      the responder, is similar to the approach taken in cryptographic
-      security models in the game-based setting, where each rule
-      corresponds to a “query”.<a href="#fnref2" class="footnote-back"
-      role="doc-backlink">↩︎</a></p></li>
-      <li id="fn3" role="doc-endnote"><p>Note that we could have re-used
-      <code>~eskI</code> for this purpose, since it will also be unique
-      for each instance.<a href="#fnref3" class="footnote-back"
+      <li id="fn3"><p>Note that we could have re-used <code>~eskI</code>
+      for this purpose, since it will also be unique for each
+      instance.<a href="#fnref3" class="footnote-back"
       role="doc-backlink">↩︎</a></p></li>
       </ol>
       </section>

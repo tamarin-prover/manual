@@ -127,7 +127,14 @@ lemma nonce_secrecy:
 </code></pre>
       <p>This proof attempt will not terminate due to there being
       <code>12 partial deconstructions left</code> when looking at this
-      example in the GUI as described in detail below.</p>
+      example in the GUI as described in detail below. The number of
+      partial deconstructions is also visible without GUI when using the
+      command line parameter <code>--precompute-only</code>. On this
+      example, running Tamarin using <code>--precompute-only</code>
+      results in the following output:</p>
+      <pre><code>Multiset rewriting rules: 9
+Raw sources: 11 cases, 12 partial deconstructions left
+Refined sources: 11 cases, 12 partial deconstructions left</code></pre>
       <h2 id="sec:openchains">Partial deconstructions left</h2>
       <p>In the precomputation phase, Tamarin goes through all rules and
       inspects their premises. For each of these facts, Tamarin will
@@ -219,14 +226,14 @@ lemma nonce_secrecy:
        IN_R_1_ni( ni, m1) @ i
        ==&gt;
        ( (Ex #j. KU(ni) @ j &amp; j &lt; i)
-       | (Ex #j. OUT_I_1( m1 ) @ j)
+       | (Ex #j. OUT_I_1( m1 ) @ j &amp; j &lt; i)
        )
     )
   &amp; (All nr m2 #i.
        IN_I_2_nr( nr, m2) @ i
        ==&gt;
        ( (Ex #j. KU(nr) @ j &amp; j &lt; i)
-       | (Ex #j. OUT_R_1( m2 ) @ j)
+       | (Ex #j. OUT_R_1( m2 ) @ j &amp; j &lt; i)
        )
     )
   &quot;
@@ -238,17 +245,17 @@ lemma nonce_secrecy:
       <p>This lemma relates the point of instantiation to the point of
       sending by either the adversary or the communicating partner. In
       other words, it says that whenever the responder receives the
-      first nonce, either the nonce was known to the adversary or the
-      initiator sent the first message prior to that moment. Similarly,
-      the second part states that whenever the initiator receives the
-      second message, either the adversary knew the corresponding nonce
-      or the responder has sent the second message before. Generally, in
-      a protocol with partial deconstructions left it is advisable to
-      try if the problem can be solved by a sources lemma that considers
-      where a term could be coming from. As in the above example, one
-      idea to do so is by stating that a used term must either have
-      occurred in one of a list of rules before, or it must have come
-      from the adversary.</p>
+      first nonce, then prior to that moment either the nonce was known
+      to the adversary or the initiator had sent the first message.
+      Similarly, the second part states that whenever the initiator
+      receives the second message, then prior to that moment either the
+      adversary knew the corresponding nonce or the responder had sent
+      the second message. Generally, in a protocol with partial
+      deconstructions left it is advisable to try if the problem can be
+      solved by a sources lemma that considers where a term could be
+      coming from. As in the above example, one idea to do so is by
+      stating that a used term must either have occurred in one of a
+      list of rules before, or it must have come from the adversary.</p>
       <p>The above sources lemma can be automatically proven by Tamarin.
       With the sources lemma, Tamarin can then automatically prove the
       lemma <code>nonce_secrecy</code>.</p>
@@ -339,17 +346,18 @@ lemma nonce_secrecy:
       <ul>
       <li><p><code>--open-chains=X</code> or <code>-c=X</code>, where
       <code>X</code> is a positive integer, limits the number of chain
-      goals Tamarin will solve during precomputations. In particular,
-      this value stops Tamarin from solving any deconstruction chains
-      that are longer than the given value <code>X</code>. This is
-      useful as some equational theories can cause loops when solving
-      deconstruction chains. At the same time, some equational theories
-      may need larger values (without looping), in which case it can be
-      necessary to increase this value. However, a too small value can
-      lead to sources that contain open deconstruction chains which
-      would be easy to solve, rendering the precomputations inefficient.
-      Tamarin shows a warning on the command line when this limit is
-      reached. Default value: <code>10</code></p></li>
+      constraints Tamarin will solve during precomputations. In
+      particular, this value stops Tamarin from solving any
+      deconstruction chains that are longer than the given value
+      <code>X</code>. This is useful as some equational theories can
+      cause loops when solving deconstruction chains. At the same time,
+      some equational theories may need larger values (without looping),
+      in which case it can be necessary to increase this value. However,
+      a too small value can lead to sources that contain open
+      deconstruction chains which would be easy to solve, rendering the
+      precomputations inefficient. Tamarin shows a warning on the
+      command line when this limit is reached. Default value:
+      <code>10</code></p></li>
       <li><p><code>--saturation=X</code> or <code>--s=X</code>, where
       <code>X</code> is a positive integer, limits the number of
       saturation steps Tamarin will do during precomputations. In a
@@ -387,9 +395,8 @@ lemma nonce_secrecy:
       href="011_advanced-features.html#sec:fact-annotations">Fact
       Annotations</a>.</p>
       <div id="refs" class="references csl-bib-body hanging-indent"
-      role="doc-bibliography">
-      <div id="ref-esorics2020" class="csl-entry"
-      role="doc-biblioentry">
+      data-entry-spacing="0" role="list">
+      <div id="ref-esorics2020" class="csl-entry" role="listitem">
       Cortier, Véronique, Stéphanie Delaune, and Jannik Dreier. 2020.
       <span>“<span class="nocase">Automatic generation of sources lemmas
       in Tamarin: towards automatic proofs of security
@@ -398,8 +405,7 @@ lemma nonce_secrecy:
       Security</span></em>. Guilford, United Kingdom. <a
       href="https://hal.archives-ouvertes.fr/hal-02903620">https://hal.archives-ouvertes.fr/hal-02903620</a>.
       </div>
-      <div id="ref-meierthesis" class="csl-entry"
-      role="doc-biblioentry">
+      <div id="ref-meierthesis" class="csl-entry" role="listitem">
       Meier, Simon. 2012. <span>“Advancing Automated Security Protocol
       Verification.”</span> {PhD} dissertation, ETH Zurich. <a
       href="http://dx.doi.org/10.3929/ethz-a-009790675">http://dx.doi.org/10.3929/ethz-a-009790675</a>.
