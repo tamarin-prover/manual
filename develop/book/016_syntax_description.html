@@ -89,7 +89,7 @@
   _function_sym  ::=  function_untyped 
                             | function_typed
   equations  ::=  &gt;(&#39;equations&#39; (&#39;[&#39; &#39;convergent&#39; &#39;]&#39;)? &#39;:&#39; equation (&#39;,&#39; equation)* &#39;,&#39;?)
-  equation  ::=  (_term: left) &#39;=&#39; (_term: right)</code></pre>
+  equation  ::=  (mset_term: left) &#39;=&#39; (mset_term: right)</code></pre>
       <p>Note that the equations must be convergent and have the Finite
       Variant Property (FVP), and do not allow the use of fixed public
       names in the terms. Tamarin provides built-in sets of function
@@ -173,7 +173,7 @@
                                | rule_role
   rule_let_block  ::=  &#39;let&#39; rule_let_term+ &#39;in&#39;
   rule_let_term  ::=  ((msg_var_or_nullary_fun 
-                               | nat_var): left) &#39;=&#39; (_term: right)
+                               | nat_var): left) &#39;=&#39; (mset_term: right)
   msg_var_or_nullary_fun  ::=  VARIABLE((ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;msg&#39;)?)
   hexcolor  ::=  (&#39;&#39;&#39; @(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/) &#39;&#39;&#39;) 
                                | (@(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/))</code></pre>
@@ -192,7 +192,7 @@ in [] --&gt; [ A(y)]    is desugared to    [] --&gt; [ A(&lt;z,y&gt;) ]</code></
       <p>Macros works similarly to let-blocks, but apply globally to all
       rules.</p>
       <pre class="tamarin"><code>  macros  ::=  &#39;macros&#39; &#39;:&#39; macro (&#39;,&#39; macro)*
-  macro  ::=  (ident: macro_identifier) &#39;(&#39; (_non_temporal_var (&#39;,&#39; _non_temporal_var)*)? &#39;)&#39; &#39;=&#39; (_term: term)
+  macro  ::=  (ident: macro_identifier) &#39;(&#39; (_non_temporal_var (&#39;,&#39; _non_temporal_var)*)? &#39;)&#39; &#39;=&#39; (mset_term: term)
   _non_temporal_var  ::=  pub_var 
                           | fresh_var 
                           | msg_var_or_nullary_fun 
@@ -297,19 +297,17 @@ search_method := &#39;DFS&#39; | &#39;BFS&#39; | &#39;SEQDFS&#39; | &#39;NONE&#3
       arguments of an n-ary function application must agree with the
       arity given in the function definition.</p>
       <pre class="tamarin"><code>  _term  ::=  tuple_term 
-                  | mset_term 
                   | nested_term 
                   | nullary_fun 
                   | binary_app 
                   | nary_app 
                   | _literal
-  mset_term  ::=  &lt;MUL_SET((nat_term: left) (&#39;++&#39; 
-                  | &#39;+&#39;) (nat_term: right))
-  nat_term  ::=  &lt;ADD((xor_term: left) &#39;%+&#39; (xor_term: right))
-  xor_term  ::=  &lt;EXCLUSIVE_OR((mult_term: left) (&#39;XOR&#39; 
-                  | &#39;⊕&#39;) (mult_term: right))
-  mult_term  ::=  &lt;MULTIPLY((exp_term: left) &#39;*&#39; (exp_term: right))
-  exp_term  ::=  &gt;EXPONENTIAL((_term: base) &#39;^&#39; (_term: exponent))</code></pre>
+  mset_term  ::=  &lt;MUL_SET((nat_term: left) ((&#39;++&#39; 
+                  | &#39;+&#39;) (nat_term: right))*)
+  nat_term  ::=  &lt;ADD((xor_term: left) (&#39;%+&#39; (xor_term: right))*)
+  xor_term  ::=  &lt;EXCLUSIVE_OR((mul_term: left) ((&#39;XOR&#39; 
+                  | &#39;⊕&#39;) (mul_term: right))*)
+  exp_term  ::=  &gt;EXPONENTIAL((_term: base) (&#39;^&#39; (_term: exponent))*)</code></pre>
       <p>Tamarin’s parser checks that functions were previously defined
       and are used with the correct arity.</p>
       <pre><code>    nullary_fun := &lt;all-nullary-functions-defined-up-to-here&gt;
@@ -318,7 +316,7 @@ search_method := &#39;DFS&#39; | &#39;BFS&#39; | &#39;SEQDFS&#39; | &#39;NONE&#3
     nary_app    := nary_fun &#39;(&#39; multterm* &#39;)&#39;</code></pre>
       <p>External tools may instead use the following grammar and check
       these conditions after parsing.</p>
-      <pre class="tamarin"><code>  binary_app  ::=  FUNCTION((ident: function_identifier) &#39;{&#39; (_term: argument) (&#39;,&#39; (_term: argument))*? &#39;}&#39; (_term: argument))
+      <pre class="tamarin"><code>  binary_app  ::=  FUNCTION((ident: function_identifier) &#39;{&#39; (arguments: argument) &#39;}&#39; (mset_term: argument))
   nary_app  ::=  FUNCTION((ident: function_identifier) &#39;(&#39; arguments &#39;)&#39;)</code></pre>
       <p>Literals and variables appear in many forms.</p>
       <pre class="tamarin"><code>  _literal  ::=  pub_name 
@@ -413,11 +411,11 @@ lvar        := node_var | nonnode_var</code></pre>
       SAPIC+</a>.</p>
       <pre class="tamarin"><code>extras  ::=  { multi_comment single_comment /\s|\\\r?\n|\u00A0/ }
 
-conflicts  ::=  { { pub_var } { fresh_var } { msg_var_or_nullary_fun } { temporal_var } { nat_var } { pub_var fresh_var msg_var_or_nullary_fun temporal_var nat_var } { pub_var fresh_var msg_var_or_nullary_fun nat_var } { accountability_lemma diff_lemma } { lemma diff_lemma } { nary_app predicate_ref } { nullary_fun nary_app msg_var_or_nullary_fun } }
+conflicts  ::=  { { pub_var } { fresh_var } { temporal_var } { nat_var } { pub_var fresh_var msg_var_or_nullary_fun temporal_var nat_var } { pub_var fresh_var msg_var_or_nullary_fun nat_var } { nary_app predicate_ref } { nullary_fun nary_app msg_var_or_nullary_fun } }
 
 externals  ::=  { multi_comment single_comment }
 
-precedences  ::=  { { &#39;NESTED&#39; &#39;FUNCTION&#39; &#39;VARIABLE&#39; &#39;EXPONENTIAL&#39; &#39;MULTIPLY&#39; &#39;ADD&#39; &#39;MUL_SET&#39; &#39;TUPLE&#39; &#39;NULLARY_FUN&#39; &#39;ATOM&#39; &#39;LOGICAL_NOT&#39; &#39;EXCLUSIVE_OR&#39; &#39;LOGICAL_AND&#39; &#39;LOGICAL_OR&#39; &#39;LOGICAL_IMPLICATION&#39; &#39;LOGICAL_IFF&#39; &#39;CHAIN_CONSTRAINT&#39; } { &#39;NON_DIFF&#39; &#39;DIFF&#39; } { &#39;REPLICATION&#39; &#39;EVENT&#39; &#39;CHOICE&#39; &#39;PROCESS_LET&#39; &#39;LOOKUP&#39; &#39;CONDITIONAL&#39; } }
+precedences  ::=  { { &#39;PROCESS&#39; &#39;NESTED&#39; &#39;FUNCTION&#39; &#39;VARIABLE&#39; &#39;EXPONENTIAL&#39; &#39;MULTIPLY&#39; &#39;ADD&#39; &#39;MUL_SET&#39; &#39;TUPLE&#39; &#39;NULLARY_FUN&#39; &#39;ATOM&#39; &#39;LOGICAL_NOT&#39; &#39;EXCLUSIVE_OR&#39; &#39;LOGICAL_AND&#39; &#39;LOGICAL_OR&#39; &#39;LOGICAL_IMPLICATION&#39; &#39;LOGICAL_IFF&#39; &#39;CHAIN_CONSTRAINT&#39; } { &#39;NON_DIFF&#39; &#39;DIFF&#39; } { &#39;REPLICATION&#39; &#39;EVENT&#39; &#39;CHOICE&#39; &#39;PROCESS_LET&#39; &#39;LOOKUP&#39; &#39;CONDITIONAL&#39; } }
 
 word  ::=  ident
 
@@ -444,7 +442,7 @@ rules:
   function_attribute  ::=  &#39;private&#39; | &#39;destructor&#39;
   function_typed  ::=  (ident: function_identifier) &#39;(&#39; arguments? &#39;)&#39; &#39;:&#39; (ident: function_type)
   equations  ::=  &gt;(&#39;equations&#39; (&#39;[&#39; &#39;convergent&#39; &#39;]&#39;)? &#39;:&#39; equation (&#39;,&#39; equation)* &#39;,&#39;?)
-  equation  ::=  (_term: left) &#39;=&#39; (_term: right)
+  equation  ::=  (mset_term: left) &#39;=&#39; (mset_term: right)
   predicates  ::=  (&#39;predicate&#39; | &#39;predicates&#39;) &#39;:&#39; predicate (&#39;,&#39; predicate)*
   predicate  ::=  (predicate_def -&gt; &#39;&#39;) &#39;&lt;=&gt;&#39; (_formula: formula)
   predicate_def  ::=  (ident: predicate_identifier) &#39;(&#39; arguments? &#39;)&#39;
@@ -474,26 +472,26 @@ rules:
   location_process  ::=  &#39;(&#39; _process &#39;)&#39; &#39;@&#39; ((_literal | tuple_term): location_identifier)
   inline_msr_process  ::=  &gt;(premise (&#39;--&gt;&#39; | action_fact) conclusion (&#39;;&#39; _process)?)
   _nested_process  ::=  &#39;(&#39; _process &#39;)&#39;
-  predefined_process  ::=  &lt;-1(_term)
+  predefined_process  ::=  &lt;PROCESS(mset_term)
   binding  ::=  &gt;(&#39;new&#39; _literal (&#39;;&#39; _process)?)
-  output  ::=  &gt;((&#39;out&#39; &#39;(&#39; _term &#39;,&#39; _term &#39;)&#39; (&#39;;&#39; _process)?) | (&#39;out&#39; &#39;(&#39; _term &#39;)&#39; (&#39;;&#39; _process)?))
-  input  ::=  &gt;((&#39;in&#39; &#39;(&#39; _term &#39;,&#39; _term &#39;)&#39; (&#39;;&#39; _process)?) | (&#39;in&#39; &#39;(&#39; _term &#39;)&#39; (&#39;;&#39; _process)?))
+  output  ::=  &gt;((&#39;out&#39; &#39;(&#39; mset_term &#39;,&#39; mset_term &#39;)&#39; (&#39;;&#39; _process)?) | (&#39;out&#39; &#39;(&#39; mset_term &#39;)&#39; (&#39;;&#39; _process)?))
+  input  ::=  &gt;((&#39;in&#39; &#39;(&#39; mset_term &#39;,&#39; mset_term &#39;)&#39; (&#39;;&#39; _process)?) | (&#39;in&#39; &#39;(&#39; mset_term &#39;)&#39; (&#39;;&#39; _process)?))
   conditional  ::=  &gt;CONDITIONAL(&#39;if&#39; (_condition: condition) &#39;then&#39; (_process: then) (&#39;else&#39; (_process: else))?)
   process_let  ::=  &gt;PROCESS_LET(&#39;let&#39; term_eq+ &#39;in&#39; (_process: in) (&#39;else&#39; (_process: else))?)
   deterministic_choice  ::=  &lt;CHOICE(_process (&#39;|&#39; | &#39;||&#39;) _process)
-  non_deterministic_choice  ::=  &lt;CHOICE(_process (&#39;+&#39;) _process)
+  non_deterministic_choice  ::=  &lt;CHOICE(_process &#39;+&#39; _process)
   null  ::=  &#39;0&#39;
   event  ::=  &gt;EVENT(&#39;event&#39; _fact (&#39;;&#39; _process)?)
   replication  ::=  &gt;REPLICATION(&#39;!&#39; _process (&#39;;&#39; _process)?)
-  set_state  ::=  &gt;(&#39;insert&#39; (_term: from) &#39;,&#39; (_term: to) (&#39;;&#39; _process)?)
-  delete_state  ::=  &gt;(&#39;delete&#39; _term (&#39;;&#39; _process)?)
-  read_state  ::=  &gt;LOOKUP(&#39;lookup&#39; (_term: from) &#39;as&#39; (_lvar: to) &#39;in&#39; (_process: in) (&#39;else&#39; (_process: else))? (&#39;;&#39; _process)?)
-  set_lock  ::=  &gt;(&#39;lock&#39; _term (&#39;;&#39; _process)?)
-  remove_lock  ::=  &gt;(&#39;unlock&#39; _term (&#39;;&#39; _process)?)
+  set_state  ::=  &gt;(&#39;insert&#39; (mset_term: from) &#39;,&#39; (mset_term: to) (&#39;;&#39; _process)?)
+  delete_state  ::=  &gt;(&#39;delete&#39; mset_term (&#39;;&#39; _process)?)
+  read_state  ::=  &gt;LOOKUP(&#39;lookup&#39; (mset_term: from) &#39;as&#39; (_lvar: to) &#39;in&#39; (_process: in) (&#39;else&#39; (_process: else))? (&#39;;&#39; _process)?)
+  set_lock  ::=  &gt;(&#39;lock&#39; mset_term (&#39;;&#39; _process)?)
+  remove_lock  ::=  &gt;(&#39;unlock&#39; mset_term (&#39;;&#39; _process)?)
   _condition  ::=  equality_check | lesser_check | predicate_ref
-  equality_check  ::=  (_term | _formula) @(1(&#39;=&#39;)) (_term | _formula)
-  lesser_check  ::=  _term (&#39;(&lt;)&#39; | &#39;&lt;&lt;&#39;) _term
-  let  ::=  &#39;let&#39; (_term: let_identifier) &#39;=&#39; _process
+  equality_check  ::=  (mset_term | _formula) @(1(&#39;=&#39;)) (mset_term | _formula)
+  lesser_check  ::=  mset_term (&#39;(&lt;)&#39; | &#39;&lt;&lt;&#39;) mset_term
+  let  ::=  &#39;let&#39; (mset_term: let_identifier) &#39;=&#39; _process
   export  ::=  &#39;export&#39; (ident: export_identifier) &#39;:&#39; &#39;&quot;&#39; export_query &#39;&quot;&#39;
   _rule  ::=  rule | diff_rule
   rule  ::=  simple_rule variants?
@@ -510,9 +508,9 @@ rules:
   rule_role  ::=  &#39;role&#39; &#39;=&#39; &#39;&quot;&#39; (ident: role_identifier) &#39;&quot;&#39;
   rule_process  ::=  &#39;process&#39; &#39;=&#39; &#39;&quot;&#39; ident &#39;&quot;&#39;
   rule_let_block  ::=  &#39;let&#39; rule_let_term+ &#39;in&#39;
-  rule_let_term  ::=  ((msg_var_or_nullary_fun | nat_var): left) &#39;=&#39; (_term: right)
+  rule_let_term  ::=  ((msg_var_or_nullary_fun | nat_var): left) &#39;=&#39; (mset_term: right)
   macros  ::=  &#39;macros&#39; &#39;:&#39; macro (&#39;,&#39; macro)*
-  macro  ::=  (ident: macro_identifier) &#39;(&#39; (_non_temporal_var (&#39;,&#39; _non_temporal_var)*)? &#39;)&#39; &#39;=&#39; (_term: term)
+  macro  ::=  (ident: macro_identifier) &#39;(&#39; (_non_temporal_var (&#39;,&#39; _non_temporal_var)*)? &#39;)&#39; &#39;=&#39; (mset_term: term)
   embedded_restriction  ::=  &#39;_restrict&#39; &#39;(&#39; (_formula: formula) &#39;)&#39;
   _facts_restrictions  ::=  &lt;((_fact | embedded_restriction) (&#39;,&#39; (_fact | embedded_restriction))*)
   _facts  ::=  &lt;(_fact (&#39;,&#39; _fact)*)
@@ -550,18 +548,18 @@ rules:
   chain_constraint  ::=  &#39;(&#39; temporal_var &#39;,&#39; natural &#39;)&#39; &#39;~~&gt;&#39; &#39;(&#39; temporal_var &#39;,&#39; natural &#39;)&#39;
   disjunction_split_constraint  ::=  CHAIN_CONSTRAINT((_formula: formula) ((&#39;||&#39; | &#39;∥&#39;) (_formula: formula))+)
   eq_split_constraint  ::=  &#39;splitEqs&#39; &#39;(&#39; natural &#39;)&#39;
-  _term  ::=  tuple_term | mset_term | nested_term | nullary_fun | binary_app | nary_app | _literal
-  tuple_term  ::=  TUPLE(&#39;&lt;&#39; ((mset_term): term) (&#39;,&#39; (mset_term: term))* &#39;&gt;&#39;)
-  mset_term  ::=  &lt;MUL_SET((nat_term: left) (&#39;++&#39; | &#39;+&#39;) (nat_term: right))
-  nat_term  ::=  &lt;ADD((xor_term: left) &#39;%+&#39; (xor_term: right))
-  xor_term  ::=  &lt;EXCLUSIVE_OR((mult_term: left) (&#39;XOR&#39; | &#39;⊕&#39;) (mult_term: right))
-  mult_term  ::=  &lt;MULTIPLY((exp_term: left) &#39;*&#39; (exp_term: right))
-  exp_term  ::=  &gt;EXPONENTIAL((_term: base) &#39;^&#39; (_term: exponent))
+  _term  ::=  tuple_term | nested_term | nullary_fun | binary_app | nary_app | _literal
+  tuple_term  ::=  TUPLE(&#39;&lt;&#39; (mset_term: left) (&#39;,&#39; (mset_term: right))* &#39;&gt;&#39;)
+  mset_term  ::=  &lt;MUL_SET((nat_term: left) ((&#39;++&#39; | &#39;+&#39;) (nat_term: right))*)
+  nat_term  ::=  &lt;ADD((xor_term: left) (&#39;%+&#39; (xor_term: right))*)
+  xor_term  ::=  &lt;EXCLUSIVE_OR((mul_term: left) ((&#39;XOR&#39; | &#39;⊕&#39;) (mul_term: right))*)
+  mul_term  ::=  &lt;MULTIPLY((exp_term: left) (&#39;*&#39; (exp_term: right))*)
+  exp_term  ::=  &gt;EXPONENTIAL((_term: base) (&#39;^&#39; (_term: exponent))*)
   nested_term  ::=  NESTED(&#39;(&#39; mset_term &#39;)&#39;)
   nullary_fun  ::=  NULLARY_FUN((ident: function_identifier) | ((ident: function_identifier) &#39;(&#39; &#39;)&#39;))
-  binary_app  ::=  FUNCTION((ident: function_identifier) &#39;{&#39; (_term: argument) (&#39;,&#39; (_term: argument))*? &#39;}&#39; (_term: argument))
+  binary_app  ::=  FUNCTION((ident: function_identifier) &#39;{&#39; (arguments: argument) &#39;}&#39; (mset_term: argument))
   nary_app  ::=  FUNCTION((ident: function_identifier) &#39;(&#39; arguments &#39;)&#39;)
-  arguments  ::=  ((_term | temporal_var): argument) (&#39;,&#39; (_term: argument))*
+  arguments  ::=  ((mset_term | temporal_var): argument) (&#39;,&#39; (mset_term: argument))*
   _literal  ::=  pub_name | fresh_name | _non_temporal_var | comp_var | _custom_type_var
   _non_temporal_var  ::=  pub_var | fresh_var | msg_var_or_nullary_fun | nat_var
   pub_var  ::=  VARIABLE((&#39;$&#39; (ident: variable_identifier) (&#39;.&#39; natural)?) | ((ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;pub&#39;))
@@ -587,15 +585,15 @@ rules:
   temp_var_induction  ::=  ATOM(&#39;last&#39; &#39;(&#39; temporal_var &#39;)&#39;)
   temp_var_order  ::=  ATOM(((temporal_var_optional_prefix -&gt; temporal_var): left) &#39;&lt;&#39; ((temporal_var_optional_prefix -&gt; temporal_var): right))
   temp_var_eq  ::=  ATOM(((temporal_var_optional_prefix -&gt; temporal_var): left) &#39;=&#39; ((temporal_var_optional_prefix -&gt; temporal_var): right))
-  term_eq  ::=  ATOM((_term: left) &#39;=&#39; (_term: right))
-  subterm_rel  ::=  ATOM((_term: left) (&#39;&lt;&lt;&#39; | &#39;⊏&#39;) (_term: right))
+  term_eq  ::=  ATOM((mset_term: left) &#39;=&#39; (mset_term: right))
+  subterm_rel  ::=  ATOM((mset_term: left) (&#39;&lt;&lt;&#39; | &#39;⊏&#39;) (mset_term: right))
   quantified_formula  ::=  ATOM((&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;) (_lvar+: variable) &#39;.&#39; (_formula: formula))
   atom  ::=  ATOM(&#39;⊥&#39; | &#39;F&#39; | &#39;⊤&#39; | &#39;T&#39;)
   _lvar  ::=  temporal_var | _non_temporal_var
   predicate_ref  ::=  FUNCTION((ident: predicate_identifier) &#39;(&#39; arguments? &#39;)&#39;)
   pre_defined  ::=  NULLARY_FUN(ident)
   hexcolor  ::=  (&#39;&#39;&#39; @(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/) &#39;&#39;&#39;) | (@(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/))
-  ident  ::=  /[A-Za-z0-9][a-zA-Z0-9_*]*/
+  ident  ::=  /[A-Za-z0-9]\w*/
   param  ::=  /[^&quot;]*/
   export_query  ::=  /(\\&quot;|[^&quot;])*/
   natural  ::=  /[0-9]+/
