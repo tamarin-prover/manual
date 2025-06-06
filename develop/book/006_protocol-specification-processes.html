@@ -379,11 +379,17 @@ out(h(h(x)));                          // implictely types h as lol-&gt;lol
       output</li>
       <li><em>msr</em> - parse and type .spthy file and translate
       processes to multiset-rewrite rules</li>
-      <li><em>proverif</em>: - translate to <a
+      <li><em>proverif</em>: - translate to the <a
       href="https://bblanche.gitlabpages.inria.fr/proverif/">ProVerif</a>
-      input format</li>
+      input format. The translation of lookups/inserts relies on
+      features that are not yet available in ProVerif (at the time of
+      writing) and require preprocessing with <a
+      href="https://gitlab.inria.fr/chevalvi/gsverif">GSVerif</a>.</li>
+      <li><em>proverifequiv</em>: - same as <code>proverif</code>, but
+      specifically for the translation of equivalence properties aka
+      privacy properties aka ProVerif’s <code>diff</code> mode.</li>
       <li><em>deepsec</em>: - translate to <a
-      href="https://deepsec-prover.github.io/">Deepsec</a> input
+      href="https://deepsec-prover.github.io/">Deepsec</a>’s input
       format</li>
       </ul>
       <h2 id="lemma-selection">Lemma selection</h2>
