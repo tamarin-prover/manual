@@ -152,32 +152,108 @@ rule setup:
       <pre><code>/*
 WARNING: the following wellformedness checks failed!
 
-Fact usage
-==========
+Fact arity issues
+=================
 
-Possible reasons:
-1. Fact names are case-sensitive, different capitalizations are considered as different facts, i.e., Fact() is different from FAct(). Check the capitalization of your fact names.
-2. Same fact is used with different arities, i.e., Fact(&#39;A&#39;,&#39;B&#39;) is different from Fact(&#39;A&#39;). Check the arguments of your facts.
+Same fact is used with different arities, i.e., Fact(&#39;A&#39;,&#39;B&#39;) is different from 
+Fact(&#39;A&#39;). 
+Check the arguments of your facts.
 
 
 Fact `agst&#39;:
 
-    1. Rule `setup&#39;, capitalization  &quot;AgSt&quot;, 2, Linear
-     AgSt( $R, ~k )
+    1. Rule `setup&#39;, arity 3
+        AgSt( $I, ~k, ~m )
+    
+    2. Rule `setup&#39;, arity 2
+        AgSt( $R, ~k )
+    
+    3. Rule `I_1&#39;, arity 2
+        AgSt( $I, &lt;~k, ~m&gt; )
+    
+    4. Rule `R_1&#39;, arity 2
+        AgSt( $R, ~k )
 
-    2. Rule `setup&#39;, capitalization  &quot;AgSt&quot;, 3, Linear
-         AgSt( $I, ~k, ~m )
 */</code></pre>
-      <p>The problem lists all the fact usages of fact
-      <code>AgSt</code>. The statement
-      <code>1. Rule 'setup', capitalization  "AgSt", 2, Linear</code>
-      means that in the rule <code>setup</code> the fact
-      <code>AgSt</code> is used as a linear fact with 2 arguments. This
-      is not consistent with its use in other rules. For example
-      <code>2. Rule 'setup', capitalization  "AgSt", 3, Linear</code>
-      indicates that it is also used with 3 arguments in the
+      <p>The problem lists all the fact usages issues of fact
+      <code>AgSt</code>. Here, we are told that we are dealing with an
+      <code>arity</code> issue and all the usages of fact
+      <code>AgSt</code> are displayed under the explanation, along with
+      their locations. For example, <code>1.Rule `setup', arity 3</code>
+      and <code>2. Rule `setup', arity 2</code> indicate that
+      <code>AgSt</code> is both used with 2 and 3 arguments in the
       <code>setup</code> rule. To solve this problem we must ensure that
       we only use the same fact with the same number of arguments.</p>
+      <p>Same goes if we would have changed the setup rule introducing
+      <code>capitalization</code> issues (notice the <code>AGSt</code>
+      instead of <code>AgSt</code>) :</p>
+      <pre class="tamarin"><code>// WARNING: this rule illustrates an error message
+rule setup:
+    [ Fr(~k), Fr(~m) ]
+    --[]-&gt;
+    [ AgSt($I,&lt;~k,~m&gt;), AGSt($R,~k) ]</code></pre>
+      <p>Resulting in the following error message :</p>
+      <pre><code>/*
+WARNING: the following wellformedness checks failed!
+
+Fact capitalization issues
+==========================
+
+Fact names are case-sensitive, different capitalizations are considered as
+different facts, i.e., Fact() is different from FAct(). 
+Check the capitalization of your fact names.
+
+
+Fact `agst&#39;:
+
+    1. Rule `setup&#39;, capitalization &quot;AgSt&quot;
+        AgSt( $I, &lt;~k, ~m&gt; )
+    
+    2. Rule `setup&#39;, capitalization &quot;AGSt&quot;
+        AGSt( $R, ~k )
+    
+    3. Rule `I_1&#39;, capitalization &quot;AgSt&quot;
+        AgSt( $I, &lt;~k, ~m&gt; )
+    
+    4. Rule `R_1&#39;, capitalization &quot;AgSt&quot;
+        AgSt( $R, ~k )
+
+*/</code></pre>
+      <p>Or introducing <code>multiplicity</code>
+      (i.e. <code>persistence</code>) issues (notice the
+      <code>!AgSt</code>) :</p>
+      <pre class="tamarin"><code>// WARNING: this rule illustrates an error message
+rule setup:
+    [ Fr(~k), Fr(~m) ]
+    --[]-&gt;
+    [ AgSt($I,&lt;~k,~m&gt;), !AgSt($R,~k) ]</code></pre>
+      <p>Resulting in :</p>
+      <pre><code>/*
+WARNING: the following wellformedness checks failed!
+
+Fact multiplicity issues
+========================
+
+Same fact is used with different multiplicities, i.e., !Fact() (Persistent fact) 
+exists along with Fact() (Linear) in your rules. 
+Check the multiplicity (persistence) of your facts.
+
+
+Fact `agst&#39;:
+
+    1. Rule `setup&#39;, multiplicity (persistence) Linear
+        AgSt( $I, &lt;~k, ~m&gt; )
+    
+    2. Rule `setup&#39;, multiplicity (persistence) Persistent
+        !AgSt( $R, ~k )
+    
+    3. Rule `I_1&#39;, multiplicity (persistence) Linear
+        AgSt( $I, &lt;~k, ~m&gt; )
+    
+    4. Rule `R_1&#39;, multiplicity (persistence) Linear
+        AgSt( $R, ~k )
+
+*/</code></pre>
       <h3 id="unbound-variables">Unbound variables</h3>
       <p>If we change the rule <code>R_1</code> to</p>
       <pre class="tamarin"><code>// WARNING: this rule illustrates an error message      
