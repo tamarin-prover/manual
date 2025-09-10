@@ -170,7 +170,8 @@
                                | &#39;no_derivcheck&#39; 
                                | &#39;issapicrule&#39; 
                                | rule_process 
-                               | rule_role
+                               | rule_role 
+                               | rule_extended_attribute
   rule_let_block  ::=  &#39;let&#39; rule_let_term+ &#39;in&#39;
   rule_let_term  ::=  ((msg_var_or_nullary_fun 
                                | nat_var): left) &#39;=&#39; (mset_term: right)
@@ -503,10 +504,18 @@ rules:
   variants  ::=  &#39;variants&#39; simple_rule (&#39;,&#39; simple_rule)*
   modulo  ::=  &#39;(&#39; &#39;modulo&#39; (&#39;E&#39; | &#39;AC&#39;) &#39;)&#39;
   rule_attrs  ::=  &#39;[&#39; rule_attr (&#39;,&#39; rule_attr)* &#39;,&#39;? &#39;]&#39;
-  rule_attr  ::=  rule_attr_color | &#39;no_derivcheck&#39; | &#39;issapicrule&#39; | rule_process | rule_role
+  rule_attr  ::=  rule_attr_color | &#39;no_derivcheck&#39; | &#39;issapicrule&#39; | rule_process | rule_role | rule_extended_attribute
   rule_attr_color  ::=  (&#39;color=&#39; | &#39;colour=&#39;) hexcolor
-  rule_role  ::=  &#39;role&#39; &#39;=&#39; &#39;&quot;&#39; (ident: role_identifier) &#39;&quot;&#39;
-  rule_process  ::=  &#39;process&#39; &#39;=&#39; &#39;&quot;&#39; ident &#39;&quot;&#39;
+  rule_role  ::=  &#39;role&#39; &#39;=&#39; &#39;&#39;&#39; (ident: role_identifier) &#39;&#39;&#39;
+  rule_process  ::=  &#39;process&#39; &#39;=&#39; &#39;&#39;&#39; ident &#39;&#39;&#39;
+  rule_extended_attribute  ::=  (xattribute_ident: extended_attribute_name) (&#39;=&#39; ((&#39;[&#39; (no_square_brackets: extended_attribute_value) &#39;]&#39;) | (&#39;(&#39; (no_round_brackets: extended_attribute_value) &#39;)&#39;) | (&#39;{&#39; (no_curly_brackets: extended_attribute_value) &#39;}&#39;) | (&#39;&quot;&#39; (no_double_quotes: extended_attribute_value) &#39;&quot;&#39;) | (&#39;&#39;&#39; (no_single_quotes: extended_attribute_value) &#39;&#39;&#39;) | (&#39;|&#39; (no_pipe: extended_attribute_value) &#39;|&#39;)))?
+  xattribute_ident  ::=  @(-1(/x-[a-zA-Z_]+/))
+  no_square_brackets  ::=  @(-1(/[^\[\]]*/))
+  no_round_brackets  ::=  @(-1(/[^\(\)]*/))
+  no_curly_brackets  ::=  @(-1(/[^\{\}]*/))
+  no_double_quotes  ::=  @(-1(/[^&quot;]*/))
+  no_single_quotes  ::=  @(-1(/[^&#39;]*/))
+  no_pipe  ::=  @(-1(/[^|]*/))
   rule_let_block  ::=  &#39;let&#39; rule_let_term+ &#39;in&#39;
   rule_let_term  ::=  ((msg_var_or_nullary_fun | nat_var): left) &#39;=&#39; (mset_term: right)
   macros  ::=  &#39;macros&#39; &#39;:&#39; macro (&#39;,&#39; macro)*
