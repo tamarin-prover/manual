@@ -428,7 +428,7 @@ rules:
   preprocessor  ::=  ifdef | define | include
   ifdef  ::=  &#39;#ifdef&#39; _ifdef_formula _body_item* (&#39;#else&#39; _body_item*)? &#39;#endif&#39;
   define  ::=  &#39;#define&#39; ident
-  include  ::=  &#39;#include&#39; &#39;&quot;&#39; (param -&gt; path) &#39;&quot;&#39;
+  include  ::=  &#39;#include&#39; &#39;&quot;&#39; path &#39;&quot;&#39;
   _ifdef_formula  ::=  ifdef_nested | ifdef_or | ifdef_and | ifdef_not | ident
   ifdef_nested  ::=  NESTED(&#39;(&#39; _ifdef_formula &#39;)&#39;)
   ifdef_or  ::=  &lt;LOGICAL_OR(_ifdef_formula &#39;|&#39; _ifdef_formula)
@@ -604,6 +604,7 @@ rules:
   hexcolor  ::=  (&#39;&#39;&#39; @(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/) &#39;&#39;&#39;) | (@(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/))
   ident  ::=  /[A-Za-z0-9]\w*/
   param  ::=  /[^&quot;]*/
+  path  ::=  /[A-Za-z0-9-\_]*/
   export_query  ::=  /(\\&quot;|[^&quot;])*/
   natural  ::=  /[0-9]+/
   natural_subscript  ::=  (&#39;₀&#39; | &#39;₁&#39; | &#39;₂&#39; | &#39;₃&#39; | &#39;₄&#39; | &#39;₅&#39; | &#39;₆&#39; | &#39;₇&#39; | &#39;₈&#39; | &#39;₉&#39;)+
