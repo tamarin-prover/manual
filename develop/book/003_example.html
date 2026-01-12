@@ -548,7 +548,20 @@ Finished loading theories ... server ready at
       <pre><code>formulas: ∀ #r. (LtkReveal( S ) @ #r) ⇒ ⊥</code></pre>
       <p>now states that any occurrence of <code>LtkReveal( S )</code>
       will lead to a contradiction.</p>
-      <p>To finish the proof, we can either continue manually by
+      <p>We can either inspect the graph in the main window, or we can
+      open the graph in another window by clicking the
+      <code>Open the Graph in New Tab</code> link or the
+      <code>Popout</code> button under certain graphs. The links under
+      graphs in the resources tab (Raw Resources or Refined Resources)
+      or of the subcases under the main proof steps will open the same
+      graph in a new tab. The buttons under the main proof graph will
+      open the same graph in a new window with dynamic rendering
+      enabled; i.e., when we navigate through the proof steps (either by
+      clicking at a certain proof step or using the <code>j</code> or
+      <code>k</code> keys), the graph in the new window will change
+      accordingly. This is especially useful when working with large
+      proof graphs.</p>
+      <p>To finish the proof at hand, we can either continue manually by
       selecting the constraint to resolve next, or by calling the
       <code>autoprove</code> command, which selects the next steps based
       on a heuristic. Here we have two constraints to resolve:
