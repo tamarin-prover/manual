@@ -270,8 +270,7 @@
       combination with heuristic annotations by including both separated
       by commas—e.g., a premise <code>A(x)[-,no_precomp]</code> will be
       delayed and also will not have its sources precomputed.</p>
-      <h3 id="using-a-tactic-subsec-tactic">Using a Tactic {subsec:
-      tactic}</h3>
+      <h3 id="subsec:tactic">Using a Tactic</h3>
       <p>The tactics are a language native to Tamarin designed to allow
       user to write custom rankings of proof methods.</p>
       <h4 id="writing-a-tactic">Writing a tactic</h4>
@@ -291,15 +290,15 @@ presort: C</code></pre>
       <code>prio</code> keywords, is composed of functions that will try
       to recognize characteristics in the proof methods given by
       Tamarin. If a proof method is recognized by a function in a
-      priority, it will be be ranked as such, i.e., the higher the
-      priority in the tactic, the higher the proof methods it recognizes
-      will be ranked. The particularity recognized by every function
-      will be detailed in a paragraph below. The tactic language
-      authorizes to combine functions using <code>|</code>,
-      <code>&amp;</code> and <code>not</code>. Even if the option is not
-      necessary for the proof of the lemma uniqueness, let’s now explore
-      the <code>deprio</code> keyword. It works as the <code>prio</code>
-      one but with the opposite goal since it allows the user to put the
+      priority, it will be ranked as such, i.e., the higher the priority
+      in the tactic, the higher the proof methods it recognizes will be
+      ranked. The particularity recognized by every function will be
+      detailed in a paragraph below. The tactic language authorizes to
+      combine functions using <code>|</code>, <code>&amp;</code> and
+      <code>not</code>. Even if the option is not necessary for the
+      proof of the lemma uniqueness, let’s now explore the
+      <code>deprio</code> keyword. It works as the <code>prio</code> one
+      but with the opposite goal since it allows the user to put the
       recognized proof methods at the bottom of the ranking. In case
       several <code>deprio</code> are written, the first one will be
       ranked higher than the last ones. If a proof method is recognized
@@ -338,33 +337,39 @@ prio: {smallest}
       functions. At the end at this section, you will find an
       explanation on how to write your own functions if the one
       described here do not suffice for your usage.</p>
-      <p>Pre-implemented functions * <code>regex</code>: as explain
-      above, this function takes in parameter a string and will use it
-      as a pattern to match against the proof methods. (Since it is
-      based on the Text.Regex.PCRE module of Haskell, some characters,
-      as the parenthesis, will need to be escaped to achieve the desired
-      behavior). * <code>isFactName</code>: as is given by its name,
-      this function will go look in the Tamarin object ‘goal’ and check
-      if the field FactName matches its parameter. To give an example of
+      <p>Pre-implemented functions</p>
+      <ul>
+      <li><code>regex</code>: as explained above, this function takes in
+      parameter a string and will use it as a pattern to match against
+      the proof methods. (Since it is based on the Text.Regex.PCRE
+      module of Haskell, some characters, as parentheses, will need to
+      be escaped to achieve the desired behavior).</li>
+      <li><code>isFactName</code>: as is given by its name, this
+      function will go look in the Tamarin object ‘goal’ and check if
+      the field FactName matches its parameter. To give an example of
       its usage, <code>isFactName</code> could be used instead of
       <code>regex</code> for the first prio of the above example with
-      same results. * <code>isInFactTerms</code>: the function will look
-      in the list contained in the field FactTest whether an element
-      corresponding the parameter can be found. The following functions
-      are also implemented but specifically designed to translate the
-      oracles of the Vacarme tool into tactics: *
-      <code>dhreNoise</code>: recognize constraints containing a
+      same results.</li>
+      <li><code>isInFactTerms</code>: the function will look in the list
+      contained in the field FactTest whether an element corresponding
+      the parameter can be found.</li>
+      </ul>
+      <p>The following functions are also implemented but specifically
+      designed to translate the oracles of the Vacarme tool into
+      tactics:</p>
+      <ul>
+      <li><p><code>dhreNoise</code>: recognize constraints containing a
       Diffie-Hellman exponentiation. For example, the constraint
       <code>Recv( &lt;'g'^~e.1,aead(kdf2(&lt;ck, 'g'^(~e*~e.1)&gt;), '0', h(&lt;hash, 'g'^~e.1&gt;), peer),aead(kdf2(&lt;kdf1(&lt;ck, 'g'^(~e*~e.1)&gt;), z&gt;), '0',h(&lt;h(&lt;hash, 'g'^~e.1&gt;),aead(kdf2(&lt;ck, 'g'^(~e*~e.1)&gt;), '0', h(&lt;hash, 'g'^~e.1&gt;), peer)&gt;), payload)&gt;) ▶₁ #claim</code>
       is recognized thanks to the presence of the following pattern
-      <code>'g'^~e.1</code>. The function does need one parameter from
-      the user, the type of oracle it is used for. It can be
+      <code>'g'^~e.1</code>. The function needs one user parameter,
+      which is the type of oracle it is used for. It can be
       <code>def</code> for the Vacarme default case, <code>curve</code>
       for Vacarme oracle_C25519_K1X1 case and <code>diff</code> if the
       tactic is used to prove an equivalence lemma. If the parameter
-      specified is anything else, the default case will be used. It
-      works as follows. First, it will retrieve from the system state
-      the formulas that have the <code>Reveal</code> fact name and
+      specified is anything else, the default case will be used.</p>
+      <p>It works as follows. First, it will retrieve from the system
+      state the formulas that have the <code>Reveal</code> fact name and
       matches the regex <code>exp\\('g'</code>. For the retrieved
       formulas, it will then put in a list the content of the
       <code>Free</code> variables along the variable <code>~n</code>. In
@@ -374,29 +379,32 @@ prio: {smallest}
       will be recognized if it includes an exponentiation that uses the
       previously listed elements (just one as exponent or a
       multiplication).<br />
-      * <code>defaultNoise</code>: this function takes two parameter:
-      the oracle type (as explained for <code>dhreNoise</code>) and a
-      regex pattern. The regex pattern should allow the program to
-      extract the nonces targeted by the user from the constraint. For
-      example, in the default case of Vacarme, the regex is
-      <code>(?&lt;!'g'\^)\~[a-zA-Z.0-9]*</code> and aims at recovering
-      the nonces used in exponentiation. The goal of the function is to
-      verify that all the recovered nonces can be found in the list
-      extracted from the system state as explained for
+      </p></li>
+      <li><p><code>defaultNoise</code>: this function takes two
+      parameter: the oracle type (as explained for
+      <code>dhreNoise</code>) and a regex pattern. The regex pattern
+      should allow the program to extract the nonces targeted by the
+      user from the constraint. For example, in the default case of
+      Vacarme, the regex is <code>(?&lt;!'g'\^)\~[a-zA-Z.0-9]*</code>
+      and aims at recovering the nonces used in exponentiation. The goal
+      of the function is to verify that all the recovered nonces can be
+      found in the list extracted from the system state as explained for
       <code>dhreNoise</code>. The constraint will only be recognized if
-      all his nonces are in the list. *
-      <code>reasonableNoncesNoise</code>: takes one parameter (same as
-      <code>dhreNoise</code>). It works as <code>defaultNoise</code> but
-      works with all the nonces of the constraint and therefore does not
-      need a regex pattern to retrieve them. *
-      <code>nonAbsurdConstraint</code>: this function retrieve the
-      functions names present in the constraint and verifies if they are
-      “Ku” or “inv” (this means the key words coming before
+      all his nonces are in the list.</p></li>
+      <li><p><code>reasonableNoncesNoise</code>: takes one parameter
+      (same as <code>dhreNoise</code>). It works as
+      <code>defaultNoise</code> but works with all the nonces of the
+      constraint and therefore does not need a regex pattern to retrieve
+      them.</p></li>
+      <li><p><code>nonAbsurdConstraint</code>: this function retrieve
+      the functions names present in the constraint and verifies if they
+      are “Ku” or “inv” (this means the key words coming before
       parenthesis). It also retrieves the list of nonces form the system
       state as explained for <code>dhreNoise</code> and checks if they
       do not appear in the constraint. If both the conditions are
       verified, the constraint is recognized. It only takes one argument
-      (the same as dhreNoise).</p>
+      (the same as dhreNoise).</p></li>
+      </ul>
       <h4 id="how-to-write-your-own-functions">How to write your own
       function(s)</h4>
       <p>The functions need to be added to the
@@ -1152,7 +1160,7 @@ end</code></pre>
       the second term is strictly increasing. Possible symbols are
       <code>≤</code>, <code>≥</code>, <code>&lt;</code>,
       <code>&gt;</code> and <code>=</code>. A tuple position is marked
-      with additional parantheses, e.g.,
+      with additional parentheses, e.g.,
       <code>Store(id,(&lt;,≥),=)</code>.</p>
       <p>Note that this support for reasoning about exclusivity was
       sufficient for our case studies, but it is likely that more
