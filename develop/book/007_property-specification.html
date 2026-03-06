@@ -361,11 +361,11 @@ end</code></pre>
       following applies when editing lemmas in the GUI:</p>
       <ul>
       <li>Your changes are not stored in your model file. If you want to
-      persist your changes, you must either download the entire theory,
-      or use the “Append modified lemmas to file” button in the top
-      right corner. This button will add new or modified lemmas at the
-      end of your model file as a comment. You must then manually merge
-      them into your model.</li>
+      persist your changes, you must either use “Download source” from
+      the Actions menu to download the entire theory, or use “Append
+      modified lemmas to file” from the Actions menu. This option will
+      add new or modified lemmas at the end of your model file as a
+      comment. You must then manually merge them into your model.</li>
       <li>Whenever you delete or edit a lemma marked as
       <code>reuse</code>, all proofs after the deleted or edited lemma
       will be invalidated. This is because Tamarin cannot be certain
@@ -374,8 +374,11 @@ end</code></pre>
       you know should it encounter any issues.</li>
       <li>You cannot add, modify, or delete sources lemmas. This is
       because sources lemmas influence Tamarin’s precomputations. You
-      must edit sources lemmas in your model file and, whenever you do,
-      restart the server afterwards.</li>
+      must edit sources lemmas in your model file and use “Reload file”
+      from the Actions menu to reload the theory with the updated
+      sources lemmas. If the theory was uploaded or modified
+      interactively in the web interface, reloading is not possible, and
+      you will have restart the server instead.</li>
       </ul>
       <p>Below, we highlight the four most important buttons for editing
       lemmas in the GUI.</p>

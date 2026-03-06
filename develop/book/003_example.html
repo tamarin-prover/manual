@@ -383,13 +383,20 @@ Finished loading theories ... server ready at
       <p>On the right hand side, you have a quick summary of the
       available commands and keyboard shortcuts you can use to navigate
       inside the theory. In the top right corner there are some links:
-      <code>Index</code> leads back to the welcome page,
-      <code>Download</code> allows you to download the current theory
-      (including partial proofs if they exist), <code>Actions</code> and
-      the sub-bullet <code>Show source</code> shows the theory’s source
-      code, and <code>Options</code> allows you to configure the level
-      of details in the graph visualization (see below for
-      examples).</p>
+      <code>Index</code> leads back to the welcome page.
+      <code>Reload file</code> (only for locally loaded files) re-reads
+      the theory file from disk and performs all the required
+      precomputations, which is useful when editing the
+      <code>.spthy</code> file outside of the web interface. The
+      <code>Actions</code> menu contains <code>Show source</code> which
+      displays the theory’s source code in a new tab,
+      <code>Download source</code> which downloads the current theory
+      (including partial proofs if they exist), and
+      <code>Append modified lemmas to file</code> (only for locally
+      loaded files) which appends any lemmas you’ve edited in the GUI to
+      the end of your file as comments. The <code>Options</code> menu
+      allows you to configure the level of details in the graph
+      visualization (see below for examples).</p>
       <p>If you click on <code>Message theory</code> on the left, you
       should see the following:</p>
       <p><img src="../images/tamarin-tutorial-message-theory.jpeg"
