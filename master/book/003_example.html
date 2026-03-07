@@ -76,11 +76,11 @@ C &lt;- S: h(k)</code></pre>
       given in the file <a
       href="../code/FirstExample.spthy">FirstExample.spthy</a>
       (<code>.spthy</code> stands for <em>security protocol
-      theory</em>), which can be found in the folder <code>code</code>
-      within the github repository of this tutorial (<a
-      href="https://github.com/tamarin-prover/manual"
-      class="uri">https://github.com/tamarin-prover/manual</a>). The
-      Tamarin file starts with <code>theory</code> followed by the
+      theory</em>), which can be found in the folder
+      <code>manual/code</code> of the main repository (<a
+      href="https://github.com/tamarin-prover/tamarin-prover"
+      class="uri">https://github.com/tamarin-prover/tamarin-prover</a>).
+      The Tamarin file starts with <code>theory</code> followed by the
       theory’s name, here <code>FirstExample</code>.</p>
       <pre class="tamarin"><code>theory FirstExample
 begin</code></pre>
@@ -166,14 +166,14 @@ begin</code></pre>
       unconnected.</p>
       <p>The above rule can therefore be read as follows. First,
       generate a fresh name <code>~ltk</code> (of sort fresh), which is
-      the new private key, and non-deterministically choose a public
-      name <code>A</code>, for the agent for whom we are generating the
-      key-pair. Afterward, generate the fact <code>!Ltk($A, ~ltk)</code>
-      (the exclamation mark <code>!</code> denotes that the fact is
-      persistent, i.e., it can be consumed arbitrarily often), which
-      denotes the association between agent <code>A</code> and its
-      private key <code>~ltk</code>, and generate the fact
-      <code>!Pk($A, pk(~ltk))</code>, which associates agent
+      the new private (long-term) key, and non-deterministically choose
+      a public name <code>A</code>, for the agent for whom we are
+      generating the key-pair. Afterward, generate the fact
+      <code>!Ltk($A, ~ltk)</code> (the exclamation mark <code>!</code>
+      denotes that the fact is persistent, i.e., it can be consumed
+      arbitrarily often), which denotes the association between agent
+      <code>A</code> and its private key <code>~ltk</code>, and generate
+      the fact <code>!Pk($A, pk(~ltk))</code>, which associates agent
       <code>A</code> and its public key <code>pk(~ltk)</code>.</p>
       <p>In the example, we allow the adversary to retrieve any public
       key using the following rule. Essentially, it reads a public-key
@@ -371,7 +371,7 @@ Finished loading theories ... server ready at
       appropriate directory.</p>
       <p>If you click on the ‘FirstExample’ entry in the table of loaded
       theories, you should see the following:</p>
-      <p><img src="../images/tamarin-tutorial-overview.png"
+      <p><img src="../images/tamarin-tutorial-overview.jpeg"
       title="FirstExample Theory Overview" style="width:100.0%"
       alt="FirstExample Theory Overview" /><br />
       </p>
@@ -383,16 +383,23 @@ Finished loading theories ... server ready at
       <p>On the right hand side, you have a quick summary of the
       available commands and keyboard shortcuts you can use to navigate
       inside the theory. In the top right corner there are some links:
-      <code>Index</code> leads back to the welcome page,
-      <code>Download</code> allows you to download the current theory
-      (including partial proofs if they exist), <code>Actions</code> and
-      the sub-bullet <code>Show source</code> shows the theory’s source
-      code, and <code>Options</code> allows you to configure the level
-      of details in the graph visualization (see below for
-      examples).</p>
+      <code>Index</code> leads back to the welcome page.
+      <code>Reload file</code> (only for locally loaded files) re-reads
+      the theory file from disk and performs all the required
+      precomputations, which is useful when editing the
+      <code>.spthy</code> file outside of the web interface. The
+      <code>Actions</code> menu contains <code>Show source</code> which
+      displays the theory’s source code in a new tab,
+      <code>Download source</code> which downloads the current theory
+      (including partial proofs if they exist), and
+      <code>Append modified lemmas to file</code> (only for locally
+      loaded files) which appends any lemmas you’ve edited in the GUI to
+      the end of your file as comments. The <code>Options</code> menu
+      allows you to configure the level of details in the graph
+      visualization (see below for examples).</p>
       <p>If you click on <code>Message theory</code> on the left, you
       should see the following:</p>
-      <p><img src="../images/tamarin-tutorial-message-theory.png"
+      <p><img src="../images/tamarin-tutorial-message-theory.jpeg"
       title="FirstExample Message Theory" style="width:100.0%"
       alt="FirstExample Message Theory" /><br />
       </p>
@@ -436,7 +443,7 @@ Finished loading theories ... server ready at
       distinction is only used to make the tool’s reasoning more
       efficient.</p>
       <p>Now click on <em>Multiset rewriting rules</em> on the left.</p>
-      <p><img src="../images/tamarin-tutorial-multiset-rules.png"
+      <p><img src="../images/tamarin-tutorial-multiset-rules.jpeg"
       title="FirstExample Multiset Rewriting Rules" style="width:100.0%"
       alt="FirstExample Multiset Rewriting Rules" /><br />
       </p>
@@ -464,7 +471,7 @@ Finished loading theories ... server ready at
       at the second set (refined/type case distinctions) also in the pictures, since
       those are the ones actually used in the proof, and 'raw' is just an
       uninteresting intermediate result. -->
-      <p><img src="../images/tamarin-tutorial-case-distinctions.png"
+      <p><img src="../images/tamarin-tutorial-case-distinctions.jpeg"
       title="FirstExample Case Distinctions" style="width:100.0%"
       alt="FirstExample Case Distinctions Rules" /><br />
       </p>
@@ -511,7 +518,7 @@ Finished loading theories ... server ready at
       For that, click on <code>sorry</code> (indicating that the proof
       has not been started) after the first lemma in the left frame to
       obtain the following screen:</p>
-      <p><img src="../images/tamarin-tutorial-lemma-1.png"
+      <p><img src="../images/tamarin-tutorial-lemma-1.jpeg"
       title="FirstExample Lemma 1" style="width:100.0%"
       alt="FirstExample Lemma 1" /><br />
       </p>
@@ -531,7 +538,7 @@ Finished loading theories ... server ready at
       the length of the trace. Here we use the default strategy, i.e., a
       simplification step by clicking on <code>1. simplify</code>, to
       obtain the following screen:</p>
-      <p><img src="../images/tamarin-tutorial-lemma-1-simplify.png"
+      <p><img src="../images/tamarin-tutorial-lemma-1-simplify.jpeg"
       title="FirstExample Lemma 1 Step 1" style="width:100.0%"
       alt="FirstExample Lemma 1 Step 1" /><br />
       </p>
@@ -548,7 +555,20 @@ Finished loading theories ... server ready at
       <pre><code>formulas: ∀ #r. (LtkReveal( S ) @ #r) ⇒ ⊥</code></pre>
       <p>now states that any occurrence of <code>LtkReveal( S )</code>
       will lead to a contradiction.</p>
-      <p>To finish the proof, we can either continue manually by
+      <p>We can either inspect the graph in the main window, or we can
+      open the graph in another window by clicking the
+      <code>Open the Graph in New Tab</code> link or the
+      <code>Popout</code> button under certain graphs. The links under
+      graphs in the resources tab (Raw Resources or Refined Resources)
+      or of the subcases under the main proof steps will open the same
+      graph in a new tab. The buttons under the main proof graph will
+      open the same graph in a new window with dynamic rendering
+      enabled; i.e., when we navigate through the proof steps (either by
+      clicking at a certain proof step or using the <code>j</code> or
+      <code>k</code> keys), the graph in the new window will change
+      accordingly. This is especially useful when working with large
+      proof graphs.</p>
+      <p>To finish the proof at hand, we can either continue manually by
       selecting the constraint to resolve next, or by calling the
       <code>autoprove</code> command, which selects the next steps based
       on a heuristic. Here we have two constraints to resolve:
@@ -566,7 +586,7 @@ Finished loading theories ... server ready at
       constraint or by using the autoprover, we end with the following
       final state, where the constructed graph leads to a contradiction
       as it contains <code>LtkReveal( S )</code>:</p>
-      <p><img src="../images/tamarin-tutorial-lemma-1-finished.png"
+      <p><img src="../images/tamarin-tutorial-lemma-1-finished.jpeg"
       title="FirstExample Lemma 1 Finished" style="width:100.0%"
       alt="FirstExample Lemma 1 Finished" /><br />
       </p>

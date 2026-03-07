@@ -209,12 +209,13 @@ snd(pair(x,y)) = y</code></pre>
       <dt><code>diffie-hellman</code>:</dt>
       <dd>
       <p>This theory models Diffie-Hellman groups. It defines the
-      function symbols <code>inv/1</code>, <code>1/0</code>, and the
-      symbols <code>^</code> and <code>*</code>. We use
-      <code>g ^ a</code> to denote exponentiation in the group and
-      <code>*</code>, <code>inv</code> and <code>1</code> to model the
-      (multiplicative) abelian group of exponents (the integers modulo
-      the group order). The set of defined equations is:</p>
+      function symbols <code>inv/1</code>, <code>1/0</code>,
+      <code>DH_neutral/0</code>, and the symbols <code>^</code> and
+      <code>*</code>. We use <code>g ^ a</code> to denote exponentiation
+      in the group and <code>*</code>, <code>inv</code> and
+      <code>1</code> to model the (multiplicative) abelian group of
+      exponents (the integers modulo the group order). The set of
+      defined equations is:</p>
       </dd>
       </dl>
       <pre><code>(x^y)^z  = x^(y*z)
@@ -222,7 +223,8 @@ x^1      = x
 x*y      = y*x
 (x*y)*z  = x*(y*z)
 x*1      = x
-x*inv(x) = 1</code></pre>
+x*inv(x) = 1
+DH_neutral^x = DH_neutral</code></pre>
       <dl>
       <dt><code>bilinear-pairing</code>:</dt>
       <dd>
@@ -239,7 +241,7 @@ x*inv(x) = 1</code></pre>
       <pre><code>pmult(x,(pmult(y,p)) = pmult(x*y,p)
 pmult(1,p)           = p
 em(p,q)              = em(q,p)
-em(pmult(x,p),q)     = pmult(x,em(q,p))</code></pre>
+em(pmult(x,p),q)     = em(p,q)^x</code></pre>
       <dl>
       <dt><code>xor</code>:</dt>
       <dd>
