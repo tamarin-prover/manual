@@ -360,7 +360,7 @@ search_method := &#39;DFS&#39; | &#39;BFS&#39; | &#39;SEQDFS&#39; | &#39;SORRY&#
       used to track the exponentiation tags. See the
       <code>loops/Crypto_API_Simple.spthy</code> example for more
       information.</p>
-      <pre class="tamarin"><code>  _facts  ::=  &lt;(_fact (&#39;,&#39; _fact)*)
+      <pre class="tamarin"><code>  _facts  ::=  &lt;(_fact (&#39;,&#39; _fact)* &#39;,&#39;?)
   _fact  ::=  (fact -&gt; linear_fact) 
                      | (&#39;!&#39; (fact -&gt; persistent_fact))
   fact_annotes  ::=  &#39;[&#39; fact_annote (&#39;,&#39; fact_annote)* &#39;]&#39;
@@ -416,7 +416,7 @@ conflicts  ::=  { { pub_var } { fresh_var } { temporal_var } { nat_var } { pub_v
 
 externals  ::=  { multi_comment single_comment }
 
-precedences  ::=  { { &#39;PROCESS&#39; &#39;NESTED&#39; &#39;FUNCTION&#39; &#39;VARIABLE&#39; &#39;EXPONENTIAL&#39; &#39;MULTIPLY&#39; &#39;ADD&#39; &#39;MUL_SET&#39; &#39;TUPLE&#39; &#39;NULLARY_FUN&#39; &#39;ATOM&#39; &#39;LOGICAL_NOT&#39; &#39;EXCLUSIVE_OR&#39; &#39;LOGICAL_AND&#39; &#39;LOGICAL_OR&#39; &#39;LOGICAL_IMPLICATION&#39; &#39;LOGICAL_IFF&#39; &#39;CHAIN_CONSTRAINT&#39; } { &#39;NON_DIFF&#39; &#39;DIFF&#39; } { &#39;REPLICATION&#39; &#39;EVENT&#39; &#39;CHOICE&#39; &#39;PROCESS_LET&#39; &#39;LOOKUP&#39; &#39;CONDITIONAL&#39; } }
+precedences  ::=  { { &#39;PROCESS&#39; &#39;NESTED&#39; &#39;FUNCTION&#39; &#39;VARIABLE&#39; &#39;EXPONENTIAL&#39; &#39;MULTIPLY&#39; &#39;ADD&#39; &#39;MUL_SET&#39; &#39;TUPLE&#39; &#39;NULLARY_FUN&#39; &#39;ATOM&#39; &#39;LOGICAL_NOT&#39; &#39;EXCLUSIVE_OR&#39; &#39;LOGICAL_AND&#39; &#39;LOGICAL_OR&#39; &#39;LOGICAL_IMPLICATION&#39; &#39;LOGICAL_IFF&#39; &#39;QUANTIFIER&#39; &#39;CHAIN_CONSTRAINT&#39; } { &#39;NON_DIFF&#39; &#39;DIFF&#39; } { &#39;REPLICATION&#39; &#39;EVENT&#39; &#39;CHOICE&#39; &#39;PROCESS_LET&#39; &#39;LOOKUP&#39; &#39;CONDITIONAL&#39; } }
 
 word  ::=  ident
 
@@ -521,8 +521,8 @@ rules:
   macros  ::=  &#39;macros&#39; &#39;:&#39; macro (&#39;,&#39; macro)*
   macro  ::=  (ident: macro_identifier) &#39;(&#39; (_non_temporal_var (&#39;,&#39; _non_temporal_var)*)? &#39;)&#39; &#39;=&#39; (mset_term: term)
   embedded_restriction  ::=  &#39;_restrict&#39; &#39;(&#39; (_formula: formula) &#39;)&#39;
-  _facts_restrictions  ::=  &lt;((_fact | embedded_restriction) (&#39;,&#39; (_fact | embedded_restriction))*)
-  _facts  ::=  &lt;(_fact (&#39;,&#39; _fact)*)
+  _facts_restrictions  ::=  &lt;((_fact | embedded_restriction) (&#39;,&#39; (_fact | embedded_restriction))* &#39;,&#39;?)
+  _facts  ::=  &lt;(_fact (&#39;,&#39; _fact)* &#39;,&#39;?)
   _fact  ::=  (fact -&gt; linear_fact) | (&#39;!&#39; (fact -&gt; persistent_fact))
   fact  ::=  &lt;((ident: fact_identifier) &#39;(&#39; arguments? &#39;)&#39; fact_annotes?)
   fact_annotes  ::=  &#39;[&#39; fact_annote (&#39;,&#39; fact_annote)* &#39;]&#39;
@@ -596,7 +596,7 @@ rules:
   temp_var_eq  ::=  ATOM(((temporal_var_optional_prefix -&gt; temporal_var): left) &#39;=&#39; ((temporal_var_optional_prefix -&gt; temporal_var): right))
   term_eq  ::=  ATOM((mset_term: left) &#39;=&#39; (mset_term: right))
   subterm_rel  ::=  ATOM((mset_term: left) (&#39;&lt;&lt;&#39; | &#39;⊏&#39;) (mset_term: right))
-  quantified_formula  ::=  ATOM((&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;) (_lvar+: variable) &#39;.&#39; (_formula: formula))
+  quantified_formula  ::=  QUANTIFIER((&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;) (_lvar+: variable) &#39;.&#39; (_formula: formula))
   atom  ::=  ATOM(&#39;⊥&#39; | &#39;F&#39; | &#39;⊤&#39; | &#39;T&#39;)
   _lvar  ::=  temporal_var | _non_temporal_var
   predicate_ref  ::=  FUNCTION((ident: predicate_identifier) &#39;(&#39; arguments? &#39;)&#39;)
