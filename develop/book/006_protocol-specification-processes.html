@@ -371,7 +371,7 @@ out(h(h(x)));                          // implictely types h as lol-&gt;lol
       of the translation is proven in <span class="citation"
       data-cites="sapicplus">(Cheval et al. 2022)</span>.</p>
       <p>The <code>-m</code> flag selects an output module:</p>
-      <pre><code> -m --output-module[=spthy|spthytyped|msr|proverif|deepsec]</code></pre>
+      <pre><code> -m --output-module[=spthy|spthytyped|msr|proverif|proverifequiv|deepsec]</code></pre>
       <p>The following outputs are supported:</p>
       <ul>
       <li><em>spthy:</em> parse .spthy file and output</li>
@@ -381,9 +381,13 @@ out(h(h(x)));                          // implictely types h as lol-&gt;lol
       processes to multiset-rewrite rules</li>
       <li><em>proverif</em>: - translate to the <a
       href="https://bblanche.gitlabpages.inria.fr/proverif/">ProVerif</a>
-      input format. The translation of lookups/inserts relies on
-      features that are not yet available in ProVerif (at the time of
-      writing) and require preprocessing with <a
+      input format. The export supports SAPIC processes and multiset
+      rewrite rules. It also translates supported Tamarin restrictions,
+      selected lemmas as ProVerif queries, and <code>reuse</code> or
+      <code>sources</code> lemmas as ProVerif axioms. The translation of
+      lookups/inserts relies on features that are not yet available in
+      ProVerif (at the time of writing) and require preprocessing with
+      <a
       href="https://gitlab.inria.fr/chevalvi/gsverif/-/tree/protocol_platform?ref_type=heads">GSVerif’s
       protocol platform branch</a>.</li>
       <li><em>proverifequiv</em>: - same as <code>proverif</code>, but
@@ -400,6 +404,30 @@ out(h(h(x)));                          // implictely types h as lol-&gt;lol
       <pre><code>lemma secrecy[reuse, output=[proverif,msr]]:</code></pre>
       <p>Lemmas are omitted when the currently selected output module is
       not in that list.</p>
+      <p>For <code>-m=proverif</code>, regular lemmas are exported as
+      ProVerif queries. Lemmas annotated with <code>reuse</code> or
+      <code>sources</code> are instead exported as ProVerif axioms, so
+      that they can be used as assumptions for the exported queries. If
+      <code>--lemma</code> is used to select a specific lemma, the
+      selected lemma is exported as a query; other <code>reuse</code>
+      and <code>sources</code> lemmas may still be exported as
+      supporting axioms unless this is disabled with the flags
+      below.</p>
+      <p>The ProVerif export has additional control flags:</p>
+      <ul>
+      <li><code>--proverif-no-reuse-lemmas</code>: do not export
+      <code>reuse</code> lemmas as ProVerif axioms.</li>
+      <li><code>--proverif-no-source-lemmas</code>: do not export
+      <code>sources</code> lemmas as ProVerif axioms.</li>
+      <li><code>--proverif-no-restrictions</code>: do not export
+      restrictions.</li>
+      <li><code>--proverif-no-multiset</code>: do not add the encoding
+      that enforces Tamarin’s linear multiset semantics in
+      ProVerif.</li>
+      <li><code>--proverif-no-precise</code>: do not emit
+      <code>set preciseActions = true.</code> in the generated ProVerif
+      file.</li>
+      </ul>
       <h2 id="exporting-queries">Exporting queries</h2>
       <p>Security properties are automatically translated, if it is
       possible. (ProVerif only supports two quantifier alternations, for
