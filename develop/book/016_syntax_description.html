@@ -175,7 +175,7 @@
   rule_let_block  ::=  &#39;let&#39; rule_let_term+ &#39;in&#39;
   rule_let_term  ::=  ((msg_var_or_nullary_fun 
                                | nat_var): left) &#39;=&#39; (mset_term: right)
-  msg_var_or_nullary_fun  ::=  VARIABLE((ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;msg&#39;)?)
+  msg_var_or_nullary_fun  ::=  VARIABLE((_term_ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;msg&#39;)?)
   hexcolor  ::=  (&#39;&#39;&#39; @(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/) &#39;&#39;&#39;) 
                                | (@(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/))</code></pre>
       <p>Rule annotations do not influence the rule’s semantics. A color
@@ -317,8 +317,8 @@ search_method := &#39;DFS&#39; | &#39;BFS&#39; | &#39;SEQDFS&#39; | &#39;SORRY&#
     nary_app    := nary_fun &#39;(&#39; multterm* &#39;)&#39;</code></pre>
       <p>External tools may instead use the following grammar and check
       these conditions after parsing.</p>
-      <pre class="tamarin"><code>  binary_app  ::=  FUNCTION((ident: function_identifier) &#39;{&#39; (arguments: argument) &#39;}&#39; (mset_term: argument))
-  nary_app  ::=  FUNCTION((ident: function_identifier) &#39;(&#39; arguments &#39;)&#39;)</code></pre>
+      <pre class="tamarin"><code>  binary_app  ::=  FUNCTION((_term_ident: function_identifier) &#39;{&#39; (arguments: argument) &#39;}&#39; (mset_term: argument))
+  nary_app  ::=  FUNCTION((_term_ident: function_identifier) &#39;(&#39; arguments &#39;)&#39;)</code></pre>
       <p>Literals and variables appear in many forms.</p>
       <pre class="tamarin"><code>  _literal  ::=  pub_name 
                           | fresh_name 
@@ -335,13 +335,13 @@ search_method := &#39;DFS&#39; | &#39;BFS&#39; | &#39;SEQDFS&#39; | &#39;SORRY&#
                                | fresh_var 
                                | msg_var_or_nullary_fun 
                                | nat_var
-  pub_var  ::=  VARIABLE((&#39;$&#39; (ident: variable_identifier) (&#39;.&#39; natural)?) 
-                               | ((ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;pub&#39;))
-  fresh_var  ::=  VARIABLE((&#39;~&#39; (ident: variable_identifier) (&#39;.&#39; natural)?) 
-                               | ((ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;fresh&#39;))
-  msg_var_or_nullary_fun  ::=  VARIABLE((ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;msg&#39;)?)
-  nat_var  ::=  (&#39;%&#39; (ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;nat&#39;)?) 
-                               | ((ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;nat&#39;)
+  pub_var  ::=  VARIABLE((&#39;$&#39; (_term_ident: variable_identifier) (&#39;.&#39; natural)?) 
+                               | ((_term_ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;pub&#39;))
+  fresh_var  ::=  VARIABLE((&#39;~&#39; (_term_ident: variable_identifier) (&#39;.&#39; natural)?) 
+                               | ((_term_ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;fresh&#39;))
+  msg_var_or_nullary_fun  ::=  VARIABLE((_term_ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;msg&#39;)?)
+  nat_var  ::=  (&#39;%&#39; (_term_ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;nat&#39;)?) 
+                               | ((_term_ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;nat&#39;)
   fresh_name  ::=  &#39;~&#39;&#39; /[^\n&#39;]+/ &#39;&#39;&#39;</code></pre>
       <p>SAPIC processes also have (optional) types. Moreover, literals
       in pattern can signify with a <code>=</code> if they are matched
@@ -412,7 +412,7 @@ lvar        := node_var | nonnode_var</code></pre>
       SAPIC+</a>.</p>
       <pre class="tamarin"><code>extras  ::=  { multi_comment single_comment /\s|\\\r?\n|\u00A0/ }
 
-conflicts  ::=  { { pub_var } { fresh_var } { temporal_var } { nat_var } { pub_var fresh_var msg_var_or_nullary_fun temporal_var nat_var } { pub_var fresh_var msg_var_or_nullary_fun nat_var } { nary_app predicate_ref } { nullary_fun nary_app msg_var_or_nullary_fun } }
+conflicts  ::=  { { pub_var } { fresh_var } { temporal_var } { nat_var } { pub_var fresh_var msg_var_or_nullary_fun temporal_var nat_var } { pub_var fresh_var msg_var_or_nullary_fun nat_var } { nary_app predicate_ref } { fact _term_ident } { nullary_fun nary_app msg_var_or_nullary_fun } }
 
 externals  ::=  { multi_comment single_comment }
 
@@ -426,7 +426,7 @@ rules:
   _search_strategy  ::=  &#39;BFS&#39; | &#39;DFS&#39; | &#39;SEQDFS&#39; | &#39;bfs&#39; | &#39;dfs&#39; | &#39;seqdfs&#39;
   _body_item  ::=  preprocessor | _signature_spec | global_heuristic | tactic | process | let | export | _rule | restriction | case_test | _lemma | formal_comment
   preprocessor  ::=  ifdef | define | include
-  ifdef  ::=  &#39;#ifdef&#39; _ifdef_formula _body_item* (&#39;#else&#39; _body_item*)? &#39;#endif&#39;
+  ifdef  ::=  &#39;#ifdef&#39; (_ifdef_formula: condition) (_body_item*: consequence) (&#39;#else&#39; (_body_item*: alternative))? &#39;#endif&#39;
   define  ::=  &#39;#define&#39; ident
   include  ::=  &#39;#include&#39; &#39;&quot;&#39; path &#39;&quot;&#39;
   _ifdef_formula  ::=  ifdef_nested | ifdef_or | ifdef_and | ifdef_not | ident
@@ -506,7 +506,7 @@ rules:
   rule_attrs  ::=  &#39;[&#39; rule_attr (&#39;,&#39; rule_attr)* &#39;,&#39;? &#39;]&#39;
   rule_attr  ::=  rule_attr_color | &#39;no_derivcheck&#39; | &#39;issapicrule&#39; | rule_process | rule_role | rule_extended_attribute
   rule_attr_color  ::=  (&#39;color=&#39; | &#39;colour=&#39;) hexcolor
-  rule_role  ::=  &#39;role&#39; &#39;=&#39; &#39;&#39;&#39; (ident: role_identifier) &#39;&#39;&#39;
+  rule_role  ::=  &#39;role&#39; &#39;=&#39; ((&#39;&quot;&#39; ((!(/[^&quot;\r\n]+/) -&gt; ident): role_identifier)? &#39;&quot;&#39;) | (&#39;&#39;&#39; ((!(/[^&#39;\r\n]+/) -&gt; ident): role_identifier)? &#39;&#39;&#39;))
   rule_process  ::=  &#39;process&#39; &#39;=&#39; &#39;&#39;&#39; ident &#39;&#39;&#39;
   rule_extended_attribute  ::=  (xattribute_ident: extended_attribute_name) (&#39;=&#39; ((&#39;[&#39; (no_square_brackets: extended_attribute_value) &#39;]&#39;) | (&#39;(&#39; (no_round_brackets: extended_attribute_value) &#39;)&#39;) | (&#39;{&#39; (no_curly_brackets: extended_attribute_value) &#39;}&#39;) | (&#39;&quot;&#39; (no_double_quotes: extended_attribute_value) &#39;&quot;&#39;) | (&#39;&#39;&#39; (no_single_quotes: extended_attribute_value) &#39;&#39;&#39;) | (&#39;|&#39; (no_pipe: extended_attribute_value) &#39;|&#39;)))?
   xattribute_ident  ::=  @(-1(/x-[a-zA-Z_]+/))
@@ -524,7 +524,7 @@ rules:
   _facts_restrictions  ::=  &lt;((_fact | embedded_restriction) (&#39;,&#39; (_fact | embedded_restriction))* &#39;,&#39;?)
   _facts  ::=  &lt;(_fact (&#39;,&#39; _fact)* &#39;,&#39;?)
   _fact  ::=  (fact -&gt; linear_fact) | (&#39;!&#39; (fact -&gt; persistent_fact))
-  fact  ::=  &lt;((ident: fact_identifier) &#39;(&#39; arguments? &#39;)&#39; fact_annotes?)
+  fact  ::=  &lt;(((fact_identifier -&gt; ident): fact_identifier) &#39;(&#39; arguments? &#39;)&#39; fact_annotes?)
   fact_annotes  ::=  &#39;[&#39; fact_annote (&#39;,&#39; fact_annote)* &#39;]&#39;
   fact_annote  ::=  &#39;+&#39; | &#39;-&#39; | &#39;no_precomp&#39;
   restriction  ::=  (&#39;restriction&#39; | &#39;axiom&#39;) (ident: restriction_identifier) restriction_attr? &#39;:&#39; &#39;&quot;&#39; (_formula: formula) &#39;&quot;&#39;
@@ -558,29 +558,29 @@ rules:
   disjunction_split_constraint  ::=  CHAIN_CONSTRAINT((_formula: formula) ((&#39;||&#39; | &#39;∥&#39;) (_formula: formula))+)
   eq_split_constraint  ::=  &#39;splitEqs&#39; &#39;(&#39; natural &#39;)&#39;
   _term  ::=  tuple_term | nested_term | nullary_fun | binary_app | nary_app | _literal
-  tuple_term  ::=  TUPLE(&#39;&lt;&#39; (mset_term: left) (&#39;,&#39; (mset_term: right))* &#39;&gt;&#39;)
+  tuple_term  ::=  TUPLE(&#39;&lt;&#39; ((mset_term: left) (&#39;,&#39; (mset_term: right))*)? &#39;&gt;&#39;)
   mset_term  ::=  &lt;MUL_SET((nat_term: left) ((&#39;++&#39; | &#39;+&#39;) (nat_term: right))*)
   nat_term  ::=  &lt;ADD((xor_term: left) (&#39;%+&#39; (xor_term: right))*)
   xor_term  ::=  &lt;EXCLUSIVE_OR((mul_term: left) ((&#39;XOR&#39; | &#39;⊕&#39;) (mul_term: right))*)
   mul_term  ::=  &lt;MULTIPLY((exp_term: left) (&#39;*&#39; (exp_term: right))*)
   exp_term  ::=  &gt;EXPONENTIAL((_term: base) (&#39;^&#39; (_term: exponent))*)
   nested_term  ::=  NESTED(&#39;(&#39; mset_term &#39;)&#39;)
-  nullary_fun  ::=  NULLARY_FUN((ident: function_identifier) | ((ident: function_identifier) &#39;(&#39; &#39;)&#39;))
-  binary_app  ::=  FUNCTION((ident: function_identifier) &#39;{&#39; (arguments: argument) &#39;}&#39; (mset_term: argument))
-  nary_app  ::=  FUNCTION((ident: function_identifier) &#39;(&#39; arguments &#39;)&#39;)
+  nullary_fun  ::=  NULLARY_FUN((_term_ident: function_identifier) | ((_term_ident: function_identifier) &#39;(&#39; &#39;)&#39;))
+  binary_app  ::=  FUNCTION((_term_ident: function_identifier) &#39;{&#39; (arguments: argument) &#39;}&#39; (mset_term: argument))
+  nary_app  ::=  FUNCTION((_term_ident: function_identifier) &#39;(&#39; arguments &#39;)&#39;)
   arguments  ::=  ((mset_term | temporal_var): argument) (&#39;,&#39; (mset_term: argument))*
   _literal  ::=  pub_name | fresh_name | _non_temporal_var | comp_var | _custom_type_var
   _non_temporal_var  ::=  pub_var | fresh_var | msg_var_or_nullary_fun | nat_var
-  pub_var  ::=  VARIABLE((&#39;$&#39; (ident: variable_identifier) (&#39;.&#39; natural)?) | ((ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;pub&#39;))
-  fresh_var  ::=  VARIABLE((&#39;~&#39; (ident: variable_identifier) (&#39;.&#39; natural)?) | ((ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;fresh&#39;))
-  msg_var_or_nullary_fun  ::=  VARIABLE((ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;msg&#39;)?)
-  temporal_var  ::=  (&#39;#&#39; (ident: variable_identifier) (&#39;.&#39; natural)?) | ((ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;node&#39;)
-  nat_var  ::=  (&#39;%&#39; (ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;nat&#39;)?) | ((ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;nat&#39;)
+  pub_var  ::=  VARIABLE((&#39;$&#39; (_term_ident: variable_identifier) (&#39;.&#39; natural)?) | ((_term_ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;pub&#39;))
+  fresh_var  ::=  VARIABLE((&#39;~&#39; (_term_ident: variable_identifier) (&#39;.&#39; natural)?) | ((_term_ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;fresh&#39;))
+  msg_var_or_nullary_fun  ::=  VARIABLE((_term_ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;msg&#39;)?)
+  temporal_var  ::=  (&#39;#&#39; (_term_ident: variable_identifier) (&#39;.&#39; natural)?) | ((_term_ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;node&#39;)
+  nat_var  ::=  (&#39;%&#39; (_term_ident: variable_identifier) (&#39;.&#39; natural)? (&#39;:&#39; &#39;nat&#39;)?) | ((_term_ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;nat&#39;)
   comp_var  ::=  &#39;=&#39; _literal
   _custom_type_var  ::=  custom_var | any_var
   custom_var  ::=  -1(_literal &#39;:&#39; (ident: variable_type))
   any_var  ::=  -1(_literal &#39;:&#39; &#39;ANY&#39;)
-  temporal_var_optional_prefix  ::=  NULLARY_FUN((&#39;#&#39;? (ident: variable_identifier) (&#39;.&#39; natural)?) | ((ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;temporal&#39;))
+  temporal_var_optional_prefix  ::=  NULLARY_FUN((&#39;#&#39;? (_term_ident: variable_identifier) (&#39;.&#39; natural)?) | ((_term_ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;temporal&#39;))
   pub_name  ::=  &#39;&#39;&#39; /[^\n&#39;]+/ &#39;&#39;&#39;
   fresh_name  ::=  &#39;~&#39;&#39; /[^\n&#39;]+/ &#39;&#39;&#39;
   _formula  ::=  iff | imp | disjunction | conjunction | negation | nested_formula | _temporal_variable_operation | action_constraint | term_eq | subterm_rel | quantified_formula | atom | predicate_ref | pre_defined
@@ -599,9 +599,11 @@ rules:
   quantified_formula  ::=  QUANTIFIER((&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;) (_lvar+: variable) &#39;.&#39; (_formula: formula))
   atom  ::=  ATOM(&#39;⊥&#39; | &#39;F&#39; | &#39;⊤&#39; | &#39;T&#39;)
   _lvar  ::=  temporal_var | _non_temporal_var
-  predicate_ref  ::=  FUNCTION((ident: predicate_identifier) &#39;(&#39; arguments? &#39;)&#39;)
-  pre_defined  ::=  NULLARY_FUN(ident)
+  predicate_ref  ::=  FUNCTION((_term_ident: predicate_identifier) &#39;(&#39; arguments? &#39;)&#39;)
+  pre_defined  ::=  NULLARY_FUN(_term_ident)
+  _term_ident  ::=  ident | (fact_identifier -&gt; ident)
   hexcolor  ::=  (&#39;&#39;&#39; @(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/) &#39;&#39;&#39;) | (@(&#39;#&#39;)? @(/[0-9a-fA-F]{1,6}/))
+  fact_identifier  ::=  @(1(/[A-Z][A-Za-z0-9_]*/))
   ident  ::=  /[A-Za-z0-9]\w*/
   param  ::=  /[^&quot;]*/
   path  ::=  /[A-Za-z0-9-\_]*/
