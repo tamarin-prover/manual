@@ -81,13 +81,20 @@
       functions have been defined. It will only parse function
       applications of defined functions.</p>
       <pre class="tamarin"><code>  _signature_spec  ::=  built_ins 
-                            | functions 
-                            | equations 
-                            | predicates 
-                            | macros 
-                            | options
+                           | functions 
+                           | equations 
+                           | predicates 
+                           | macros 
+                           | options
   _function_sym  ::=  function_untyped 
-                            | function_typed
+                           | function_typed
+  function_untyped  ::=  (ident: function_identifier) &#39;/&#39; (natural: arity) (&#39;[&#39; function_attribute (&#39;,&#39; function_attribute)* &#39;,&#39;? &#39;]&#39;)?
+  function_attribute  ::=  &#39;private&#39; 
+                           | &#39;destructor&#39; 
+                           | &#39;AC&#39; 
+                           | &#39;NDC&#39; 
+                           | &#39;NDC-diff&#39;
+  function_typed  ::=  (ident: function_identifier) &#39;(&#39; arguments? &#39;)&#39; &#39;:&#39; (ident: function_type)
   equations  ::=  &gt;(&#39;equations&#39; (&#39;[&#39; &#39;convergent&#39; &#39;]&#39;)? &#39;:&#39; equation (&#39;,&#39; equation)* &#39;,&#39;?)
   equation  ::=  (mset_term: left) &#39;=&#39; (mset_term: right)</code></pre>
       <p>Note that the equations must be convergent and have the Finite
@@ -440,7 +447,7 @@ rules:
   functions  ::=  &gt;(&#39;functions&#39; &#39;:&#39; _function_sym (&#39;,&#39; _function_sym)* &#39;,&#39;?)
   _function_sym  ::=  function_untyped | function_typed
   function_untyped  ::=  (ident: function_identifier) &#39;/&#39; (natural: arity) (&#39;[&#39; function_attribute (&#39;,&#39; function_attribute)* &#39;,&#39;? &#39;]&#39;)?
-  function_attribute  ::=  &#39;private&#39; | &#39;destructor&#39;
+  function_attribute  ::=  &#39;private&#39; | &#39;destructor&#39; | &#39;AC&#39; | &#39;NDC&#39; | &#39;NDC-diff&#39;
   function_typed  ::=  (ident: function_identifier) &#39;(&#39; arguments? &#39;)&#39; &#39;:&#39; (ident: function_type)
   equations  ::=  &gt;(&#39;equations&#39; (&#39;[&#39; &#39;convergent&#39; &#39;]&#39;)? &#39;:&#39; equation (&#39;,&#39; equation)* &#39;,&#39;?)
   equation  ::=  (mset_term: left) &#39;=&#39; (mset_term: right)
