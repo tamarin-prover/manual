@@ -496,9 +496,8 @@ rules:
   read_state  ::=  &gt;LOOKUP(&#39;lookup&#39; (mset_term: from) &#39;as&#39; (_lvar: to) &#39;in&#39; (_process: in) (&#39;else&#39; (_process: else))? (&#39;;&#39; _process)?)
   set_lock  ::=  &gt;(&#39;lock&#39; mset_term (&#39;;&#39; _process)?)
   remove_lock  ::=  &gt;(&#39;unlock&#39; mset_term (&#39;;&#39; _process)?)
-  _condition  ::=  equality_check | lesser_check | predicate_ref
-  equality_check  ::=  (mset_term | _formula) @(1(&#39;=&#39;)) (mset_term | _formula)
-  lesser_check  ::=  mset_term (&#39;(&lt;)&#39; | &#39;&lt;&lt;&#39;) mset_term
+  _condition  ::=  equality_check | _formula
+  equality_check  ::=  mset_term @(1(&#39;=&#39;)) mset_term
   let  ::=  &#39;let&#39; (mset_term: let_identifier) &#39;=&#39; _process
   export  ::=  &#39;export&#39; (ident: export_identifier) &#39;:&#39; &#39;&quot;&#39; export_query &#39;&quot;&#39;
   _rule  ::=  rule | diff_rule
@@ -590,7 +589,7 @@ rules:
   temporal_var_optional_prefix  ::=  NULLARY_FUN((&#39;#&#39;? (_term_ident: variable_identifier) (&#39;.&#39; natural)?) | ((_term_ident: variable_identifier) (&#39;.&#39; natural)? &#39;:&#39; &#39;temporal&#39;))
   pub_name  ::=  &#39;&#39;&#39; /[^\n&#39;]+/ &#39;&#39;&#39;
   fresh_name  ::=  &#39;~&#39;&#39; /[^\n&#39;]+/ &#39;&#39;&#39;
-  _formula  ::=  iff | imp | disjunction | conjunction | negation | nested_formula | _temporal_variable_operation | action_constraint | term_eq | subterm_rel | quantified_formula | atom | predicate_ref | pre_defined
+  _formula  ::=  iff | imp | disjunction | conjunction | negation | nested_formula | _temporal_variable_operation | action_constraint | term_eq | subterm_rel | lesser_check | quantified_formula | atom | predicate_ref | pre_defined
   iff  ::=  &lt;LOGICAL_IFF((_formula: left) (&#39;&lt;=&gt;&#39; | &#39;⇔&#39;) (_formula: right))
   imp  ::=  &lt;LOGICAL_IMPLICATION((_formula: left) (@(1(&#39;==&gt;&#39;)) | &#39;⇒&#39;) (_formula: right))
   disjunction  ::=  &lt;LOGICAL_OR((_formula: left) (&#39;|&#39; | &#39;∨&#39;) (_formula: right))
@@ -603,6 +602,7 @@ rules:
   temp_var_eq  ::=  ATOM(((temporal_var_optional_prefix -&gt; temporal_var): left) &#39;=&#39; ((temporal_var_optional_prefix -&gt; temporal_var): right))
   term_eq  ::=  ATOM((mset_term: left) &#39;=&#39; (mset_term: right))
   subterm_rel  ::=  ATOM((mset_term: left) (&#39;&lt;&lt;&#39; | &#39;⊏&#39;) (mset_term: right))
+  lesser_check  ::=  ATOM((mset_term: left) &#39;(&lt;)&#39; (mset_term: right))
   quantified_formula  ::=  QUANTIFIER((&#39;Ex&#39; | &#39;∃&#39; | &#39;All&#39; | &#39;∀&#39;) (_lvar+: variable) &#39;.&#39; (_formula: formula))
   atom  ::=  ATOM(&#39;⊥&#39; | &#39;F&#39; | &#39;⊤&#39; | &#39;T&#39;)
   _lvar  ::=  temporal_var | _non_temporal_var
