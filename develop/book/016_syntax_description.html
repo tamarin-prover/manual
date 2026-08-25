@@ -199,7 +199,7 @@ in [] --&gt; [ A(y)]    is desugared to    [] --&gt; [ A(&lt;z,y&gt;) ]</code></
       on the right-hand side.</p>
       <p>Macros works similarly to let-blocks, but apply globally to all
       rules.</p>
-      <pre class="tamarin"><code>  macros  ::=  &#39;macros&#39; &#39;:&#39; macro (&#39;,&#39; macro)*
+      <pre class="tamarin"><code>  macros  ::=  &gt;(&#39;macros&#39; &#39;:&#39; macro (&#39;,&#39; macro)* &#39;,&#39;?)
   macro  ::=  (ident: macro_identifier) &#39;(&#39; (_non_temporal_var (&#39;,&#39; _non_temporal_var)*)? &#39;)&#39; &#39;=&#39; (mset_term: term)
   _non_temporal_var  ::=  pub_var 
                           | fresh_var 
@@ -368,8 +368,8 @@ search_method := &#39;DFS&#39; | &#39;BFS&#39; | &#39;SEQDFS&#39; | &#39;SORRY&#
       <code>loops/Crypto_API_Simple.spthy</code> example for more
       information.</p>
       <pre class="tamarin"><code>  _facts  ::=  &lt;(_fact (&#39;,&#39; _fact)* &#39;,&#39;?)
-  _fact  ::=  (fact -&gt; linear_fact) 
-                     | (&#39;!&#39; (fact -&gt; persistent_fact))
+  _fact  ::=  linear_fact 
+                     | persistent_fact
   fact_annotes  ::=  &#39;[&#39; fact_annote (&#39;,&#39; fact_annote)* &#39;]&#39;
   fact_annote  ::=  &#39;+&#39; 
                      | &#39;-&#39; 
@@ -419,7 +419,7 @@ lvar        := node_var | nonnode_var</code></pre>
       SAPIC+</a>.</p>
       <pre class="tamarin"><code>extras  ::=  { multi_comment single_comment /\s|\\\r?\n|\u00A0/ }
 
-conflicts  ::=  { { pub_var } { fresh_var } { temporal_var } { nat_var } { pub_var fresh_var msg_var_or_nullary_fun temporal_var nat_var } { pub_var fresh_var msg_var_or_nullary_fun nat_var } { nary_app predicate_ref } { fact _term_ident } { nullary_fun nary_app msg_var_or_nullary_fun } }
+conflicts  ::=  { { pub_var } { fresh_var } { temporal_var } { nat_var } { pub_var fresh_var msg_var_or_nullary_fun temporal_var nat_var } { pub_var fresh_var msg_var_or_nullary_fun nat_var } { nary_app predicate_ref } { _base_fact _term_ident } { nullary_fun nary_app msg_var_or_nullary_fun } }
 
 externals  ::=  { multi_comment single_comment }
 
@@ -451,9 +451,8 @@ rules:
   function_typed  ::=  (ident: function_identifier) &#39;(&#39; arguments? &#39;)&#39; &#39;:&#39; (ident: function_type)
   equations  ::=  &gt;(&#39;equations&#39; (&#39;[&#39; &#39;convergent&#39; &#39;]&#39;)? &#39;:&#39; equation (&#39;,&#39; equation)* &#39;,&#39;?)
   equation  ::=  (mset_term: left) &#39;=&#39; (mset_term: right)
-  predicates  ::=  (&#39;predicate&#39; | &#39;predicates&#39;) &#39;:&#39; predicate (&#39;,&#39; predicate)*
-  predicate  ::=  (predicate_def -&gt; &#39;&#39;) &#39;&lt;=&gt;&#39; (_formula: formula)
-  predicate_def  ::=  (ident: predicate_identifier) &#39;(&#39; arguments? &#39;)&#39;
+  predicates  ::=  &gt;((&#39;predicate&#39; | &#39;predicates&#39;) &#39;:&#39; predicate (&#39;,&#39; predicate)* &#39;,&#39;?)
+  predicate  ::=  (ident: predicate_identifier) &#39;(&#39; arguments? &#39;)&#39; &#39;&lt;=&gt;&#39; (_formula: formula)
   options  ::=  &#39;options&#39; &#39;:&#39; option (&#39;,&#39; option)* &#39;,&#39;?
   option  ::=  &#39;translation-state-optimisation&#39; | &#39;translation-progress&#39; | &#39;translation-asynchronous-channels&#39; | &#39;translation-compress-events&#39; | &#39;translation-allow-pattern-lookups&#39;
   global_heuristic  ::=  &#39;heuristic&#39; &#39;:&#39; (_proof_method_ranking+: proof_method_ranking)
@@ -473,13 +472,13 @@ rules:
   std_function  ::=  function_name (&#39;&quot;&#39; param &#39;&quot;&#39;)*
   function_name  ::=  &#39;regex&#39; | &#39;isFactName&#39; | &#39;isInFactTerms&#39; | &#39;dhreNoise&#39; | &#39;defaultNoise&#39; | &#39;reasonableNoncesNoise&#39; | &#39;nonAbsurdConstraint&#39;
   process  ::=  &#39;process&#39; &#39;:&#39; _process
-  _process  ::=  _elementary_process | _extended_process | _stateful_process | inline_msr_process | _nested_process | location_process | predefined_process
+  _process  ::=  _elementary_process | _extended_process | _stateful_process | inline_msr_process | nested_process | location_process | predefined_process
   _elementary_process  ::=  binding | output | input | conditional | process_let | deterministic_choice | non_deterministic_choice | null
   _extended_process  ::=  event | replication
   _stateful_process  ::=  set_state | delete_state | read_state | set_lock | remove_lock
   location_process  ::=  &#39;(&#39; _process &#39;)&#39; &#39;@&#39; ((_literal | tuple_term): location_identifier)
   inline_msr_process  ::=  &gt;(premise (&#39;--&gt;&#39; | action_fact) conclusion (&#39;;&#39; _process)?)
-  _nested_process  ::=  &#39;(&#39; _process &#39;)&#39;
+  nested_process  ::=  &#39;(&#39; _process &#39;)&#39;
   predefined_process  ::=  &lt;PROCESS(mset_term)
   binding  ::=  &gt;(&#39;new&#39; _literal (&#39;;&#39; _process)?)
   output  ::=  &gt;((&#39;out&#39; &#39;(&#39; mset_term &#39;,&#39; mset_term &#39;)&#39; (&#39;;&#39; _process)?) | (&#39;out&#39; &#39;(&#39; mset_term &#39;)&#39; (&#39;;&#39; _process)?))
@@ -524,13 +523,15 @@ rules:
   no_pipe  ::=  @(-1(/[^|]*/))
   rule_let_block  ::=  &#39;let&#39; rule_let_term+ &#39;in&#39;
   rule_let_term  ::=  ((msg_var_or_nullary_fun | nat_var): left) &#39;=&#39; (mset_term: right)
-  macros  ::=  &#39;macros&#39; &#39;:&#39; macro (&#39;,&#39; macro)*
+  macros  ::=  &gt;(&#39;macros&#39; &#39;:&#39; macro (&#39;,&#39; macro)* &#39;,&#39;?)
   macro  ::=  (ident: macro_identifier) &#39;(&#39; (_non_temporal_var (&#39;,&#39; _non_temporal_var)*)? &#39;)&#39; &#39;=&#39; (mset_term: term)
   embedded_restriction  ::=  &#39;_restrict&#39; &#39;(&#39; (_formula: formula) &#39;)&#39;
   _facts_restrictions  ::=  &lt;((_fact | embedded_restriction) (&#39;,&#39; (_fact | embedded_restriction))* &#39;,&#39;?)
   _facts  ::=  &lt;(_fact (&#39;,&#39; _fact)* &#39;,&#39;?)
-  _fact  ::=  (fact -&gt; linear_fact) | (&#39;!&#39; (fact -&gt; persistent_fact))
-  fact  ::=  &lt;(((fact_identifier -&gt; ident): fact_identifier) &#39;(&#39; arguments? &#39;)&#39; fact_annotes?)
+  _fact  ::=  linear_fact | persistent_fact
+  linear_fact  ::=  _base_fact
+  persistent_fact  ::=  &#39;!&#39; _base_fact
+  _base_fact  ::=  &lt;(((fact_identifier -&gt; ident): fact_identifier) &#39;(&#39; arguments? &#39;)&#39; fact_annotes?)
   fact_annotes  ::=  &#39;[&#39; fact_annote (&#39;,&#39; fact_annote)* &#39;]&#39;
   fact_annote  ::=  &#39;+&#39; | &#39;-&#39; | &#39;no_precomp&#39;
   restriction  ::=  (&#39;restriction&#39; | &#39;axiom&#39;) (ident: restriction_identifier) restriction_attr? &#39;:&#39; &#39;&quot;&#39; (_formula: formula) &#39;&quot;&#39;
