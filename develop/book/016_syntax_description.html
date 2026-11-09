@@ -272,7 +272,8 @@ search_method := &#39;DFS&#39; | &#39;BFS&#39; | &#39;SEQDFS&#39; | &#39;SORRY&#
                                | &#39;induction&#39; 
                                | &#39;rule-equivalence&#39; 
                                | &#39;backward-search&#39; 
-                               | &#39;ATTACK&#39;
+                               | &#39;ATTACK&#39; 
+                               | &#39;UNFINISHABLE&#39;
   natural  ::=  /[0-9]+/
   natural_subscript  ::=  (&#39;₀&#39; 
                                | &#39;₁&#39; 
@@ -556,7 +557,7 @@ rules:
   cases  ::=  case (&#39;next&#39; case)* &#39;qed&#39;
   case  ::=  &#39;case&#39; (ident: case_identifier) (_proof_skeleton: proof_skeleton)
   _proof_methods  ::=  &gt;(proof_method | step+)
-  proof_method  ::=  &#39;sorry&#39; | &#39;simplify&#39; | (&#39;solve&#39; &#39;(&#39; constraint &#39;)&#39;) | &#39;contradiction&#39; | &#39;induction&#39; | &#39;rule-equivalence&#39; | &#39;backward-search&#39; | &#39;ATTACK&#39;
+  proof_method  ::=  &#39;sorry&#39; | &#39;simplify&#39; | (&#39;solve&#39; &#39;(&#39; constraint &#39;)&#39;) | &#39;contradiction&#39; | &#39;induction&#39; | &#39;rule-equivalence&#39; | &#39;backward-search&#39; | &#39;ATTACK&#39; | &#39;UNFINISHABLE&#39;
   step  ::=  &#39;step&#39; &#39;(&#39; proof_method &#39;)&#39;
   constraint  ::=  premise_constraint | action_constraint | chain_constraint | disjunction_split_constraint | eq_split_constraint
   premise_constraint  ::=  _fact &#39;▶&#39; natural_subscript temporal_var

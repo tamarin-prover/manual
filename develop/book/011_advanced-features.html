@@ -1074,6 +1074,19 @@ end</code></pre>
       <p><img src="../images/YellowSubterms.png" title="Subterms"
       style="width:100.0%" alt="Subterms" /><br />
       </p>
+      <p>A positive subterm constraint with an unresolved message
+      variable on its right, such as <code>n &lt;&lt; x</code>, can also
+      leave a branch incomplete. Even if the adversary may choose
+      <code>x</code>, the solver must establish that a derivable choice
+      contains <code>n</code>. For example, if a fresh <code>n</code> is
+      never sent, receiving an arbitrary <code>x</code> does not
+      establish a trace satisfying <code>n &lt;&lt; x</code>. Such a
+      branch is not a witness and is reported as incomplete. Further
+      constraints that determine <code>x</code> can still allow the
+      subterm constraint to be solved normally. The solver can also
+      finish an unconstrained message variable when a public containing
+      witness can be built without violating other constraints or
+      triggering additional restriction guards.</p>
       <h4 id="subterm-store">Subterm Store</h4>
       <p>Subterms are solved by recursively deconstructing the right
       side which basically boils down to replacing
