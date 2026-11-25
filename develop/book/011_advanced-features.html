@@ -1277,6 +1277,48 @@ dot -Tpng -O traces.dot</code></pre>
       graph as a separate entry in the same <code>"graphs"</code> list.
       These graphs can be viewed with <code>interactive</code> mode in
       the same way as dependency graphs from non-diff theories.</p>
+      <h2 id="sec:graph-simplification">Graph simplification levels</h2>
+      <p>Constraint systems can be shown with different levels of
+      simplification, both in the interactive GUI and in the output of
+      <code>--output-dot</code> and <code>--output-json</code>. The
+      levels are:</p>
+      <ul>
+      <li><p><strong>Level 0</strong>: no simplification. All nodes and
+      edges of the constraint system are shown, and intruder rules are
+      drawn in full like protocol rules. This is useful for detailed
+      inspection, but large graphs quickly become hard to read.</p></li>
+      <li><p><strong>Level 1</strong>: compression. Intruder rules are
+      drawn as small ellipses, and simple steps whose inputs and outputs
+      are all connected are hidden, such as the <code>isend</code>,
+      <code>irecv</code>, <code>coerce</code> and <code>Fr</code> rules,
+      and the adversary’s deduction of pairs, inverses, public names and
+      numbers. Ordering (dashed) edges that are already implied by the
+      other kinds of edges (fact edges and unsolved chains) are dropped,
+      whatever their origin.</p></li>
+      <li><p><strong>Level 2 (default)</strong>: as level 1, and
+      additionally drops ordering edges that are implied by paths
+      through other ordering edges (transitive reduction). This
+      reduction keeps ordering edges that come from the lemma’s formula
+      or from adversary reasoning, as they are often relevant for
+      understanding the proof. Such edges are still dropped as in level
+      1, when the other kinds of edges imply them.</p></li>
+      <li><p><strong>Level 3</strong>: as level 2, but also drops
+      implied ordering edges that come from the formula or from
+      adversary reasoning.</p></li>
+      </ul>
+      <p>The transitive reduction of levels 2 and 3 is skipped when the
+      ordering constraints are cyclic, which can happen in constraint
+      systems that are about to be refuted.</p>
+      <p>In the interactive GUI, the level is selected in the
+      <code>Options</code> menu (<code>Graph simplification off</code>,
+      <code>L1</code>, <code>L2</code> and <code>L3</code>).</p>
+      <p>On the command line, the level for <code>--output-dot</code>
+      and <code>--output-json</code> is set with
+      <code>--graph-simplification</code>, which accepts the values 0 to
+      3 and defaults to 2:</p>
+      <pre><code>tamarin-prover --prove --output-dot=traces.dot --graph-simplification=3 examples/Tutorial.spthy</code></pre>
+      <p>The level is part of the label of each output graph, e.g.,
+      <code>SL3</code> for level 3.</p>
       <h2 id="sec:load-json">Viewing exported JSON graphs in the
       interactive GUI</h2>
       <p>A JSON file produced by <code>--output-json</code> (as
